@@ -1,37 +1,51 @@
 import Image from "next/image";
 
-const services = [
-  { number: "01", image: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=900&q=85", icon: "↗", title: "Business Consultancy", description: "Turn ideas into practical plans, stronger operations and sustainable growth.", items: ["Business plans & feasibility studies", "Strategy & business development", "Proposals, grants & tender support"] },
-  { number: "02", image: "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=900&q=85", icon: "✳", title: "Marketing & Branding", description: "Build a memorable brand and reach the people who matter to your business.", items: ["Brand identity & graphic design", "Digital marketing & social media", "Market research & campaign planning"] },
-  { number: "03", image: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=900&q=85", icon: "⌘", title: "Software & Technology", description: "Make everyday work simpler with thoughtful digital tools and automation.", items: ["Websites & web applications", "Billing, invoicing & expense systems", "CRM, reporting & workflow automation"] },
-  { number: "04", image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=900&q=85", icon: "◫", title: "Research & Analytics", description: "Turn questions and data into clear evidence, insight and better decisions.", items: ["Research design & data analysis", "Monitoring & evaluation", "Statistical reports & dashboards"] },
-  { number: "05", image: "https://images.unsplash.com/photo-1523726491678-bf852e717f6a?auto=format&fit=crop&w=900&q=85", icon: "▤", title: "Creative & Corporate", description: "Communicate with confidence through polished business and campaign materials.", items: ["Company profiles & brochures", "Proposals, reports & presentations", "Event and campaign branding"] },
-  { number: "06", image: "https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=900&q=85", icon: "◎", title: "Business Support", description: "Get reliable support for the work that keeps your organisation moving.", items: ["Documentation & business communications", "Tender documentation support", "Project planning & process improvement"] },
-];
-
 export default function Home() {
-  return <main>
-    <header className="site-header">
-      <a className="brand" href="/" aria-label="Johden home"><Image src="/johden-logo.svg" alt="Johden Business Consultancy Services — For Academics and Business Solutions" width={310} height={105} priority /></a>
-      <nav className="desktop-nav" aria-label="Main navigation"><a href="/services">Services</a><a href="/about">About Johden</a><a href="/technology">Technology</a><a href="/contact">Contact</a></nav>
-      <a className="button button-primary header-cta" href="https://wa.me/256702846597" target="_blank" rel="noopener noreferrer">Let’s talk <span>↗</span></a>
-    </header>
-    <section className="hero">
-      <div className="hero-content">
-        <span className="eyebrow"><i /> YOUR PARTNER IN PROGRESS</span>
-        <h1>Good ideas deserve <em>great execution.</em></h1>
-        <p className="hero-lede">Practical academic and business solutions to help you move forward with clarity, confidence and the right support.</p>
-        <div className="hero-actions"><a className="button button-primary" href="/services">Explore our services <span>↗</span></a><a className="button button-secondary" href="/contact">Talk to an expert</a></div>
-        <div className="hero-assurance"><span className="assurance-icon">✓</span><p><strong>One partner. Multiple capabilities.</strong><br/>Consultancy, creativity and technology working together.</p></div>
-      </div>
-      <div className="hero-visual"><div className="hero-visual-shape"><div className="hero-photo-caption"><span>IDEAS INTO ACTION</span><strong>Let’s build<br/>something meaningful.</strong></div><div className="hero-visual-logo"><Image src="/johden-logo.svg" alt="Johden brand mark" width={390} height={132} priority /></div><span className="visual-arc arc-a"/><span className="visual-arc arc-b"/></div><div className="hero-note note-top"><span className="note-symbol">✳</span><div><small>YOUR NEXT CHAPTER</small><strong>Starts with a plan.</strong></div></div><div className="hero-note note-bottom"><span className="note-symbol orange">↗</span><div><small>BUILT AROUND YOU</small><strong>Practical. Personal. Purposeful.</strong></div></div><span className="visual-caption">CLARITY <b>•</b> CREATIVITY <b>•</b> PROGRESS</span></div>
-    </section>
-    <section className="section services-section" id="services"><div className="section-heading"><div><span className="eyebrow dark"><i/> WHAT WE DO</span><h2>Support for the work<br/><em>that matters to you.</em></h2></div><p>Whether you are developing an idea, growing an organisation or looking for specialist support, we help you find a clear way forward.</p></div><div className="services-grid">{services.map(service => <article className="service-card" key={service.number}><div className="service-image" role="img" aria-label={service.title} style={{ backgroundImage: "url(" + service.image + ")" }}><span>{service.number}</span></div><div className="service-card-top"><span className="service-number">{service.number}</span><span className="service-icon">{service.icon}</span></div><h3>{service.title}</h3><p>{service.description}</p><ul>{service.items.map(item => <li key={item}><span>✓</span>{item}</li>)}</ul><a className="card-link" href={"/contact?service=" + encodeURIComponent(service.title)}>Discuss this service <span>↗</span></a></article>)}</div><div className="section-bottom"><p>Not sure which service is right for you?</p><a className="text-link" href="/contact">Tell us what you’re trying to achieve <span>→</span></a></div></section>
-    <section className="about-band"><div className="about-badge about-photo" role="img" aria-label="Business professionals collaborating"><span>YOUR IDEAS.<br/>OUR SHARED FOCUS.</span></div><div className="about-band-copy"><span className="eyebrow"><i/> THE JOHDEN APPROACH</span><h2>Understand first.<br/><em>Deliver with purpose.</em></h2><p>Good solutions start by listening. We take time to understand your goals, your context and what success looks like — then work with you on practical next steps.</p><a className="button button-light" href="/about">Get to know Johden <span>↗</span></a></div><div className="approach-list"><div><span>01</span><p><strong>Listen and understand</strong><small>Your goals set the direction.</small></p></div><div><span>02</span><p><strong>Plan with clarity</strong><small>Agree on scope and outcomes.</small></p></div><div><span>03</span><p><strong>Deliver collaboratively</strong><small>Useful work, built around you.</small></p></div></div></section>
-    <section className="section process-section"><div className="section-heading"><div><span className="eyebrow dark"><i/> HOW WE WORK</span><h2>A clear path from<br/><em>challenge to progress.</em></h2></div><p>No unnecessary complexity. Just a straightforward, collaborative process that keeps your priorities at the centre.</p></div><div className="process-grid"><article><span>01</span><h3>Tell us your goal</h3><p>Share your idea, challenge or opportunity through a short inquiry.</p></article><article><span>02</span><h3>Get a clear plan</h3><p>We discuss your needs, agree on scope and recommend a practical approach.</p></article><article><span>03</span><h3>Move forward</h3><p>Work together with clear deliverables and a shared understanding of next steps.</p></article></div></section>
-    <section className="cta-section"><div><span className="eyebrow"><i/> LET’S START A CONVERSATION</span><h2>What would progress<br/><em>look like for you?</em></h2><p>Tell us where you want to go. We’ll help you explore a practical way to get there.</p></div><div className="cta-actions"><a className="button button-light" href="/contact">Make an inquiry <span>↗</span></a><a className="cta-secondary" href="/contact">Request a consultation <span>→</span></a></div><div className="cta-ring ring-one"/><div className="cta-ring ring-two"/></section>
-    <div className="footer-service-strip" aria-label="Johden core service areas"><span>BUSINESS STRATEGY</span><i aria-hidden="true"/><span>BRAND &amp; MARKETING</span><i aria-hidden="true"/><span>SOFTWARE SOLUTIONS</span><i aria-hidden="true"/><span>RESEARCH &amp; INSIGHT</span></div>
-    <footer className="site-footer"><div className="footer-main"><a className="footer-logo" href="/"><Image src="/johden-logo.svg" alt="Johden Business Consultancy Services" width={280} height={95}/></a><p>For academics and business solutions.<br/>Practical expertise for meaningful progress.</p><div className="footer-links"><a href="/services">Services</a><a href="/about">About</a><a href="/technology">Technology</a><a href="/contact">Contact</a></div></div><div className="footer-bottom"><span>© {new Date().getFullYear()} Johden Business Consultancy Services. All rights reserved.</span><span>Business. Creativity. Technology.</span></div></footer>
-    <a className="floating-contact" href="https://wa.me/256702846597" target="_blank" rel="noopener noreferrer" aria-label="Chat with Johden on WhatsApp"><span>↗</span><b>Talk to us</b></a>
-  </main>;
+  return (
+    <main className="home-page">
+      <header className="site-header">
+        <a className="brand" href="/" aria-label="Johden home"><Image src="/johden-logo.svg" alt="Johden Business Consultancy Services" width={310} height={105} priority /></a>
+        <nav className="desktop-nav" aria-label="Main navigation">
+          <a href="/services">Services</a><a href="/about">About Johden</a><a href="/technology">Technology</a><a href="/contact">Contact</a>
+        </nav>
+        <a className="button button-primary header-cta" href="https://wa.me/256702846597" target="_blank" rel="noopener noreferrer">Let’s talk <span>↗</span></a>
+      </header>
+
+      <section className="hero home-hero">
+        <div className="hero-content">
+          <span className="eyebrow"><i /> YOUR PARTNER IN PROGRESS</span>
+          <h1>Good ideas deserve <em>great execution.</em></h1>
+          <p className="hero-lede">Practical academic and business solutions to help you move forward with clarity, confidence and the right support.</p>
+          <div className="hero-actions"><a className="button button-primary" href="/services">Explore our services <span>↗</span></a><a className="button button-secondary" href="/contact">Make an inquiry</a></div>
+          <div className="hero-assurance"><span className="assurance-icon">✓</span><p><strong>One partner. Multiple capabilities.</strong><br/>Consultancy, creativity and technology working together.</p></div>
+        </div>
+        <div className="hero-visual">
+          <div className="hero-visual-shape">
+            <div className="hero-photo-caption"><span>IDEAS INTO ACTION</span><strong>Let’s build<br/>something meaningful.</strong></div>
+            <div className="hero-visual-logo"><Image src="/johden-logo.svg" alt="Johden brand mark" width={390} height={132} priority /></div>
+            <span className="visual-arc arc-a"/><span className="visual-arc arc-b"/>
+          </div>
+          <div className="hero-note note-top"><span className="note-symbol">✳</span><div><small>YOUR NEXT CHAPTER</small><strong>Starts with a plan.</strong></div></div>
+          <div className="hero-note note-bottom"><span className="note-symbol orange">↗</span><div><small>BUILT AROUND YOU</small><strong>Practical. Personal. Purposeful.</strong></div></div>
+          <span className="visual-caption">CLARITY <b>•</b> CREATIVITY <b>•</b> PROGRESS</span>
+        </div>
+      </section>
+
+      <section className="home-intro">
+        <span className="eyebrow dark"><i/> A GOOD PLACE TO START</span>
+        <h2>What are you looking to <em>achieve?</em></h2>
+        <p>Explore our services to find the right support for your organisation, your research or your next big idea. We’ll help you turn your goals into practical next steps.</p>
+        <div className="home-intro-actions"><a className="button button-primary" href="/services">View all services <span>↗</span></a><a className="text-link" href="/about">Get to know Johden <span>→</span></a></div>
+      </section>
+
+      <section className="home-contact-band">
+        <div><span className="eyebrow"><i/> READY WHEN YOU ARE</span><h2>Let’s talk about<br/><em>what comes next.</em></h2><p>Have a project in mind or need a little guidance? Start a conversation with our team.</p></div>
+        <div className="home-contact-actions"><a className="button button-light" href="/contact">Make an inquiry <span>↗</span></a><a className="home-whatsapp" href="https://wa.me/256702846597" target="_blank" rel="noopener noreferrer">Or chat with us on WhatsApp ↗</a></div>
+      </section>
+
+      <div className="footer-service-strip" aria-label="Johden core service areas"><span>BUSINESS STRATEGY</span><i aria-hidden="true"/><span>BRAND &amp; MARKETING</span><i aria-hidden="true"/><span>SOFTWARE SOLUTIONS</span><i aria-hidden="true"/><span>RESEARCH &amp; INSIGHT</span></div>
+      <footer className="site-footer"><div className="footer-bottom"><span>© {new Date().getFullYear()} Johden Business Consultancy Services. All rights reserved.</span></div></footer>
+      <a className="floating-contact" href="https://wa.me/256702846597" target="_blank" rel="noopener noreferrer" aria-label="Chat with Johden on WhatsApp"><span>↗</span><b>Talk to us</b></a>
+    </main>
+  );
 }
