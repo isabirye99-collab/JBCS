@@ -127,14 +127,21 @@ export async function POST(request: NextRequest) {
     "other",
   ];
 
+  const validExpenseDate =
+    /^\d{4}-\d{2}-\d{2}$/.test(expenseDate) &&
+    !Number.isNaN(Date.parse(`${expenseDate}T00:00:00Z`)) &&
+    new Date(`${expenseDate}T00:00:00Z`).toISOString().slice(0, 10) === expenseDate;
+
   if (
-    !/^\d{4}-\d{2}-\d{2}$/.test(expenseDate) ||
+    !validExpenseDate ||
     !category ||
     !description ||
     !Number.isFinite(amount) ||
     amount <= 0 ||
+    amount > 9_999_999_999_999_999 ||
     !Number.isFinite(exchangeRate) ||
     exchangeRate <= 0 ||
+    exchangeRate > 999_999_999_999 ||
     !/^[A-Z]{3}$/.test(currency) ||
     !allowedMethods.includes(paymentMethod)
   ) {
