@@ -11,6 +11,7 @@ export default function Home() {
           <a href="/about">About</a>
           <a href="/technology">Technology</a>
           <a href="/contact">Contact</a>
+          <a href="/feedback">Feedback</a>
         </nav>
         <a className="button button-primary header-cta" href="https://wa.me/256702846597" target="_blank" rel="noopener noreferrer">Let’s talk <span>↗</span></a>
       </header>
@@ -38,13 +39,6 @@ export default function Home() {
         <div className="home-intro-actions"><a className="button button-primary" href="/services">View all services <span>↗</span></a><a className="text-link" href="/about">Get to know Johden <span>→</span></a></div>
       </section>
 
-      <section className="johden-testimonials">
-        <div className="johden-testimonials-heading"><span className="eyebrow dark"><i/> CLIENT FEEDBACK</span><h2>What clients appreciate about <em>Johden</em></h2><p>Feedback shared on our previous website highlights the value of practical guidance and personal support.</p></div>
-        <div className="johden-testimonial-grid">
-          <blockquote><span className="quote-mark">“</span><p>I can't thank JOHDEN CONSULTANCY SERVICES enough for their exceptional services. We needed funding for our expansion plans, and the team crafted a business plan and grant proposal that gave us a clear roadmap for growth. Their dedication, expertise and attention to detail were truly impressive.</p><footer>Business planning and grant proposal client</footer></blockquote>
-          <blockquote><span className="quote-mark">“</span><p>JOHDEN CONSULTANCY SERVICES played a pivotal role in my academic journey. Their assistance with my research proposal and dissertation was invaluable. They helped refine my ideas and guided me through proposal writing and data analysis with patience and commitment to academic excellence.</p><footer>Research and dissertation support client</footer></blockquote>
-        </div>
-      </section>
       <section className="home-contact-band">
         <div><span className="eyebrow"><i/> READY WHEN YOU ARE</span><h2>Let’s talk about<br/><em>what comes next.</em></h2><p>Have a project in mind or need a little guidance? Start a conversation with our team.</p></div>
         <div className="home-contact-actions"><a className="button button-light" href="/contact">Make an inquiry <span>↗</span></a><a className="home-whatsapp" href="https://wa.me/256702846597" target="_blank" rel="noopener noreferrer">Or chat with us on WhatsApp ↗</a></div>
