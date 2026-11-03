@@ -14,6 +14,7 @@ export default function Page() {
           <a href="/about">About</a>
           <a href="/technology">Technology</a>
           <a href="/contact">Contact</a>
+          <a href="/feedback">Feedback</a>
         </nav>
         <a className="button button-primary header-cta" href="https://wa.me/256702846597" target="_blank" rel="noopener noreferrer">Let’s talk ↗</a>
       </header>
