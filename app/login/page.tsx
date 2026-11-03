@@ -7,7 +7,7 @@ import Image from "next/image";
 type Mode = "login" | "signup";
 
 export default function LoginPage() {
-  const [mode, setMode] = useState<Mode>("signup");
+  const [mode, setMode] = useState<Mode>("login");
   const [companyName, setCompanyName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
