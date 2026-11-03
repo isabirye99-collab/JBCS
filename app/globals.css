@@ -26,3 +26,86 @@
 @media(max-width:720px){.hero-visual-logo{margin-bottom:28px}.service-image{height:175px}.about-photo{min-height:220px}}
 
 .inner-cards article{padding:0 0 23px;overflow:hidden}.inner-cards article>b,.inner-cards article h2,.inner-cards article p{margin-left:22px;margin-right:22px}.inner-cards article>b{display:block;margin-top:17px}.inner-cards article h2{margin-top:8px}.inner-card-photo{height:155px;background-size:cover;background-position:center;position:relative}.inner-card-photo:after{content:'';position:absolute;inset:0;background:linear-gradient(0deg,rgba(39,35,39,.32),rgba(243,25,45,.06))}.inner-wide-photo{height:190px;margin:-28px -28px 22px;background-size:cover;background-position:center;position:relative}.inner-wide-photo:after{content:'';position:absolute;inset:0;background:linear-gradient(0deg,rgba(39,35,39,.25),transparent)}@media(max-width:720px){.inner-card-photo{height:190px}.inner-wide-photo{margin:-24px -24px 20px}}
+
+/* Global typography, spacing and responsive page alignment refinement */
+body{font-size:16px;line-height:1.75}
+.site-header{padding-left:7%;padding-right:7%;gap:30px}
+.brand img{width:275px}
+.desktop-nav{font-size:14px;gap:clamp(20px,2.7vw,38px)}
+.button{font-size:14px;padding:14px 21px}
+.hero{padding-top:84px;padding-bottom:88px;gap:7%}
+.hero h1{font-size:clamp(48px,5.2vw,72px);line-height:1.08}
+.hero-lede{font-size:18px;line-height:1.85}
+.eyebrow{font-size:12px;letter-spacing:.13em}
+.hero-assurance p{font-size:13px}.hero-assurance strong{font-size:14px}
+.section{padding-top:105px;padding-bottom:105px}
+.section h2,.about-band h2,.cta-section h2{font-size:clamp(40px,4.2vw,56px)}
+.section-heading>p{font-size:15px;line-height:1.9}
+.service-card h3{font-size:21px;line-height:1.35}
+.service-card>p,.process-grid p{font-size:14px;line-height:1.85}
+.service-card li{font-size:13px;line-height:1.65}
+.card-link,.text-link{font-size:13px}
+.service-image{height:170px}
+.about-band-copy>p,.cta-section p{font-size:15px;line-height:1.9}
+.approach-list strong{font-size:14px}.approach-list small{font-size:12px}
+.process-grid h3{font-size:21px}.process-grid article>span{font-size:13px}
+.inner-hero{padding:88px 8% 70px}
+.inner-hero h1{font-size:clamp(48px,5vw,68px);line-height:1.1;margin:24px 0}
+.inner-hero>p{font-size:17px;line-height:1.9}
+.inner-content{padding:65px 8% 100px}
+.inner-cards{gap:24px}
+.inner-cards h2,.inner-two h2{font-size:24px;line-height:1.35}
+.inner-cards p,.inner-two p{font-size:15px;line-height:1.85}
+.inner-card-photo{height:190px}
+.inner-two article{padding:30px}
+.inner-wide-photo{height:230px}
+.site-footer{padding:40px 7% 22px}
+.footer-main{display:grid;grid-template-columns:minmax(210px,1fr) minmax(210px,1fr) auto;align-items:center;gap:30px}
+.footer-logo img{width:260px}
+.footer-main>p{font-size:14px;line-height:1.8}
+.footer-links{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:16px 22px;font-size:13px}
+.footer-bottom{font-size:11px}
+.contact-layout{padding-top:80px;padding-bottom:100px}
+.contact-side h2{font-size:38px}
+.contact-side>p,.form-intro>p{font-size:14px}
+.contact-promise strong{font-size:14px}.contact-promise p,.contact-help p{font-size:13px}
+.form-tab{font-size:14px}.form-intro h2{font-size:32px}
+.form-grid label{font-size:13px}
+.form-grid input,.form-grid select,.form-grid textarea{font-size:14px;padding:14px}
+.privacy-note,.form-notice{font-size:12px}
+@media(max-width:1000px){.brand img{width:230px}.desktop-nav{font-size:12px;gap:16px}.footer-main{grid-template-columns:1fr 1fr}.footer-links{grid-column:1/-1;justify-content:flex-start}.inner-hero{padding-top:65px}}
+@media(max-width:720px){
+ body{font-size:15px}
+ .site-header{padding:12px 5%;gap:12px}
+ .brand img{width:185px}
+ .desktop-nav{font-size:13px;gap:22px}
+ .header-cta{font-size:12px;padding:10px 12px}
+ .hero{padding:55px 6% 60px}
+ .hero h1{font-size:clamp(42px,10.5vw,58px)}
+ .hero-lede{font-size:16px}
+ .section{padding:70px 6%}
+ .section h2,.about-band h2,.cta-section h2{font-size:clamp(35px,8.5vw,46px)}
+ .section-heading>p{font-size:14px}
+ .service-image{height:190px}
+ .service-card h3{font-size:21px}
+ .service-card>p{font-size:14px}
+ .service-card li{font-size:13px}
+ .inner-hero{padding:55px 6% 42px}
+ .inner-hero h1{font-size:clamp(40px,10vw,54px)}
+ .inner-hero>p{font-size:15px}
+ .inner-content{padding:38px 6% 65px}
+ .inner-cards h2,.inner-two h2{font-size:22px}
+ .inner-cards p,.inner-two p{font-size:14px}
+ .inner-card-photo{height:200px}
+ .inner-two article{padding:24px}
+ .inner-wide-photo{height:200px}
+ .footer-main{display:flex;align-items:flex-start;flex-direction:column;gap:15px}
+ .footer-logo img{width:220px}
+ .footer-main>p{font-size:13px}
+ .footer-links{display:flex;justify-content:flex-start;gap:12px 18px;font-size:13px}
+ .footer-bottom{font-size:10px;gap:5px}
+ .contact-layout{padding:42px 5% 65px}
+ .contact-side h2{font-size:32px}
+ .form-grid label{font-size:12px}
+ .form-grid input,.form-grid select,.form-grid textarea{font-size:14px}
+}
