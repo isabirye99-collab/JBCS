@@ -29,6 +29,12 @@ async function getWorkspaceId(url: string, key: string) {
   return Array.isArray(rows) && rows.length === 1 ? rows[0].id : null;
 }
 
+function currentBusinessDate() {
+  const parts = new Intl.DateTimeFormat("en-CA", { timeZone: "Africa/Kampala", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(new Date());
+  const get = (type: string) => parts.find((part) => part.type === type)?.value || "";
+  return get("year") + "-" + get("month") + "-" + get("day");
+}
+
 function totalsByCurrency(
   rows: Record<string, unknown>[],
   field: string
@@ -159,7 +165,7 @@ export async function GET(request: NextRequest) {
     const overdueInvoices = outstandingInvoices.filter(
       (invoice) =>
         invoice.due_date &&
-        String(invoice.due_date) < new Date().toISOString().slice(0, 10) &&
+        String(invoice.due_date) < currentBusinessDate() &&
         !["draft", "void"].includes(String(invoice.status))
     );
 
