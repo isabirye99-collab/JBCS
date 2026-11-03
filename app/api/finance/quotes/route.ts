@@ -50,19 +50,35 @@ export async function GET() {
       return error("JBCS workspace not found or inactive.", 503);
     }
 
-    const response = await fetch(
-      `${url}/rest/v1/quotes?workspace_id=eq.${encodeURIComponent(workspaceId)}&select=id,quote_number,contact_id,issue_date,valid_until,currency,exchange_rate,subtotal,tax_amount,total,status,notes,created_at,business_contacts(name),document_items(id,description,quantity,unit_price,tax_rate,line_total)&order=created_at.desc`,
-      {
-        headers: { apikey: key, Authorization: `Bearer ${key}` },
-        cache: "no-store",
-      }
-    );
+    const quoteUrl = ${url}/rest/v1/quotes?workspace_id=eq.${encodeURIComponent(workspaceId)}&select=id,quote_number,contact_id,issue_date,valid_until,currency,exchange_rate,subtotal,tax_amount,total,status,notes,created_at,business_contacts(name),document_items(id,description,quantity,unit_price,tax_rate,line_total)&order=created_at.desc;
+    const quotes: Record<string, unknown>[] = [];
+    const pageSize = 500;
 
-    if (!response.ok) {
-      return error("Unable to load quotations.", 502);
+    for (let offset = 0; ; offset += pageSize) {
+      const response = await fetch(quoteUrl, {
+        headers: {
+          apikey: key,
+          Authorization: `Bearer ${key}`,
+          "Range-Unit": "items",
+          Range: `${offset}-${offset + pageSize - 1}`,
+        },
+        cache: "no-store",
+      });
+
+      if (!response.ok) {
+        return error("Unable to load quotations.", 502);
+      }
+
+      const rows = await response.json();
+      if (!Array.isArray(rows)) {
+        return error("Unexpected quotation data from the database.", 502);
+      }
+
+      quotes.push(...rows);
+      if (rows.length < pageSize) break;
     }
 
-    return NextResponse.json({ quotes: await response.json() });
+    return NextResponse.json({ quotes });
   } catch {
     return error("Unable to connect to the finance database.", 502);
   }
