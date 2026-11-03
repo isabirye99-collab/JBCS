@@ -35,6 +35,7 @@ export default function InvoicingPage() {
           <a className="button button-secondary" href="#how-it-works">See how it works</a>
         </div>
         <div className="invoice-product-trust"><span>✓ 14-day trial</span><span>✓ Multi-currency records</span><span>✓ Private business workspace</span></div>
+        <div className="inner-hero-visual invoicing-hero-visual" role="img" aria-label="Professional business team reviewing invoices and financial records" style={{backgroundImage:"linear-gradient(180deg,rgba(38,35,38,.02) 20%,rgba(38,35,38,.78) 100%),url(https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1400&q=90)"}}><div className="inner-hero-visual-caption"><span>JOHDEN BUSINESS TOOLS</span><strong>Clarity for every business decision.</strong></div></div>
       </section>
 
       <section className="inner-content" id="how-it-works">
