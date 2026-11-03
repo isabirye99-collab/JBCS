@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { getClinicContext } from "@/lib/clinic-context";
+import { getClinicContext } from "@/lib/clinic-context";\nimport PatientRegistrationForm from "@/components/clinic/PatientRegistrationForm";
 
 export const dynamic = "force-dynamic";
 
@@ -74,6 +74,10 @@ export default async function ClinicWorkspacePage() {
         ].map(([label, value, detail]) => <article key={String(label)} style={{ background: "#fff", border: "1px solid #e7eaf0", borderRadius: 14, padding: 20 }}><div style={{ color: "#687080", fontSize: 12 }}>{label}</div><strong style={{ display: "block", fontSize: 32, margin: "12px 0 6px" }}>{value}</strong><small style={{ color: "#87909e" }}>{detail}</small></article>)}
       </section>
       <section id="patients" style={{ marginTop: 24, background: "#fff", border: "1px solid #e7eaf0", borderRadius: 14, padding: 22 }}>
+        <h2 style={{ marginTop: 0 }}>Register a patient</h2>
+        <p style={{ color: "#687080" }}>Create a patient record for Johnpaul Medical Center. A patient number is generated automatically.</p>
+        <PatientRegistrationForm />
+        <hr style={{ border: 0, borderTop: "1px solid #e7eaf0", margin: "26px 0" }} />
         <h2 style={{ marginTop: 0 }}>Recent patient registrations</h2>
         {patients.length ? <div style={{ overflowX: "auto" }}><table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}><thead><tr>{["Patient number","Name","Phone","Registered"].map(x=><th key={x} style={{ padding: 11, borderBottom: "1px solid #e7eaf0" }}>{x}</th>)}</tr></thead><tbody>{patients.map(p=><tr key={p.id}>{[p.patient_number,p.full_name,p.phone||"—",String(p.created_at||"").slice(0,10)].map((x,i)=><td key={i} style={{ padding: 11, borderBottom: "1px solid #f0f1f4" }}>{x}</td>)}</tr>)}</tbody></table></div> : <p style={{ color: "#687080" }}>No patient records are available yet in this workspace.</p>}
       </section>
