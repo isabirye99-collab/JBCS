@@ -94,13 +94,20 @@ export async function POST(request: NextRequest) {
     "other",
   ];
 
+  const validPaymentDate =
+    /^\d{4}-\d{2}-\d{2}$/.test(paymentDate) &&
+    !Number.isNaN(Date.parse(`${paymentDate}T00:00:00Z`)) &&
+    new Date(`${paymentDate}T00:00:00Z`).toISOString().slice(0, 10) === paymentDate;
+
   if (
     !/^[0-9a-f-]{36}$/i.test(invoiceId) ||
-    !/^\d{4}-\d{2}-\d{2}$/.test(paymentDate) ||
+    !validPaymentDate ||
     !Number.isFinite(amount) ||
     amount <= 0 ||
+    amount > 9_999_999_999_999_999 ||
     !Number.isFinite(exchangeRate) ||
     exchangeRate <= 0 ||
+    exchangeRate > 999_999_999_999 ||
     !allowedMethods.includes(method)
   ) {
     return fail("Enter a valid invoice, date, amount, exchange rate and payment method.");
