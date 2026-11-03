@@ -42,6 +42,7 @@ export default function FeedbackPage() {
           <a href="/about">About</a>
           <a href="/services">Services</a>
           <a href="/technology">Technology</a>
+          <a href="/invoicing">Invoicing</a>
           <a href="/contact">Contact</a>
           <a href="/feedback" aria-current="page">Feedback</a>
         </nav>
