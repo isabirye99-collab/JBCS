@@ -123,7 +123,8 @@ export async function POST(request: NextRequest) {
 
   const validDate = (value: string) =>
     /^\d{4}-\d{2}-\d{2}$/.test(value) &&
-    !Number.isNaN(Date.parse(`${value}T00:00:00Z`));
+    !Number.isNaN(Date.parse(`${value}T00:00:00Z`)) &&
+    new Date(`${value}T00:00:00Z`).toISOString().slice(0, 10) === value;
 
   if (issueDate && !validDate(issueDate)) {
     return NextResponse.json(
@@ -193,8 +194,10 @@ export async function POST(request: NextRequest) {
       !description ||
       !Number.isFinite(quantity) ||
       quantity <= 0 ||
+      quantity > 1_000_000_000 ||
       !Number.isFinite(unitPrice) ||
       unitPrice < 0 ||
+      unitPrice > 1_000_000_000_000 ||
       !Number.isFinite(taxRate) ||
       taxRate < 0 ||
       taxRate > 100
@@ -207,6 +210,14 @@ export async function POST(request: NextRequest) {
 
     const base = Math.round(quantity * unitPrice * 100) / 100;
     const tax = Math.round(base * taxRate) / 100;
+
+    if (!Number.isFinite(base) || !Number.isFinite(tax) || !Number.isFinite(base + tax)) {
+      return NextResponse.json(
+        { error: "An invoice item amount is too large." },
+        { status: 400 }
+      );
+    }
+
     cleanItems.push({
       description,
       quantity,
@@ -225,6 +236,13 @@ export async function POST(request: NextRequest) {
   ) / 100;
 
   const taxAmount = Math.round((total - subtotal) * 100) / 100;
+
+  if (![subtotal, total, taxAmount].every(Number.isFinite)) {
+    return NextResponse.json(
+      { error: "The invoice total is too large." },
+      { status: 400 }
+    );
+  }
 
   try {
     const workspaceId = await getWorkspaceId(url, key);
