@@ -33,8 +33,8 @@ export async function getWorkspaceForUser(userId: string) {
   const { url, serviceKey } = supabaseConfig();
   if (!url || !serviceKey) return null;
   const response = await fetch(
-    `${url}/rest/v1/workspace_members?user_id=eq.${encodeURIComponent(userId)}&is_active=eq.true&select:workspace_id,role,business_workspaces(id,name,slug,base_currency,is_active),workspace_subscriptions(status,billing_interval,billing_currency,trial_ends_at,current_period_ends_at)&limit=10`.replace("select:","select="),
-    { headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey} ` }, cache: "no-store" }
+    `${url}/rest/v1/workspace_members?user_id=eq.${encodeURIComponent(userId)}&is_active=eq.true&select:workspace_id,role,business_workspaces(id,name,slug,base_currency,is_active,workspace_subscriptions(status,billing_interval,billing_currency,trial_ends_at,current_period_ends_at))&limit=10`.replace("select:","select="),
+    { headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` }, cache: "no-store" }
   );
   if (!response.ok) return null;
   const rows = await response.json();
