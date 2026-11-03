@@ -65,7 +65,6 @@ export async function POST(request: import("next/server").NextRequest) {
     cache: "no-store",
   });
   if (!rpc.ok) {
-    const detail = await rpc.text().catch(() => "");
     if (rpc.status === 400 || rpc.status === 404) return NextResponse.json({ error: "Invoice details were rejected. Confirm the customer and item values, then try again." }, { status: 400 });
     return NextResponse.json({ error: "Could not create invoice atomically. No partial invoice was saved." }, { status: 502 });
   }
