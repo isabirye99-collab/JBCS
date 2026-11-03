@@ -47,7 +47,7 @@ export async function GET() {
       );
     }
 
-    const invoiceUrl = ${url}/rest/v1/invoices?workspace_id=eq.${encodeURIComponent(workspaceId)}&select=id,invoice_number,contact_id,issue_date,due_date,currency,exchange_rate,subtotal,tax_amount,total,amount_paid,status,notes,created_at,business_contacts(name),document_items(id,description,quantity,unit_price,tax_rate,line_total)&order=created_at.desc;
+    const invoiceUrl = `${url}/rest/v1/invoices?workspace_id=eq.${encodeURIComponent(workspaceId)}&select=id,invoice_number,contact_id,issue_date,due_date,currency,exchange_rate,subtotal,tax_amount,total,amount_paid,status,notes,created_at,business_contacts(name),document_items(id,description,quantity,unit_price,tax_rate,line_total)&order=created_at.desc`;
     const invoices: Record<string, unknown>[] = [];
     const pageSize = 500;
 
