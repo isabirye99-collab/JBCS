@@ -2,17 +2,17 @@ import type { Metadata } from "next";
 import Image from "next/image";
 
 export const metadata: Metadata = {
-  title: "Online Invoicing & Billing Software",
-  description: "Create professional invoices, manage customers and expenses, and track payments with Johden's business billing platform.",
+  title: "Johden Business Tools | Invoicing for Growing Businesses",
+  description: "Organise customers, prepare draft invoices, print professional invoice PDFs and record expenses in one business workspace.",
 };
 
-const features = [
-  { number: "01", title: "Professional invoices", description: "Prepare clear, branded invoices with line items, taxes, due dates and multiple currencies." },
-  { number: "02", title: "Customer management", description: "Keep client details organised and find the information you need without scattered spreadsheets." },
-  { number: "03", title: "Expenses and payments", description: "Record business expenses, monitor what customers owe and follow payment progress." },
-  { number: "04", title: "Recurring billing", description: "Set up repeat invoice schedules and review drafts before they are sent to customers." },
-  { number: "05", title: "Reports and insights", description: "Understand outstanding balances, revenue activity and business performance in one workspace." },
-  { number: "06", title: "Multiple currencies", description: "Work with different currencies, with UGX as the default base currency." },
+const available = [
+  { number: "01", title: "Keep customer details together", description: "Create a customer list with names and email addresses, ready to use when preparing an invoice." },
+  { number: "02", title: "Prepare clear invoices", description: "Choose a customer, add line items, quantity, price, tax and a due date, then save your invoice as a draft." },
+  { number: "03", title: "Print or save as PDF", description: "Open a draft invoice in a print-friendly view and save a copy as PDF for your records or to share yourself." },
+  { number: "04", title: "Record everyday expenses", description: "Log expense categories, amounts, dates, payment methods and currencies in your private workspace." },
+  { number: "05", title: "Work across currencies", description: "Prepare records in UGX, USD, EUR, GBP, KES and TZS. Subscription billing preference is selected separately." },
+  { number: "06", title: "A separate workspace for your business", description: "Your company records are tied to your own workspace membership rather than another customer's workspace." },
 ];
 
 export default function InvoicingPage() {
@@ -23,27 +23,27 @@ export default function InvoicingPage() {
         <nav className="desktop-nav" aria-label="Main navigation">
           <a href="/">Home</a><a href="/services">Services</a><a href="/technology">Technology</a><a href="/invoicing" aria-current="page">Invoicing</a><a href="/contact">Contact</a>
         </nav>
-        <a className="button button-secondary header-cta" href="/login">Sign in / Create account</a>
+        <a className="button button-secondary header-cta" href="/login">Sign in</a>
       </header>
 
       <section className="inner-hero invoice-product-hero">
-        <span className="eyebrow dark"><i /> JOH DEN BUSINESS TOOLS</span>
-        <h1>Invoices, expenses and payments. <em>All in one place.</em></h1>
-        <p>Spend less time chasing paperwork and more time running your business. Johden's billing workspace is being developed for businesses, consultants and growing teams.</p>
+        <span className="eyebrow dark"><i /> JOHDEN BUSINESS TOOLS</span>
+        <h1>Less paperwork. <em>More clarity.</em></h1>
+        <p>Keep your customers, draft invoices and everyday expenses organised in one place. Johden Business Tools is designed for consultants, small businesses and growing teams that want a simpler finance routine.</p>
         <div className="hero-actions">
-          <a className="button button-primary" href="/login">Get started <span>↗</span></a>
-          <a className="button button-secondary" href="#features">Explore features</a>
+          <a className="button button-primary" href="/login">Create your workspace <span>↗</span></a>
+          <a className="button button-secondary" href="#how-it-works">See how it works</a>
         </div>
-        <div className="invoice-product-trust"><span>✓ Multi-currency workflows</span><span>✓ Customer and supplier records</span><span>✓ Invoice and expense tracking</span></div>
+        <div className="invoice-product-trust"><span>✓ 14-day trial</span><span>✓ Multi-currency records</span><span>✓ Private business workspace</span></div>
       </section>
 
-      <section className="inner-content" id="features">
+      <section className="inner-content" id="how-it-works">
         <div className="section-heading">
-          <div><span className="eyebrow dark">BUILT FOR EVERYDAY BUSINESS</span><h2>Manage the money side of <em>your work.</em></h2></div>
-          <p>Tools for the daily financial tasks that keep a business moving, designed to grow with your needs.</p>
+          <div><span className="eyebrow dark">A SIMPLE PLACE TO START</span><h2>Your everyday finance tasks, <em>in one workflow.</em></h2></div>
+          <p>Start with the essentials and build a reliable record of customers, invoices and expenses as your business grows.</p>
         </div>
         <div className="invoice-feature-grid">
-          {features.map((feature) => <article className="invoice-feature-card" key={feature.number}>
+          {available.map((feature) => <article className="invoice-feature-card" key={feature.number}>
             <span className="invoice-feature-number">{feature.number}</span>
             <h3>{feature.title}</h3><p>{feature.description}</p>
           </article>)}
@@ -51,18 +51,18 @@ export default function InvoicingPage() {
       </section>
 
       <section className="invoice-product-band">
-        <div><span className="eyebrow"><i /> SIMPLE WORKFLOWS, BETTER VISIBILITY</span><h2>Your business finances, <em>with more clarity.</em></h2><p>Prepare invoices, keep an eye on outstanding balances and organise routine finance work in a dedicated workspace.</p></div>
-        <a className="button button-light" href="/login">Join the platform <span>↗</span></a>
+        <div><span className="eyebrow"><i /> GET STARTED AT YOUR OWN PACE</span><h2>Set up your business workspace <em>in a few steps.</em></h2><p>Create an account, confirm your email if requested, and sign in to add your first customer. A 14-day trial is planned for eligible new workspaces.</p></div>
+        <a className="button button-light" href="/login">Create account <span>↗</span></a>
       </section>
 
       <section className="invoice-access-section" id="account-access">
-        <div><span className="eyebrow dark"><i /> YOUR BUSINESS WORKSPACE</span><h2>Ready to manage your <em>invoicing?</em></h2><p>Create a secure account for your company, receive a 14-day trial, and prepare for annual billing in UGX or USD. Paid subscription checkout is being completed separately.</p></div>
+        <div><span className="eyebrow dark"><i /> CLEAR ABOUT WHAT'S READY</span><h2>Start with the essentials. <em>Grow from there.</em></h2><p>Customer records, draft invoice creation, print/PDF and expense recording are the initial workflows. Automated email delivery, online payment collection, recurring invoices and paid subscription checkout are not yet enabled.</p></div>
         <div className="invoice-access-card">
-          <h3>Access options</h3>
-          <p>Create a new business workspace or sign in to an existing one. Your workspace is separated from Johden internal operations.</p>
-          <a className="button button-primary" href="/login">Create account / Sign in <span>↗</span></a>
-          <a className="invoice-access-link" href="https://wa.me/256702846597?text=Hello%20Johden%2C%20I%20am%20interested%20in%20your%20online%20invoicing%20platform." target="_blank" rel="noopener noreferrer">Ask us on WhatsApp ↗</a>
-          <small>New accounts begin with a 14-day trial. Annual paid-plan checkout is not yet enabled; we will not charge you until payment setup is ready.</small>
+          <h3>Your business, your workspace</h3>
+          <p>New here? Create an account for your company. Already registered? Sign in with your existing email and password.</p>
+          <a className="button button-primary" href="/login">Continue to account access <span>↗</span></a>
+          <a className="invoice-access-link" href="https://wa.me/256702846597?text=Hello%20Johden%2C%20I%20need%20help%20with%20the%20invoicing%20platform." target="_blank" rel="noopener noreferrer">Questions? Contact Johden on WhatsApp ↗</a>
+          <small>Account creation does not collect a payment. Please contact support if you cannot sign in or if your workspace setup appears incomplete.</small>
         </div>
       </section>
 
