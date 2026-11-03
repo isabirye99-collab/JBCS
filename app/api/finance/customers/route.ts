@@ -45,19 +45,41 @@ export async function GET(request: NextRequest) {
       ? requestedType
       : "client";
 
-    const response = await fetch(
-      `${url}/rest/v1/business_contacts?workspace_id=eq.${encodeURIComponent(workspaceId)}&contact_type=eq.${contactType}&select=id,name,email,phone,address,tax_number,notes,created_at,updated_at&order=name.asc`,
-      {
-        headers: { apikey: key, Authorization: `Bearer ${key}` },
-        cache: "no-store",
-      }
-    );
+    const contactsUrl = ${url}/rest/v1/business_contacts?workspace_id=eq.${encodeURIComponent(workspaceId)}&contact_type=eq.${contactType}&select=id,name,email,phone,address,tax_number,notes,created_at,updated_at&order=name.asc;
+    const customers: Record<string, unknown>[] = [];
+    const pageSize = 500;
 
-    if (!response.ok) {
-      return NextResponse.json({ error: "Unable to load finance customers." }, { status: 502 });
+    for (let offset = 0; ; offset += pageSize) {
+      const response = await fetch(contactsUrl, {
+        headers: {
+          apikey: key,
+          Authorization: `Bearer ${key}`,
+          "Range-Unit": "items",
+          Range: `${offset}-${offset + pageSize - 1}`,
+        },
+        cache: "no-store",
+      });
+
+      if (!response.ok) {
+        return NextResponse.json(
+          { error: "Unable to load customers or suppliers." },
+          { status: 502 }
+        );
+      }
+
+      const rows = await response.json();
+      if (!Array.isArray(rows)) {
+        return NextResponse.json(
+          { error: "Unexpected customer data from the database." },
+          { status: 502 }
+        );
+      }
+
+      customers.push(...rows);
+      if (rows.length < pageSize) break;
     }
 
-    return NextResponse.json({ customers: await response.json() });
+    return NextResponse.json({ customers });
   } catch {
     return NextResponse.json({ error: "Unable to connect to the finance database." }, { status: 502 });
   }
