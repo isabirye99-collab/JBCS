@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
       ? requestedType
       : "client";
 
-    const contactsUrl = ${url}/rest/v1/business_contacts?workspace_id=eq.${encodeURIComponent(workspaceId)}&contact_type=eq.${contactType}&select=id,name,email,phone,address,tax_number,notes,created_at,updated_at&order=name.asc;
+    const contactsUrl = `${url}/rest/v1/business_contacts?workspace_id=eq.${encodeURIComponent(workspaceId)}&contact_type=eq.${contactType}&select=id,name,email,phone,address,tax_number,notes,created_at,updated_at&order=name.asc`;
     const customers: Record<string, unknown>[] = [];
     const pageSize = 500;
 
