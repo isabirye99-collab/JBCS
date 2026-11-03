@@ -4,6 +4,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import InvoiceForm from "@/components/finance/InvoiceForm";
 import QuoteForm from "@/components/finance/QuoteForm";
+import FinanceOperations from "@/components/finance/FinanceOperations";
 
 type NavItem = { label: string; icon: string };
 
@@ -410,6 +411,10 @@ export default function FinanceDashboard() {
                 setInvoiceError("");
                 setQuoteError("");
                 setNotice("");
+                if (active === "Expenses" || active === "Payments" || active === "Reports") {
+                  setShowCreate(false);
+                  return;
+                }
                 setShowCreate(true);
               }}
             >
@@ -684,19 +689,12 @@ export default function FinanceDashboard() {
                     </div>
                   )}
                 </>
+              ) : active === "Expenses" || active === "Payments" || active === "Reports" ? (
+                <FinanceOperations section={active} onNotice={setNotice} />
               ) : (
                 <div className="finance-empty">
-                  <div className="finance-empty-icon">✦</div>
                   <h3>{active} workspace</h3>
-                  <p>
-                    This module is not connected to database storage yet.
-                  </p>
-                  <button
-                    className="finance-primary-button"
-                    onClick={() => setShowCreate(true)}
-                  >
-                    + Create {createLabel}
-                  </button>
+                  <p>Select a supported finance module.</p>
                 </div>
               )}
             </article>
