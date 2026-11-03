@@ -83,6 +83,7 @@ export async function POST(request: NextRequest) {
   const field = (value: unknown, max: number) =>
     typeof value === "string" ? value.trim().slice(0, max) : "";
 
+  const contactType = body.contact_type === "supplier" ? "supplier" : "client";
   const name = field(body.name, 160);
   const email = field(body.email, 254);
   const phone = field(body.phone, 40);
@@ -91,7 +92,7 @@ export async function POST(request: NextRequest) {
   const notes = field(body.notes, 2000);
 
   if (!name) {
-    return NextResponse.json({ error: "Customer name is required." }, { status: 400 });
+    return NextResponse.json({ error: "Contact name is required." }, { status: 400 });
   }
 
   if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -114,7 +115,7 @@ export async function POST(request: NextRequest) {
       },
       body: JSON.stringify({
         workspace_id: workspaceId,
-        contact_type: "client",
+        contact_type: contactType,
         name,
         email: email || null,
         phone: phone || null,
@@ -126,12 +127,12 @@ export async function POST(request: NextRequest) {
     });
 
     if (!response.ok) {
-      return NextResponse.json({ error: "Could not save the customer." }, { status: 502 });
+      return NextResponse.json({ error: "Could not save the contact." }, { status: 502 });
     }
 
     const rows = await response.json();
     if (!Array.isArray(rows) || !rows[0]) {
-      return NextResponse.json({ error: "The customer was not returned after saving." }, { status: 502 });
+      return NextResponse.json({ error: "The contact was not returned after saving." }, { status: 502 });
     }
 
     return NextResponse.json({ customer: rows[0] }, { status: 201 });
