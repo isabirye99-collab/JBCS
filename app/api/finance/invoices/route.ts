@@ -154,7 +154,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  if (!Number.isFinite(exchangeRate) || exchangeRate <= 0) {
+  if (!Number.isFinite(exchangeRate) || exchangeRate <= 0 || exchangeRate > 999_999_999_999) {
     return NextResponse.json(
       { error: "Exchange rate must be greater than zero." },
       { status: 400 }
@@ -211,7 +211,12 @@ export async function POST(request: NextRequest) {
     const base = Math.round(quantity * unitPrice * 100) / 100;
     const tax = Math.round(base * taxRate) / 100;
 
-    if (!Number.isFinite(base) || !Number.isFinite(tax) || !Number.isFinite(base + tax)) {
+    if (
+      !Number.isFinite(base) ||
+      !Number.isFinite(tax) ||
+      !Number.isFinite(base + tax) ||
+      base + tax > 9_999_999_999_999_999.99
+    ) {
       return NextResponse.json(
         { error: "An invoice item amount is too large." },
         { status: 400 }
@@ -237,7 +242,12 @@ export async function POST(request: NextRequest) {
 
   const taxAmount = Math.round((total - subtotal) * 100) / 100;
 
-  if (![subtotal, total, taxAmount].every(Number.isFinite)) {
+  if (
+    ![subtotal, total, taxAmount].every(Number.isFinite) ||
+    subtotal > 9_999_999_999_999_999.99 ||
+    total > 9_999_999_999_999_999.99 ||
+    taxAmount > 9_999_999_999_999_999.99
+  ) {
     return NextResponse.json(
       { error: "The invoice total is too large." },
       { status: 400 }
