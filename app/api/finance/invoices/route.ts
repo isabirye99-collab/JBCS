@@ -47,22 +47,41 @@ export async function GET() {
       );
     }
 
-    const response = await fetch(
-      `${url}/rest/v1/invoices?workspace_id=eq.${encodeURIComponent(workspaceId)}&select=id,invoice_number,contact_id,issue_date,due_date,currency,exchange_rate,subtotal,tax_amount,total,amount_paid,status,notes,created_at,business_contacts(name),document_items(id,description,quantity,unit_price,tax_rate,line_total)&order=created_at.desc`,
-      {
-        headers: { apikey: key, Authorization: `Bearer ${key}` },
-        cache: "no-store",
-      }
-    );
+    const invoiceUrl = ${url}/rest/v1/invoices?workspace_id=eq.${encodeURIComponent(workspaceId)}&select=id,invoice_number,contact_id,issue_date,due_date,currency,exchange_rate,subtotal,tax_amount,total,amount_paid,status,notes,created_at,business_contacts(name),document_items(id,description,quantity,unit_price,tax_rate,line_total)&order=created_at.desc;
+    const invoices: Record<string, unknown>[] = [];
+    const pageSize = 500;
 
-    if (!response.ok) {
-      return NextResponse.json(
-        { error: "Unable to load invoices." },
-        { status: 502 }
-      );
+    for (let offset = 0; ; offset += pageSize) {
+      const response = await fetch(invoiceUrl, {
+        headers: {
+          apikey: key,
+          Authorization: `Bearer ${key}`,
+          "Range-Unit": "items",
+          Range: `${offset}-${offset + pageSize - 1}`,
+        },
+        cache: "no-store",
+      });
+
+      if (!response.ok) {
+        return NextResponse.json(
+          { error: "Unable to load invoices." },
+          { status: 502 }
+        );
+      }
+
+      const rows = await response.json();
+      if (!Array.isArray(rows)) {
+        return NextResponse.json(
+          { error: "Unexpected invoice data from the database." },
+          { status: 502 }
+        );
+      }
+
+      invoices.push(...rows);
+      if (rows.length < pageSize) break;
     }
 
-    return NextResponse.json({ invoices: await response.json() });
+    return NextResponse.json({ invoices });
   } catch {
     return NextResponse.json(
       { error: "Unable to connect to the finance database." },
