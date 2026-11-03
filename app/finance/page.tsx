@@ -240,7 +240,7 @@ export default function FinanceDashboard() {
       : active === "Quotes"
         ? "quote"
         : active === "Customers"
-          ? "customer"
+          ? contactType === "supplier" ? "supplier" : "customer"
           : active === "Expenses"
             ? "expense"
             : active === "Payments"
