@@ -18,6 +18,7 @@ export async function POST(request:Request){
  if(chargeId){if(!/^[0-9a-f-]{36}$/i.test(chargeId))return NextResponse.json({error:"Invalid charge."},{status:400});
  const r=await fetch(base+"clinic_charges?id=eq."+encodeURIComponent(chargeId)+"&workspace_id=eq."+encodeURIComponent(ctx.workspaceId)+"&patient_id=eq."+encodeURIComponent(patient)+"&select=id,quantity,unit_price,currency,status&limit=1",{headers,cache:"no-store"});
  const found=r.ok?await r.json():[];if(!Array.isArray(found)||!found.length)return NextResponse.json({error:"Charge not found for this patient."},{status:400});charge=found[0];
+ if(charge.status==="void"||charge.status==="paid")return NextResponse.json({error:"This charge is not open for payment."},{status:400});
  if(String(charge.currency).trim()!==currency)return NextResponse.json({error:"Payment currency must match the charge."},{status:400});
  const rr=await fetch(base+"clinic_receipts?workspace_id=eq."+encodeURIComponent(ctx.workspaceId)+"&charge_id=eq."+encodeURIComponent(chargeId)+"&select=amount",{headers,cache:"no-store"});
  const paidRows=rr.ok?await rr.json():null;if(!Array.isArray(paidRows))return NextResponse.json({error:"Could not verify existing payments; no receipt was saved."},{status:502});
@@ -28,5 +29,16 @@ export async function POST(request:Request){
  const saved=await fetch(base+"clinic_receipts",{method:"POST",headers,cache:"no-store",body:JSON.stringify({workspace_id:ctx.workspaceId,patient_id:patient,charge_id:chargeId||null,receipt_number:receiptNumber,amount,currency,payment_method:method,transaction_reference:reference||null})});
  if(!saved.ok){console.error("Clinic receipt save failed",saved.status,(await saved.text().catch(()=>"")).slice(0,200));return NextResponse.json({error:"Could not save receipt. Please retry."},{status:502});}
  const result=await saved.json();if(!Array.isArray(result)||!result[0])return NextResponse.json({error:"Receipt could not be confirmed."},{status:502});
+ if(charge){
+  const total=Number(charge.quantity)*Number(charge.unit_price);
+  const priorRes=await fetch(base+"clinic_receipts?workspace_id=eq."+encodeURIComponent(ctx.workspaceId)+"&charge_id=eq."+encodeURIComponent(chargeId)+"&select=amount",{headers,cache:"no-store"});
+  const prior=priorRes.ok?await priorRes.json():null;
+  if(Array.isArray(prior)){
+   const paid=prior.reduce((s:number,x:any)=>s+Number(x.amount||0),0);
+   const status=paid+0.0001>=total?"paid":"part_paid";
+   const updated=await fetch(base+"clinic_charges?id=eq."+encodeURIComponent(chargeId)+"&workspace_id=eq."+encodeURIComponent(ctx.workspaceId),{method:"PATCH",headers:{...headers,Prefer:"return=minimal"},cache:"no-store",body:JSON.stringify({status})});
+   if(!updated.ok)console.error("Clinic charge status update failed",updated.status);
+  }else console.error("Could not recalculate charge status after receipt",chargeId);
+ }
  return NextResponse.json({receipt:{receipt_number:result[0].receipt_number,amount:result[0].amount,currency:result[0].currency,payment_method:result[0].payment_method}},{status:201});
 }
