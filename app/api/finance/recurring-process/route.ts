@@ -41,3 +41,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Unable to connect to finance database." }, { status: 502 });
   }
 }
+
+// Vercel Cron invokes endpoints with GET; the same authentication and processor apply.
+export async function GET(request: Request) {
+  return POST(request);
+}
