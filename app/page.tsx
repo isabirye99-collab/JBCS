@@ -21,13 +21,9 @@ export default function Home() {
         </div>
         <div className="hero-visual">
           <div className="hero-visual-shape">
-            <div className="hero-photo-caption"><span>IDEAS INTO ACTION</span><strong>Let’s build<br/>something meaningful.</strong></div>
-            <div className="hero-visual-logo"><Image src="/johden-logo.svg" alt="Johden brand mark" width={390} height={132} priority /></div>
-            <span className="visual-arc arc-a"/><span className="visual-arc arc-b"/>
+            <div className="hero-photo-caption"><span>JOHDEN BUSINESS CONSULTANCY SERVICES</span><strong>Strategy. Growth.<br/>Technology.</strong></div>
           </div>
-          <div className="hero-note note-top"><span className="note-symbol">✳</span><div><small>YOUR NEXT CHAPTER</small><strong>Starts with a plan.</strong></div></div>
-          <div className="hero-note note-bottom"><span className="note-symbol orange">↗</span><div><small>BUILT AROUND YOU</small><strong>Practical. Personal. Purposeful.</strong></div></div>
-          <span className="visual-caption">CLARITY <b>•</b> CREATIVITY <b>•</b> PROGRESS</span>
+          <div className="hero-image-badge"><span className="hero-image-badge-icon">↗</span><div><small>BUILT AROUND YOU</small><strong>Practical solutions. Real progress.</strong></div></div>
         </div>
       </section>
 
