@@ -21,6 +21,7 @@ export default function WorkspaceFinancePage() {
   const [customerEmail, setCustomerEmail] = useState("");
   const [selectedCustomer, setSelectedCustomer] = useState("");
   const [customerSearch, setCustomerSearch] = useState("");
+  const [invoiceSearch, setInvoiceSearch] = useState("");
   const [description, setDescription] = useState("Professional services");
   const [quantity, setQuantity] = useState("1");
   const [unitPrice, setUnitPrice] = useState("0");
@@ -32,13 +33,39 @@ export default function WorkspaceFinancePage() {
   const [busy, setBusy] = useState(false);
 
   const load = useCallback(async () => {
-    const [c, i, e] = await Promise.all([fetch("/api/saas/customers", { cache: "no-store" }), fetch("/api/saas/invoices", { cache: "no-store" }), fetch("/api/saas/expenses", { cache: "no-store" })]);
-    const cd = await c.json(); const id = await i.json(); const ed = await e.json();
-    if (!c.ok) throw new Error(cd.error || "Could not load customers.");
-    if (!i.ok) throw new Error(id.error || "Could not load invoices.");
-    if (!e.ok) throw new Error(ed.error || "Could not load expenses.");
-    setCustomers(cd.customers || []); setInvoices(id.invoices || []); setExpenses(ed.expenses || []);
-    if (!selectedCustomer && cd.customers?.length) setSelectedCustomer(cd.customers[0].id);
+    // Load each workspace resource independently: a customer or expense
+    // endpoint failure must never hide invoices that loaded successfully.
+    const results = await Promise.allSettled([
+      fetch("/api/saas/customers", { cache: "no-store" }).then(async response => ({ response, data: await response.json() })),
+      fetch("/api/saas/invoices", { cache: "no-store" }).then(async response => ({ response, data: await response.json() })),
+      fetch("/api/saas/expenses", { cache: "no-store" }).then(async response => ({ response, data: await response.json() })),
+    ]);
+    const errors: string[] = [];
+    const customerResult = results[0];
+    const invoiceResult = results[1];
+    const expenseResult = results[2];
+
+    if (customerResult.status === "fulfilled" && customerResult.value.response.ok) {
+      const list = Array.isArray(customerResult.value.data.customers) ? customerResult.value.data.customers : [];
+      setCustomers(list);
+      if (!selectedCustomer && list.length) setSelectedCustomer(list[0].id);
+    } else {
+      errors.push(customerResult.status === "fulfilled" ? customerResult.value.data.error || "Could not load customers." : "Could not connect to customers.");
+    }
+
+    if (invoiceResult.status === "fulfilled" && invoiceResult.value.response.ok) {
+      setInvoices(Array.isArray(invoiceResult.value.data.invoices) ? invoiceResult.value.data.invoices : []);
+    } else {
+      errors.push(invoiceResult.status === "fulfilled" ? invoiceResult.value.data.error || "Could not load invoices." : "Could not connect to invoices.");
+    }
+
+    if (expenseResult.status === "fulfilled" && expenseResult.value.response.ok) {
+      setExpenses(Array.isArray(expenseResult.value.data.expenses) ? expenseResult.value.data.expenses : []);
+    } else {
+      errors.push(expenseResult.status === "fulfilled" ? expenseResult.value.data.error || "Could not load expenses." : "Could not connect to expenses.");
+    }
+
+    setError(errors.join(" "));
   }, [selectedCustomer]);
 
   useEffect(() => { load().catch(e => setError(e instanceof Error ? e.message : "Unable to load workspace data.")); }, [load]);
@@ -97,6 +124,7 @@ export default function WorkspaceFinancePage() {
   const invoiceTotal = invoices.reduce((sum, invoice) => sum + Number(invoice.total || 0), 0);
   const expenseTotal = expenses.reduce((sum, expense) => sum + Number(expense.amount || 0), 0);
   const filteredCustomers = customers.filter(customer => (customer.name + " " + (customer.email || "")).toLowerCase().includes(customerSearch.toLowerCase()));
+  const filteredInvoices = invoices.filter(invoice => [invoice.invoice_number, invoice.business_contacts?.name || "", invoice.status, invoice.issue_date].join(" ").toLowerCase().includes(invoiceSearch.toLowerCase()));
 
   return <main className="inner-page invoice-product-page">
     <header className="site-header"><Link className="brand" href="/workspace"><span style={{color:"#f3192d",fontWeight:800}}>JOHDEN</span>&nbsp; BUSINESS TOOLS</Link><nav className="desktop-nav"><Link href="/workspace">Workspace</Link><a href="#overview">Overview</a><a href="#customers">Customers</a><a href="#invoice-list">Invoices</a><a href="#expense-list">Expenses</a><Link href="/invoicing">Product site</Link></nav><form action="/api/saas/logout" method="post"><button className="button button-secondary">Sign out</button></form></header>
@@ -120,7 +148,7 @@ export default function WorkspaceFinancePage() {
         <label style={{display:"block",marginTop:16}}>Search customers<input value={customerSearch} onChange={e=>setCustomerSearch(e.target.value)} placeholder="Search by name or email" /></label>
         {filteredCustomers.length===0 ? <p style={{marginTop:16}}>{customers.length===0?"Your directory is empty. Add your first customer above.":"No customers match that search."}</p> : <div style={{overflowX:"auto",marginTop:12}}><table style={{width:"100%",borderCollapse:"collapse",textAlign:"left"}}><thead><tr><th style={{padding:10}}>Customer</th><th style={{padding:10}}>Email</th><th style={{padding:10}}>Action</th></tr></thead><tbody>{filteredCustomers.map(customer=><tr key={customer.id}><td style={{padding:10}}>{customer.name}</td><td style={{padding:10}}>{customer.email||"—"}</td><td style={{padding:10}}><button type="button" onClick={()=>{setSelectedCustomer(customer.id);setNotice(customer.name+" selected for the invoice form.");window.scrollTo({top:0,behavior:"smooth"});}}>Use for invoice</button></td></tr>)}</tbody></table></div>}
       </article>
-      <div id="invoice-list" style={{marginTop:32,background:"#fff",border:"1px solid #ece7e6",borderRadius:12,padding:20}}><h2>Invoices</h2>{invoices.length===0 ? <p>No invoices yet. Create your first draft above.</p> : <div style={{overflowX:"auto"}}><table style={{width:"100%",borderCollapse:"collapse",textAlign:"left"}}><thead><tr><th style={{padding:12}}>Invoice</th><th style={{padding:12}}>Date</th><th style={{padding:12}}>Customer</th><th style={{padding:12}}>Total</th><th style={{padding:12}}>Status</th><th style={{padding:12}}>Actions</th></tr></thead><tbody>{invoices.map(i=><tr key={i.id}><td style={{padding:12}}>{i.invoice_number}</td><td style={{padding:12}}>{i.issue_date}</td><td style={{padding:12}}>{i.business_contacts?.name || "Customer"}</td><td style={{padding:12}}>{money(i.total,i.currency)}</td><td style={{padding:12}}>{i.status}</td><td style={{padding:12,display:"flex",gap:10,flexWrap:"wrap"}}>{i.status === "draft" && <button type="button" disabled={busy} onClick={() => editDraftInvoice(i)}>Edit draft</button>}<Link href={`/workspace/invoices/${i.id}/print`} target="_blank">Print / Save PDF</Link></td></tr>)}</tbody></table></div>}</div>
+      <div id="invoice-list" className="invoice-list-panel" style={{marginTop:32,background:"#fff",border:"1px solid #ece7e6",borderRadius:12,padding:20}}><div className="invoice-list-heading"><div><span className="eyebrow dark"><i/> BILLING REGISTER</span><h2>Invoices</h2><p>Search, review, and print invoices saved in this workspace.</p></div><input aria-label="Search invoices" value={invoiceSearch} onChange={e=>setInvoiceSearch(e.target.value)} placeholder="Search invoice, customer or status" /></div>{filteredInvoices.length===0 ? <p>{invoiceSearch ? "No invoices match your search." : "No invoices yet. Create your first draft above."}</p> : <div style={{overflowX:"auto"}}><table style={{width:"100%",borderCollapse:"collapse",textAlign:"left"}}><thead><tr><th style={{padding:12}}>Invoice</th><th style={{padding:12}}>Date</th><th style={{padding:12}}>Customer</th><th style={{padding:12}}>Total</th><th style={{padding:12}}>Status</th><th style={{padding:12}}>Actions</th></tr></thead><tbody>{filteredInvoices.map(i=><tr key={i.id}><td style={{padding:12}}>{i.invoice_number}</td><td style={{padding:12}}>{i.issue_date}</td><td style={{padding:12}}>{i.business_contacts?.name || "Customer"}</td><td style={{padding:12}}>{money(i.total,i.currency)}</td><td style={{padding:12}}>{i.status}</td><td style={{padding:12,display:"flex",gap:10,flexWrap:"wrap"}}>{i.status === "draft" && <button type="button" disabled={busy} onClick={() => editDraftInvoice(i)}>Edit draft</button>}<Link href={`/workspace/invoices/${i.id}/print`} target="_blank">Print / Save PDF</Link></td></tr>)}</tbody></table></div>}</div>
       <div id="expense-list" style={{marginTop:32,background:"#fff",border:"1px solid #ece7e6",borderRadius:12,padding:20}}><h2>Expenses</h2>{expenses.length===0 ? <p>No expenses recorded yet.</p> : <div style={{overflowX:"auto"}}><table style={{width:"100%",borderCollapse:"collapse",textAlign:"left"}}><thead><tr><th style={{padding:12}}>Date</th><th style={{padding:12}}>Category</th><th style={{padding:12}}>Description</th><th style={{padding:12}}>Amount</th><th style={{padding:12}}>Method</th></tr></thead><tbody>{expenses.map(e=><tr key={e.id}><td style={{padding:12}}>{e.expense_date}</td><td style={{padding:12}}>{e.category}</td><td style={{padding:12}}>{e.description}</td><td style={{padding:12}}>{money(e.amount,e.currency)}</td><td style={{padding:12}}>{e.payment_method.replace("_"," ")}</td></tr>)}</tbody></table></div>}</div>
       <p style={{marginTop:20,fontSize:13,opacity:.8}}>This is an initial workspace module. Email delivery, payment recording and subscription checkout remain disabled until provider credentials and secure payment webhooks are configured and tested.</p>
     </section>
