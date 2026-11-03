@@ -293,16 +293,24 @@ export default function FinanceDashboard() {
     [quotes, search]
   );
 
-  const outstanding = invoices.reduce(
-    (sum, invoice) =>
-      sum + Math.max(0, Number(invoice.total) - Number(invoice.amount_paid)),
-    0
-  );
+  // Keep currencies separate: adding UGX, USD and EUR into one number
+  // would produce a misleading financial total.
+  const outstandingByCurrency = invoices.reduce<Record<string, number>>((totals, invoice) => {
+    const currency = /^[A-Z]{3}$/.test(invoice.currency) ? invoice.currency : "UGX";
+    totals[currency] = (totals[currency] || 0) + Math.max(0, Number(invoice.total) - Number(invoice.amount_paid));
+    return totals;
+  }, {});
 
-  const paid = invoices.reduce(
-    (sum, invoice) => sum + Number(invoice.amount_paid || 0),
-    0
-  );
+  const paidByCurrency = invoices.reduce<Record<string, number>>((totals, invoice) => {
+    const currency = /^[A-Z]{3}$/.test(invoice.currency) ? invoice.currency : "UGX";
+    totals[currency] = (totals[currency] || 0) + Number(invoice.amount_paid || 0);
+    return totals;
+  }, {});
+
+  const moneyByCurrency = (totals: Record<string, number>) => {
+    const entries = Object.entries(totals).filter(([, amount]) => amount !== 0);
+    return entries.length ? entries.map(([currency, amount]) => money(amount, currency)).join(" · ") : money(0, "UGX");
+  };
 
   return (
     <main className="finance-app">
@@ -447,7 +455,7 @@ export default function FinanceDashboard() {
                     <span>Outstanding</span>
                     <span className="finance-stat-icon orange">◷</span>
                   </div>
-                  <strong>{money(outstanding)}</strong>
+                  <strong>{moneyByCurrency(outstandingByCurrency)}</strong>
                   <p>
                     <span className="finance-muted">
                       Unpaid invoice balance
@@ -460,7 +468,7 @@ export default function FinanceDashboard() {
                     <span>Payments received</span>
                     <span className="finance-stat-icon green">↗</span>
                   </div>
-                  <strong>{money(paid)}</strong>
+                  <strong>{moneyByCurrency(paidByCurrency)}</strong>
                   <p>
                     <span className="finance-muted">
                       Recorded against invoices
