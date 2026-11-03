@@ -75,6 +75,37 @@ export default function FinanceOperations({ section, onNotice }: { section: Sect
     finally { setSaving(false); }
   }
 
+  function exportReportCsv() {
+    if (!report) return;
+    const rows: (string | number)[][] = [
+      ["JBCS Financial Report"],
+      ["From", from || "All dates"],
+      ["To", to || "All dates"],
+      [],
+      ["Metric", "Currency", "Amount"],
+      ...reportRows.map(row => [row.label, row.currency, row.amount]),
+      [],
+      ["Invoice count", report.summary.invoiceCount],
+      ["Payment count", report.summary.paymentCount],
+      ["Expense count", report.summary.expenseCount],
+      ["Outstanding invoice count", report.summary.outstandingInvoiceCount],
+      ["Overdue invoice count", report.summary.overdueInvoiceCount],
+    ];
+    const csv = rows.map(row => row.map(value => {
+      const text = String(value ?? "");
+      return '"' + text.replace(/"/g, '""') + '"';
+    }).join(",")).join("\r\n");
+    const blob = new Blob(["\\uFEFF", csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `jbcs-financial-report-${from || "all"}-to-${to || "all"}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+  }
+
   const inputStyle = { width: "100%", padding: "11px 12px", border: "1px solid var(--finance-border, #d8dee8)", borderRadius: 8, background: "var(--finance-input, #fff)", color: "inherit", font: "inherit" };
   const fieldStyle = { display: "grid", gap: 6, marginBottom: 14 } as const;
   const selectStyle = inputStyle;
@@ -91,7 +122,7 @@ export default function FinanceOperations({ section, onNotice }: { section: Sect
 
   return <div className="finance-panel finance-table-panel">
     <div className="finance-panel-heading"><div><h2>{section}</h2><p>{section === "Expenses" ? "Record and review business expenditure." : section === "Payments" ? "Record receipts against outstanding invoices." : "Financial summaries from saved invoices, payments and expenses."}</p></div>
-      {section !== "Reports" ? <button className="finance-primary-button" onClick={() => setShowForm(v => !v)}>{showForm ? "Cancel" : section === "Expenses" ? "+ New expense" : "+ Record payment"}</button> : <button className="finance-secondary-button" onClick={() => void load()} disabled={loading}>Refresh report</button>}
+      {section !== "Reports" ? <button className="finance-primary-button" onClick={() => setShowForm(v => !v)}>{showForm ? "Cancel" : section === "Expenses" ? "+ New expense" : "+ Record payment"}</button> : <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}><button className="finance-secondary-button" onClick={exportReportCsv} disabled={!report}>Export CSV</button><button className="finance-secondary-button" onClick={() => void load()} disabled={loading}>Refresh report</button></div>}
     </div>
     {error && <div className="finance-notice" role="alert">{error} <button className="finance-text-button" onClick={() => void load()}>Retry</button></div>}
     {showForm && section !== "Reports" && <form onSubmit={save} style={{ padding: 18, border: "1px solid #e1e5eb", borderRadius: 12, marginBottom: 20 }}>
