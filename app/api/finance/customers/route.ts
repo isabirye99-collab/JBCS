@@ -24,7 +24,7 @@ async function getWorkspaceId(url: string, key: string): Promise<string | null> 
   return Array.isArray(rows) && rows.length === 1 ? rows[0].id : null;
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   if (!(await verifyAdmin())) {
     return NextResponse.json({ error: "Unauthorised" }, { status: 401 });
   }
@@ -40,8 +40,13 @@ export async function GET() {
       return NextResponse.json({ error: "JBCS workspace not found or inactive." }, { status: 503 });
     }
 
+    const requestedType = request.nextUrl.searchParams.get("type") || "client";
+    const contactType = ["client", "supplier", "other"].includes(requestedType)
+      ? requestedType
+      : "client";
+
     const response = await fetch(
-      `${url}/rest/v1/business_contacts?workspace_id=eq.${encodeURIComponent(workspaceId)}&contact_type=eq.client&select=id,name,email,phone,address,tax_number,notes,created_at,updated_at&order=name.asc`,
+      `${url}/rest/v1/business_contacts?workspace_id=eq.${encodeURIComponent(workspaceId)}&contact_type=eq.${contactType}&select=id,name,email,phone,address,tax_number,notes,created_at,updated_at&order=name.asc`,
       {
         headers: { apikey: key, Authorization: `Bearer ${key}` },
         cache: "no-store",
