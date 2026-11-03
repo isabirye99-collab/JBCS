@@ -214,3 +214,18 @@ body{font-size:16px;line-height:1.75}
  .inner-hero-visual-caption strong{font-size:25px}
  .inner-page .inner-hero>.contact-benefits{margin-top:18px}
 }
+
+/* Final navigation state: visibly mark the current page, not just on hover */
+.desktop-nav a{display:inline-flex;align-items:center;justify-content:center;min-height:38px;padding:7px 11px;border-radius:7px;color:#4e494d!important;text-decoration:none;transition:background-color .18s ease,color .18s ease}
+.desktop-nav a[aria-current="page"]{background:var(--red)!important;color:#fff!important;font-weight:800!important;box-shadow:0 4px 12px rgba(243,25,45,.16)}
+.desktop-nav a:hover:not([aria-current="page"]),.desktop-nav a:focus-visible:not([aria-current="page"]){background:#fff0f1!important;color:var(--red)!important;outline:none}
+.desktop-nav a[aria-current="page"]:hover,.desktop-nav a[aria-current="page"]:focus-visible{background:var(--red-dark)!important;color:#fff!important}
+@media(max-width:1000px){.desktop-nav a{padding:6px 8px;min-height:34px}}
+@media(max-width:720px){.desktop-nav{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:4px 7px}.desktop-nav a{font-size:12px;padding:5px 8px;min-height:31px}}
+/* Keep photography areas visibly sized and consistently cropped across the website */
+.home-page .hero-visual-shape{display:block!important;min-height:320px;background-color:#7b343b;background-size:cover!important;background-position:center!important;background-repeat:no-repeat!important}
+.inner-hero-visual,.inner-card-photo,.inner-wide-photo,.service-image,.about-photo{display:block;background-color:#eadfe0;background-size:cover!important;background-position:center!important;background-repeat:no-repeat!important}
+.inner-hero-visual{min-height:255px}
+.inner-card-photo{min-height:155px}
+.inner-wide-photo{min-height:190px}
+@media(max-width:720px){.inner-hero-visual{min-height:245px}.inner-card-photo{min-height:190px}.inner-wide-photo{min-height:200px}}
