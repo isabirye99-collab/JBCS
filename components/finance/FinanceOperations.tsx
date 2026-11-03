@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 type Section = "Expenses" | "Payments" | "Reports";
 type Invoice = { id: string; invoice_number: string; currency: string; total: number; amount_paid: number; status: string; business_contacts?: { name: string } | null };
+type Supplier = { id: string; name: string };
 type Expense = { id: string; expense_date: string; category: string; description: string; amount: number; currency: string; payment_method: string | null; business_contacts?: { name: string } | null };
 type Payment = { id: string; invoice_id: string; payment_reference: string | null; payment_date: string; amount: number; currency: string; method: string; invoices?: { invoice_number: string } | null };
 type Report = { summary: { invoiceCount: number; paymentCount: number; expenseCount: number; outstandingInvoiceCount: number; overdueInvoiceCount: number; invoicedByCurrency: Record<string, number>; collectedByCurrency: Record<string, number>; expensesByCurrency: Record<string, number>; outstandingByCurrency: Record<string, number> }; invoices: unknown[]; payments: unknown[]; expenses: unknown[] };
@@ -14,6 +15,7 @@ const dateLabel = (value: string) => value ? new Date(value.slice(0, 10) + "T00:
 
 export default function FinanceOperations({ section, onNotice }: { section: Section; onNotice: (message: string) => void }) {
   const [expenses, setExpenses] = useState<Expense[]>([]);
+  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [payments, setPayments] = useState<Payment[]>([]);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [report, setReport] = useState<Report | null>(null);
@@ -24,16 +26,19 @@ export default function FinanceOperations({ section, onNotice }: { section: Sect
   const [showForm, setShowForm] = useState(false);
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
-  const [expense, setExpense] = useState({ expense_date: today(), category: "Office supplies", description: "", amount: "", currency: "UGX", exchange_rate: "1", payment_method: "cash", notes: "" });
+  const [expense, setExpense] = useState({ expense_date: today(), category: "Office supplies", description: "", amount: "", currency: "UGX", exchange_rate: "1", payment_method: "cash", supplier_contact_id: "", notes: "" });
   const [payment, setPayment] = useState({ invoice_id: "", payment_date: today(), amount: "", method: "cash", payment_reference: "", notes: "" });
 
   const load = useCallback(async () => {
     setLoading(true); setError("");
     try {
       if (section === "Expenses") {
-        const r = await fetch("/api/finance/expenses", { cache: "no-store" }); const d = await r.json();
+        const [r, sr] = await Promise.all([fetch("/api/finance/expenses", { cache: "no-store" }), fetch("/api/finance/customers?type=supplier", { cache: "no-store" })]);
+        const [d, sd] = await Promise.all([r.json(), sr.json()]);
         if (!r.ok) throw new Error(d.error || "Unable to load expenses.");
+        if (!sr.ok) throw new Error(sd.error || "Unable to load suppliers.");
         setExpenses(Array.isArray(d.expenses) ? d.expenses : []);
+        setSuppliers(Array.isArray(sd.customers) ? sd.customers : []);
       } else if (section === "Payments") {
         const [pr, ir] = await Promise.all([fetch("/api/finance/payments", { cache: "no-store" }), fetch("/api/finance/invoices", { cache: "no-store" })]);
         const [pd, id] = await Promise.all([pr.json(), ir.json()]);
@@ -63,7 +68,7 @@ export default function FinanceOperations({ section, onNotice }: { section: Sect
       const d = await r.json();
       if (!r.ok) throw new Error(d.error || "Unable to save record.");
       setShowForm(false); onNotice(isExpense ? "Expense saved successfully." : "Payment recorded successfully.");
-      if (isExpense) setExpense({ expense_date: today(), category: "Office supplies", description: "", amount: "", currency: "UGX", exchange_rate: "1", payment_method: "cash", notes: "" });
+      if (isExpense) setExpense({ expense_date: today(), category: "Office supplies", description: "", amount: "", currency: "UGX", exchange_rate: "1", payment_method: "cash", supplier_contact_id: "", notes: "" });
       else setPayment({ invoice_id: "", payment_date: today(), amount: "", method: "cash", payment_reference: "", notes: "" });
       await load();
     } catch (e) { setError(e instanceof Error ? e.message : "Unable to save record."); }
@@ -97,6 +102,7 @@ export default function FinanceOperations({ section, onNotice }: { section: Sect
         <div style={fieldStyle}><label htmlFor="expense-amount">Amount</label><input id="expense-amount" style={inputStyle} type="number" min="0.01" step="0.01" required value={expense.amount} onChange={e => setExpense({ ...expense, amount: e.target.value })}/></div>
         <div style={fieldStyle}><label htmlFor="expense-currency">Currency</label><select id="expense-currency" style={selectStyle} value={expense.currency} onChange={e => setExpense({ ...expense, currency: e.target.value })}>{["UGX","USD","EUR","GBP","KES","TZS","RWF"].map(c => <option key={c}>{c}</option>)}</select></div>
         <div style={fieldStyle}><label htmlFor="expense-rate">Exchange rate to base currency</label><input id="expense-rate" style={inputStyle} type="number" min="0.000001" step="any" required value={expense.exchange_rate} onChange={e => setExpense({ ...expense, exchange_rate: e.target.value })}/></div>
+        <div style={fieldStyle}><label htmlFor="expense-supplier">Supplier (optional)</label><select id="expense-supplier" style={selectStyle} value={expense.supplier_contact_id} onChange={e => setExpense({ ...expense, supplier_contact_id: e.target.value })}><option value="">No supplier selected</option>{suppliers.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}</select></div>
         <div style={fieldStyle}><label htmlFor="expense-method">Payment method</label><select id="expense-method" style={selectStyle} value={expense.payment_method} onChange={e => setExpense({ ...expense, payment_method: e.target.value })}>{methods.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}</select></div>
         <div style={fieldStyle}><label htmlFor="expense-notes">Notes</label><textarea id="expense-notes" style={inputStyle} rows={2} value={expense.notes} onChange={e => setExpense({ ...expense, notes: e.target.value })}/></div>
       </> : <>
