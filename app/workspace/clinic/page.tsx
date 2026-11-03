@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { getClinicContext } from "@/lib/clinic-context";\nimport PatientRegistrationForm from "@/components/clinic/PatientRegistrationForm";
+import { getClinicContext } from "@/lib/clinic-context";
+import PatientRegistrationForm from "@/components/clinic/PatientRegistrationForm";
 
 export const dynamic = "force-dynamic";
 
