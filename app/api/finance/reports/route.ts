@@ -97,21 +97,36 @@ export async function GET(request: NextRequest) {
 
       if (from) params.append(dateField, `gte.${from}`);
       if (to) params.append(dateField, `lte.${to}`);
-      const response = await fetch(
-        `${url}/rest/v1/${table}?${params.toString()}`,
-        { headers, cache: "no-store" }
-      );
+      const allRows: Record<string, unknown>[] = [];
+      const pageSize = 1000;
 
-      if (!response.ok) {
-        throw new Error(`Failed to load ${table}: ${response.status}`);
+      for (let offset = 0; ; offset += pageSize) {
+        const response = await fetch(
+          `${url}/rest/v1/${table}?${params.toString()}`,
+          {
+            headers: {
+              ...headers,
+              "Range-Unit": "items",
+              Range: `${offset}-${offset + pageSize - 1}`,
+            },
+            cache: "no-store",
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(`Failed to load ${table}: ${response.status}`);
+        }
+
+        const data = await response.json();
+        if (!Array.isArray(data)) {
+          throw new Error(`Unexpected response from ${table}`);
+        }
+
+        allRows.push(...data);
+        if (data.length < pageSize) break;
       }
 
-      const data = await response.json();
-      if (!Array.isArray(data)) {
-        throw new Error(`Unexpected response from ${table}`);
-      }
-
-      return data;
+      return allRows;
     }
 
     const [invoices, payments, expenses] = await Promise.all([
