@@ -117,136 +117,47 @@ export async function POST(request: NextRequest) {
     const workspaceId = await getWorkspaceId(url, key);
     if (!workspaceId) return fail("JBCS workspace not found or inactive.", 503);
 
-    const invoiceResponse = await fetch(
-      `${url}/rest/v1/invoices?id=eq.${encodeURIComponent(invoiceId)}&workspace_id=eq.${encodeURIComponent(workspaceId)}&select=id,invoice_number,total,amount_paid,status,currency,exchange_rate&limit=1`,
-      {
-        headers: { apikey: key, Authorization: `Bearer ${key}` },
-        cache: "no-store",
-      }
-    );
-
-    if (!invoiceResponse.ok) return fail("Unable to validate the invoice.", 502);
-
-    const invoices = await invoiceResponse.json();
-    if (!Array.isArray(invoices) || invoices.length !== 1) {
-      return fail("Invoice not found in this workspace.", 404);
-    }
-
-    const invoice = invoices[0];
-
-    if (invoice.status === "void") {
-      return fail("Payments cannot be recorded against a void invoice.");
-    }
-
-    const total = Number(invoice.total);
-    const amountPaid = Number(invoice.amount_paid || 0);
-    const outstanding = Math.round((total - amountPaid) * 100) / 100;
-
-    if (!Number.isFinite(total) || total <= 0 || outstanding <= 0) {
-      return fail("This invoice has no outstanding balance.");
-    }
-
-    if (amount > outstanding + 0.000001) {
-      return fail(
-        `Payment exceeds the outstanding balance of ${outstanding.toFixed(2)} ${invoice.currency}.`
-      );
-    }
-
-    const currency = String(invoice.currency || "UGX").toUpperCase();
-    const newAmountPaid = Math.round((amountPaid + amount) * 100) / 100;
-    const newStatus = newAmountPaid >= total - 0.000001 ? "paid" : "part_paid";
-
-    const paymentPayload = {
-      workspace_id: workspaceId,
-      invoice_id: invoice.id,
-      payment_reference: reference || null,
-      payment_date: paymentDate,
-      amount,
-      currency,
-      exchange_rate: exchangeRate,
-      method,
-      notes: notes || null,
-    };
-
-    const paymentResponse = await fetch(
-      `${url}/rest/v1/payments?select=*`,
+    const rpcResponse = await fetch(
+      `${url}/rest/v1/rpc/record_jbcs_invoice_payment`,
       {
         method: "POST",
         headers: {
           apikey: key,
           Authorization: `Bearer ${key}`,
           "Content-Type": "application/json",
-          Prefer: "return=representation",
-        },
-        body: JSON.stringify(paymentPayload),
-        cache: "no-store",
-      }
-    );
-
-    if (!paymentResponse.ok) {
-      const details = await paymentResponse.text();
-      console.error("Payment creation failed:", paymentResponse.status, details);
-      return fail("Unable to save the payment.", 502);
-    }
-
-    const createdPayments = await paymentResponse.json();
-    const payment = Array.isArray(createdPayments) ? createdPayments[0] : null;
-
-    if (!payment?.id) {
-      return fail("The payment could not be confirmed as saved.", 502);
-    }
-
-    const updateResponse = await fetch(
-      `${url}/rest/v1/invoices?id=eq.${encodeURIComponent(invoice.id)}&workspace_id=eq.${encodeURIComponent(workspaceId)}&amount_paid=eq.${encodeURIComponent(String(amountPaid))}`,
-      {
-        method: "PATCH",
-        headers: {
-          apikey: key,
-          Authorization: `Bearer ${key}`,
-          "Content-Type": "application/json",
-          Prefer: "return=representation",
         },
         body: JSON.stringify({
-          amount_paid: newAmountPaid,
-          status: newStatus,
+          p_workspace_id: workspaceId,
+          p_invoice_id: invoiceId,
+          p_payment_date: paymentDate,
+          p_amount: amount,
+          p_exchange_rate: exchangeRate,
+          p_method: method,
+          p_payment_reference: reference || null,
+          p_notes: notes || null,
         }),
         cache: "no-store",
       }
     );
 
-    const updatedInvoices = updateResponse.ok
-      ? await updateResponse.json()
-      : [];
-
-    if (!updateResponse.ok || !Array.isArray(updatedInvoices) || updatedInvoices.length !== 1) {
-      // Compensate if the invoice update fails.
-      // A production-grade atomic database transaction is still recommended.
-      await fetch(
-        `${url}/rest/v1/payments?id=eq.${encodeURIComponent(payment.id)}&workspace_id=eq.${encodeURIComponent(workspaceId)}`,
-        {
-          method: "DELETE",
-          headers: {
-            apikey: key,
-            Authorization: `Bearer ${key}`,
-          },
-          cache: "no-store",
-        }
-      );
-
+    if (!rpcResponse.ok) {
+      const details = await rpcResponse.text();
+      console.error("Atomic payment recording failed:", rpcResponse.status, details);
+      if (rpcResponse.status === 404) {
+        return fail("The atomic payment database function is not available yet. Apply the latest Supabase migration before recording payments.", 503);
+      }
       return fail(
-        "The invoice balance could not be updated. The payment was rolled back; please retry.",
-        409
+        "The payment could not be recorded. Check that the invoice has an outstanding balance and try again.",
+        rpcResponse.status === 409 ? 409 : 400
       );
     }
 
-    return NextResponse.json(
-      {
-        payment,
-        invoice: updatedInvoices[0],
-        outstanding: Math.round((total - newAmountPaid) * 100) / 100,
-      },
-      { status: 201 }
-    );
+    const result = await rpcResponse.json();
+    if (!result?.payment?.id || !result?.invoice?.id) {
+      return fail("The database did not confirm the payment and invoice update.", 502);
+    }
+
+    return NextResponse.json(result, { status: 201 });
   } catch {
     return fail("Unable to connect to the finance database.", 502);
   }
