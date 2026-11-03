@@ -15,7 +15,7 @@ export default function AppointmentForm({ patients }: { patients: Patient[] }) {
     event.preventDefault();
     setBusy(true); setMessage(""); setError("");
     const form = event.currentTarget;
-    const payload = Object.fromEntries(new FormData(form).entries());
+    const payload = { ...Object.fromEntries(new FormData(form).entries()), timezone_offset_minutes: new Date().getTimezoneOffset() };
     try {
       const response = await fetch("/api/clinic/appointments", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
       const result = await response.json();
