@@ -9,7 +9,7 @@ export default function Page() {
       <header className="site-header">
         <a className="brand" href="/" aria-label="Johden home"><Image src="/johden-logo.svg" alt="Johden Business Consultancy Services" width={290} height={98} priority /></a>
         <nav className="desktop-nav" aria-label="Main navigation"><a href="/">Home</a><a href="/about">About</a><a href="/services">Services</a><a href="/technology">Technology</a><a href="/contact">Contact</a></nav>
-        <a className="button button-primary header-cta" href="/contact">Let’s talk ↗</a>
+        <a className="button button-primary header-cta" href="https://wa.me/256702846597" target="_blank" rel="noopener noreferrer">Let’s talk ↗</a>
       </header>
       <section className="inner-hero"><div className="eyebrow dark-eyebrow"><span /> WHO WE ARE</div><h1>About <em>Johden</em></h1><p>A multidisciplinary business consultancy focused on helping organisations turn ideas into clear plans, useful tools and meaningful progress.</p></section>
       <section className="inner-content">
