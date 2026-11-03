@@ -74,3 +74,36 @@ export async function POST(request: import("next/server").NextRequest) {
   }
   return NextResponse.json({ invoice: { ...result.invoice, document_items: result.document_items } }, { status: 201 });
 }
+
+
+export async function PATCH(request: import("next/server").NextRequest) {
+  const ctx = await getSaasContext();
+  if ("error" in ctx) return NextResponse.json({ error: ctx.error }, { status: ctx.status });
+  let body: Record<string, unknown>;
+  try { body = await request.json(); } catch { return NextResponse.json({ error: "Enter valid invoice details." }, { status: 400 }); }
+  const id = typeof body.id === "string" ? body.id : "";
+  const dueDate = typeof body.due_date === "string" ? body.due_date.trim() : "";
+  const notes = typeof body.notes === "string" ? body.notes.trim().slice(0, 2000) : "";
+  const validDate = (v: string) => /^\d{4}-\d{2}-\d{2}$/.test(v) && !Number.isNaN(Date.parse(v)) && new Date(v + "T00:00:00Z").toISOString().slice(0,10) === v;
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id) || (dueDate && !validDate(dueDate))) {
+    return NextResponse.json({ error: "Choose a valid draft invoice and due date." }, { status: 400 });
+  }
+  const existing = await fetch(`${ctx.url}/rest/v1/invoices?id=eq.${encodeURIComponent(id)}&workspace_id=eq.${encodeURIComponent(ctx.workspaceId)}&select=id,status,issue_date&limit=1`, {
+    headers: { apikey: ctx.serviceKey, Authorization: `Bearer ${ctx.serviceKey}` }, cache: "no-store",
+  });
+  if (!existing.ok) return NextResponse.json({ error: "Unable to verify invoice." }, { status: 502 });
+  const rows = await existing.json();
+  if (!Array.isArray(rows) || !rows[0]) return NextResponse.json({ error: "Invoice not found in this workspace." }, { status: 404 });
+  if (rows[0].status !== "draft") return NextResponse.json({ error: "Only draft invoices can be edited." }, { status: 409 });
+  if (dueDate && dueDate < rows[0].issue_date) return NextResponse.json({ error: "Due date cannot be earlier than the issue date." }, { status: 400 });
+  const response = await fetch(`${ctx.url}/rest/v1/invoices?id=eq.${encodeURIComponent(id)}&workspace_id=eq.${encodeURIComponent(ctx.workspaceId)}&status=eq.draft`, {
+    method: "PATCH",
+    headers: { apikey: ctx.serviceKey, Authorization: `Bearer ${ctx.serviceKey}`, "Content-Type": "application/json", Prefer: "return=representation" },
+    body: JSON.stringify({ due_date: dueDate || null, notes: notes || null, updated_at: new Date().toISOString() }),
+    cache: "no-store",
+  });
+  if (!response.ok) return NextResponse.json({ error: "Could not update draft invoice." }, { status: 502 });
+  const updated = await response.json();
+  if (!Array.isArray(updated) || !updated[0]) return NextResponse.json({ error: "Invoice changed or is no longer a draft. Reload and try again." }, { status: 409 });
+  return NextResponse.json({ invoice: updated[0] });
+}
