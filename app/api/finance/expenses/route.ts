@@ -171,7 +171,7 @@ export async function POST(request: NextRequest) {
           supplierId
         )}&workspace_id=eq.${encodeURIComponent(
           workspaceId
-        )}&select=id&limit=1`,
+        )}&contact_type=eq.supplier&select=id&limit=1`,
         {
           headers: { apikey: key, Authorization: `Bearer ${key}` },
           cache: "no-store",
