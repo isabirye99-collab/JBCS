@@ -139,7 +139,8 @@ begin
     end if;
     v_next := public.jbcs_next_recurring_date(v_template.next_run_date, v_template.frequency);
     update public.recurring_expense_templates
-      set last_generated_at = now(), next_run_date = v_next,
+      set last_generated_at = now(),
+          next_run_date = case when end_date is not null and v_next > end_date then next_run_date else v_next end,
           is_active = case when end_date is not null and v_next > end_date then false else is_active end,
           updated_at = now()
       where id = v_template.id;
