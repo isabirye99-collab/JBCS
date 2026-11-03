@@ -30,7 +30,8 @@ export default async function WorkspacePage() {
       <div className="invoice-feature-grid">
         {workspaces.map((membership: any) => {
           const workspace = membership.business_workspaces;
-          const subscription = Array.isArray(membership.workspace_subscriptions) ? membership.workspace_subscriptions[0] : membership.workspace_subscriptions;
+          const subscriptionValue = workspace.workspace_subscriptions;
+          const subscription = Array.isArray(subscriptionValue) ? subscriptionValue[0] : subscriptionValue;
           const trialEnded = subscription?.status === "trialing" && subscription?.trial_ends_at && new Date(subscription.trial_ends_at).getTime() <= Date.now();
           return <article className="invoice-feature-card" key={workspace.id}>
             <span className="invoice-product-trust">ROLE: {membership.role}</span>
