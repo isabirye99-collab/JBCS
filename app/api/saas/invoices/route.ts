@@ -32,12 +32,6 @@ export async function POST(request: import("next/server").NextRequest) {
   if (!/^[A-Z]{3}$/.test(currency)) return NextResponse.json({ error: "Use a valid three-letter invoice currency." }, { status: 400 });
   if (!Array.isArray(items) || items.length < 1 || items.length > 100) return NextResponse.json({ error: "Add between 1 and 100 invoice items." }, { status: 400 });
 
-  const contactResponse = await fetch(`${ctx.url}/rest/v1/business_contacts?id=eq.${encodeURIComponent(contactId)}&workspace_id=eq.${encodeURIComponent(ctx.workspaceId)}&contact_type=eq.client&select=id&limit=1`, {
-    headers: { apikey: ctx.serviceKey, Authorization: `Bearer ${ctx.serviceKey}` }, cache: "no-store",
-  });
-  const contacts = contactResponse.ok ? await contactResponse.json() : null;
-  if (!Array.isArray(contacts) || contacts.length !== 1) return NextResponse.json({ error: "Customer not found in your workspace." }, { status: 400 });
-
   const cleanItems: Array<{description:string;quantity:number;unit_price:number;tax_rate:number;line_total:number}> = [];
   for (const raw of items) {
     if (!raw || typeof raw !== "object") return NextResponse.json({ error: "Invalid invoice item." }, { status: 400 });
@@ -53,34 +47,31 @@ export async function POST(request: import("next/server").NextRequest) {
     if (![base,tax,lineTotal].every(Number.isFinite) || lineTotal > 9e15) return NextResponse.json({ error: "An invoice item amount is too large." }, { status: 400 });
     cleanItems.push({ description, quantity, unit_price: unitPrice, tax_rate: taxRate, line_total: lineTotal });
   }
-  const subtotal = Math.round(cleanItems.reduce((s,i)=>s+i.quantity*i.unit_price,0)*100)/100;
-  const total = Math.round(cleanItems.reduce((s,i)=>s+i.line_total,0)*100)/100;
-  const taxAmount = Math.round((total-subtotal)*100)/100;
-  if (![subtotal,total,taxAmount].every(Number.isFinite) || total > 9e15) return NextResponse.json({ error: "Invoice total is too large." }, { status: 400 });
-
   const invoiceNumber = `INV-${issueDate.replace(/-/g,"")}-${crypto.randomUUID().slice(0,8).toUpperCase()}`;
-  const create = await fetch(`${ctx.url}/rest/v1/invoices`, {
+  const rpc = await fetch(`${ctx.url}/rest/v1/rpc/create_workspace_invoice`, {
     method: "POST",
-    headers: { apikey: ctx.serviceKey, Authorization: `Bearer ${ctx.serviceKey}`, "Content-Type": "application/json", Prefer: "return=representation" },
-    body: JSON.stringify({ workspace_id: ctx.workspaceId, invoice_number: invoiceNumber, contact_id: contactId, issue_date: issueDate, due_date: dueDate || null, currency, exchange_rate: 1, subtotal, tax_amount: taxAmount, total, amount_paid: 0, status: "draft", notes: notes || null, created_by: ctx.session.user.id }),
+    headers: { apikey: ctx.serviceKey, Authorization: `Bearer ${ctx.serviceKey}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      p_workspace_id: ctx.workspaceId,
+      p_created_by: ctx.session.user.id,
+      p_contact_id: contactId,
+      p_invoice_number: invoiceNumber,
+      p_issue_date: issueDate,
+      p_due_date: dueDate || null,
+      p_currency: currency,
+      p_notes: notes || null,
+      p_items: cleanItems.map(({ description, quantity, unit_price, tax_rate }) => ({ description, quantity, unit_price, tax_rate })),
+    }),
     cache: "no-store",
   });
-  if (!create.ok) return NextResponse.json({ error: "Could not create invoice." }, { status: 502 });
-  const invoiceRows = await create.json();
-  const invoice = Array.isArray(invoiceRows) ? invoiceRows[0] : null;
-  if (!invoice?.id) return NextResponse.json({ error: "Invoice creation could not be confirmed." }, { status: 502 });
-
-  const lineResponse = await fetch(`${ctx.url}/rest/v1/document_items`, {
-    method: "POST",
-    headers: { apikey: ctx.serviceKey, Authorization: `Bearer ${ctx.serviceKey}`, "Content-Type": "application/json", Prefer: "return=minimal" },
-    body: JSON.stringify(cleanItems.map(item => ({ ...item, workspace_id: ctx.workspaceId, document_type: "invoice", invoice_id: invoice.id, quote_id: null }))),
-    cache: "no-store",
-  });
-  if (!lineResponse.ok) {
-    await fetch(`${ctx.url}/rest/v1/invoices?id=eq.${encodeURIComponent(invoice.id)}&workspace_id=eq.${encodeURIComponent(ctx.workspaceId)}`, {
-      method: "DELETE", headers: { apikey: ctx.serviceKey, Authorization: `Bearer ${ctx.serviceKey}` }, cache: "no-store",
-    });
-    return NextResponse.json({ error: "Invoice items could not be saved; the incomplete invoice was rolled back." }, { status: 502 });
+  if (!rpc.ok) {
+    const detail = await rpc.text().catch(() => "");
+    if (rpc.status === 400 || rpc.status === 404) return NextResponse.json({ error: "Invoice details were rejected. Confirm the customer and item values, then try again." }, { status: 400 });
+    return NextResponse.json({ error: "Could not create invoice atomically. No partial invoice was saved." }, { status: 502 });
   }
-  return NextResponse.json({ invoice: { ...invoice, document_items: cleanItems } }, { status: 201 });
+  const result = await rpc.json();
+  if (!result?.invoice?.id || !Array.isArray(result?.document_items)) {
+    return NextResponse.json({ error: "Invoice creation could not be confirmed." }, { status: 502 });
+  }
+  return NextResponse.json({ invoice: { ...result.invoice, document_items: result.document_items } }, { status: 201 });
 }
