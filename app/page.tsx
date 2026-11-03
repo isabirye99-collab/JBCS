@@ -63,12 +63,12 @@ export default function Home() {
           <span className="brand-copy"><strong>JOHDEN</strong><small>BUSINESS CONSULTANCY SERVICES</small></span>
         </a>
         <nav className="desktop-nav" aria-label="Main navigation">
-          <a href="#services">Services</a>
-          <a href="#about">About us</a>
-          <a href="#products">Technology</a>
-          <a href="#process">How we work</a>
+          <a href="/services">Services</a>
+          <a href="/about">About us</a>
+          <a href="/technology">Technology</a>
+          <a href="/services#process">How we work</a>
         </nav>
-        <a className="button button-dark header-cta" href="#contact">Let’s talk <span>↗</span></a>
+        <a className="button button-dark header-cta" href="/contact">Let’s talk <span>↗</span></a>
       </header>
 
       <section className="hero" id="home">
@@ -79,8 +79,8 @@ export default function Home() {
             We help businesses build stronger foundations, connect with the right customers and use technology to work smarter.
           </p>
           <div className="hero-actions">
-            <a className="button button-gold" href="#contact">Discuss your project <span>↗</span></a>
-            <a className="text-link" href="#services">Explore our services <span>↓</span></a>
+            <a className="button button-gold" href="/contact">Discuss your project <span>↗</span></a>
+            <a className="text-link" href="/services">Explore our services <span>↓</span></a>
           </div>
           <div className="hero-proof">
             <div className="proof-icon">✳</div>
@@ -160,7 +160,7 @@ export default function Home() {
             <li><span>✓</span> Customer relationship management systems</li>
             <li><span>✓</span> Reporting, dashboards and automation</li>
           </ul>
-          <a className="button button-gold" href="#contact">Explore a technology solution <span>↗</span></a>
+          <a className="button button-gold" href="/contact">Explore a technology solution <span>↗</span></a>
         </div>
         <div className="dashboard-visual" aria-label="Illustrative business software dashboard">
           <div className="dashboard-window">
@@ -200,7 +200,7 @@ export default function Home() {
       <footer className="site-footer">
         <a className="brand footer-brand" href="#home"><span className="brand-mark">J<span>.</span></span><span className="brand-copy"><strong>JOHDEN</strong><small>BUSINESS CONSULTANCY SERVICES</small></span></a>
         <p>Strategy. Growth. Technology.</p>
-        <div className="footer-links"><a href="#services">Services</a><a href="#about">About</a><a href="#products">Technology</a><a href="#contact">Contact</a></div>
+        <div className="footer-links"><a href="/services">Services</a><a href="/about">About</a><a href="/technology">Technology</a><a href="/contact">Contact</a></div>
         <small>© {new Date().getFullYear()} Johden Business Consultancy Services. All rights reserved.</small>
       </footer>
     </main>
