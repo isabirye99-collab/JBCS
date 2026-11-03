@@ -7,8 +7,8 @@ export default function Home() {
         <a className="brand" href="/" aria-label="Johden home"><Image src="/johden-logo.svg" alt="Johden Business Consultancy Services" width={310} height={105} priority /></a>
         <nav className="desktop-nav" aria-label="Main navigation">
           <a href="/" aria-current="page">Home</a>
-          <a href="/services">Services</a>
           <a href="/about">About</a>
+          <a href="/services">Services</a>
           <a href="/technology">Technology</a>
           <a href="/contact">Contact</a>
           <a href="/feedback">Feedback</a>
