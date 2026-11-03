@@ -46,3 +46,26 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({template:(await r.json())[0]},{status:201});
   }catch{return fail("Unable to connect to finance database.",502);}
 }
+export async function PATCH(request: NextRequest) {
+  if (!(await verifyAdmin())) return fail("Unauthorised", 401);
+  const { url, key } = config();
+  if (!url || !key) return fail("Finance database configuration is missing.", 503);
+  let body: Record<string, unknown>;
+  try { body = await request.json(); } catch { return fail("Invalid schedule update."); }
+  const id = typeof body.id === "string" ? body.id : "";
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id) || typeof body.is_active !== "boolean") return fail("Select a valid schedule and status.");
+  try {
+    const wid = await workspace(url, key);
+    if (!wid) return fail("JBCS workspace not found or inactive.", 503);
+    const response = await fetch(`${url}/rest/v1/recurring_expense_templates?id=eq.${encodeURIComponent(id)}&workspace_id=eq.${encodeURIComponent(wid)}&select=id,is_active`, {
+      method: "PATCH",
+      headers: { apikey: key, Authorization: `Bearer ${key}`, "Content-Type": "application/json", Prefer: "return=representation" },
+      body: JSON.stringify({ is_active: body.is_active, updated_at: new Date().toISOString() }),
+      cache: "no-store",
+    });
+    if (!response.ok) return fail("Unable to update recurring schedule.", 502);
+    const rows = await response.json();
+    if (!Array.isArray(rows) || rows.length !== 1) return fail("Schedule not found in this workspace.", 404);
+    return NextResponse.json({ template: rows[0] });
+  } catch { return fail("Unable to connect to finance database.", 502); }
+}
