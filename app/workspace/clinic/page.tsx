@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getClinicContext } from "@/lib/clinic-context";
 import PatientRegistrationForm from "@/components/clinic/PatientRegistrationForm";
+import AppointmentForm from "@/components/clinic/AppointmentForm";
 
 export const dynamic = "force-dynamic";
 
@@ -33,8 +34,9 @@ export default async function ClinicWorkspacePage() {
   }
 
   const wid = encodeURIComponent(ctx.workspaceId);
-  const [patients, appointments, charges, receipts, inventory] = await Promise.all([
+  const [patients, patientDirectory, appointments, charges, receipts, inventory] = await Promise.all([
     rows(ctx.url, ctx.serviceKey, `patients?workspace_id=eq.${wid}&select=id,patient_number,full_name,phone,created_at&order=created_at.desc&limit=8`),
+    rows(ctx.url, ctx.serviceKey, `patients?workspace_id=eq.${wid}&select=id,patient_number,full_name&order=full_name.asc&limit=500`),
     rows(ctx.url, ctx.serviceKey, `clinic_appointments?workspace_id=eq.${wid}&select=id,patient_id,appointment_at,status,reason&order=appointment_at.desc&limit=8`),
     rows(ctx.url, ctx.serviceKey, `clinic_charges?workspace_id=eq.${wid}&select=id,patient_id,description,quantity,unit_price,currency,status,charge_date&order=charge_date.desc&limit=1000`),
     rows(ctx.url, ctx.serviceKey, `clinic_receipts?workspace_id=eq.${wid}&select=id,patient_id,receipt_number,amount,currency,payment_method,receipt_date&order=receipt_date.desc&limit=8`),
@@ -46,7 +48,7 @@ export default async function ClinicWorkspacePage() {
   const unpaidCharges = charges.filter(c => c.status === "unpaid");
   const lowStock = inventory.filter(i => Number(i.quantity_on_hand) <= Number(i.reorder_level));
   const todayReceipts = receipts.filter(r => String(r.receipt_date || "").slice(0, 10) === today);
-  const patientNames = new Map(patients.map(p => [p.id, p.full_name]));
+  const patientNames = new Map(patientDirectory.map(p => [p.id, p.full_name]));
 
   return <main style={{ minHeight: "100vh", background: "#f7f8fa", color: "#252b36", fontFamily: "Arial, sans-serif" }}>
     <aside style={{ position: "fixed", inset: "0 auto 0 0", width: 236, padding: 24, background: "#202632", color: "#fff", display: "flex", flexDirection: "column", gap: 10, zIndex: 2 }}>
@@ -84,7 +86,7 @@ export default async function ClinicWorkspacePage() {
         {patients.length ? <div style={{ overflowX: "auto" }}><table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}><thead><tr>{["Patient number","Name","Phone","Registered"].map(x=><th key={x} style={{ padding: 11, borderBottom: "1px solid #e7eaf0" }}>{x}</th>)}</tr></thead><tbody>{patients.map(p=><tr key={p.id}>{[p.patient_number,p.full_name,p.phone||"—",String(p.created_at||"").slice(0,10)].map((x,i)=><td key={i} style={{ padding: 11, borderBottom: "1px solid #f0f1f4" }}>{x}</td>)}</tr>)}</tbody></table></div> : <p style={{ color: "#687080" }}>No patient records are available yet in this workspace.</p>}
       </section>
       <section id="appointments" style={{ marginTop: 20, background: "#fff", border: "1px solid #e7eaf0", borderRadius: 14, padding: 22 }}>
-        <h2 style={{ marginTop: 0 }}>Recent appointments</h2>
+        <h2 style={{ marginTop: 0 }}>Schedule an appointment</h2>\n        <p style={{ color: "#687080" }}>Choose a registered patient and a future date and time. Appointment records remain within Johnpaul Medical Center.</p>\n        <AppointmentForm patients={patientDirectory.map(p => ({ id: p.id, patient_number: p.patient_number, full_name: p.full_name }))} />\n        <hr style={{ border: 0, borderTop: "1px solid #e7eaf0", margin: "26px 0" }} />\n        <h2 style={{ marginTop: 0 }}>Recent appointments</h2>
         {appointments.length ? <div style={{ overflowX: "auto" }}><table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}><thead><tr>{["Date & time","Patient","Reason","Status"].map(x=><th key={x} style={{ padding: 11, borderBottom: "1px solid #e7eaf0" }}>{x}</th>)}</tr></thead><tbody>{appointments.map(a=><tr key={a.id}><td style={{ padding: 11 }}>{new Date(a.appointment_at).toLocaleString("en-UG",{timeZone:"Africa/Kampala"})}</td><td style={{ padding: 11 }}>{patientNames.get(a.patient_id)||"Patient record"}</td><td style={{ padding: 11 }}>{a.reason||"—"}</td><td style={{ padding: 11 }}>{a.status}</td></tr>)}</tbody></table></div> : <p style={{ color: "#687080" }}>No appointment records are available yet.</p>}
       </section>
       <section id="billing" style={{ marginTop: 20, background: "#fff", border: "1px solid #e7eaf0", borderRadius: 14, padding: 22 }}>
