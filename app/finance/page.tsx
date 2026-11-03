@@ -91,6 +91,7 @@ export default function FinanceDashboard() {
   const [active, setActive] = useState("Overview");
   const [search, setSearch] = useState("");
   const [showCreate, setShowCreate] = useState(false);
+  const [contactType, setContactType] = useState<"client" | "supplier">("client");
   const [notice, setNotice] = useState("");
 
   const [customers, setCustomers] = useState<Customer[]>([]);
@@ -113,7 +114,7 @@ export default function FinanceDashboard() {
     setCustomerError("");
 
     try {
-      const response = await fetch("/api/finance/customers", {
+      const response = await fetch(`/api/finance/customers?type=${contactType}`, {
         cache: "no-store",
       });
       const data = await response.json();
@@ -130,7 +131,7 @@ export default function FinanceDashboard() {
     } finally {
       setLoadingCustomers(false);
     }
-  }, []);
+  }, [contactType]);
 
   const loadInvoices = useCallback(async () => {
     setLoadingInvoices(true);
@@ -196,7 +197,7 @@ export default function FinanceDashboard() {
       const response = await fetch("/api/finance/customers", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(customerForm),
+        body: JSON.stringify({ ...customerForm, contact_type: contactType }),
       });
 
       const data = await response.json();
@@ -207,7 +208,7 @@ export default function FinanceDashboard() {
 
       setCustomerForm(emptyCustomer);
       setShowCreate(false);
-      setNotice(`Customer "${data.customer.name}" was saved successfully.`);
+      setNotice(`${contactType === "supplier" ? "Supplier" : "Customer"} "${data.customer.name}" was saved successfully.`);
       await loadCustomers();
     } catch (err) {
       setCustomerError(
@@ -578,17 +579,25 @@ export default function FinanceDashboard() {
                   </p>
                 </div>
 
+                {active === "Customers" && (
+                  <select
+                    className="finance-search"
+                    aria-label="Contact type"
+                    value={contactType}
+                    onChange={(event) => {
+                      setContactType(event.target.value as "client" | "supplier");
+                      setSearch("");
+                    }}
+                  >
+                    <option value="client">Customers / Clients</option>
+                    <option value="supplier">Suppliers</option>
+                  </select>
+                )}
                 <input
                   className="finance-search"
                   value={search}
                   onChange={(event) => setSearch(event.target.value)}
-                  placeholder={
-                    active === "Customers"
-                      ? "Search name, email or phone..."
-                      : active === "Quotes"
-                        ? "Search quotation or customer..."
-                        : "Search records..."
-                  }
+                  placeholder={active === "Customers" ? "Search contacts by name, email or phone..." : active === "Quotes" ? "Search quotation or customer..." : "Search records..."}
                 />
               </div>
 
@@ -655,7 +664,7 @@ export default function FinanceDashboard() {
                       <table className="finance-table">
                         <thead>
                           <tr>
-                            <th>CUSTOMER</th>
+                            <th>{contactType === "supplier" ? "SUPPLIER" : "CUSTOMER"}</th>
                             <th>EMAIL</th>
                             <th>TELEPHONE</th>
                             <th>ADDRESS</th>
@@ -681,18 +690,18 @@ export default function FinanceDashboard() {
                     <div className="finance-empty">
                       <div className="finance-empty-icon">♙</div>
                       <h3>
-                        {search ? "No matching customers" : "No customers yet"}
+                        {search ? `No matching ${contactType === "supplier" ? "suppliers" : "customers"}` : `No ${contactType === "supplier" ? "suppliers" : "customers"} yet`}
                       </h3>
                       <p>
                         {search
                           ? "Try another search."
-                          : "Add a customer before preparing invoices."}
+                          : contactType === "supplier" ? "Add a supplier to link it to business expenses." : "Add a customer before preparing invoices."}
                       </p>
                       <button
                         className="finance-primary-button"
                         onClick={() => setShowCreate(true)}
                       >
-                        + Add customer
+                        {`+ Add ${contactType === "supplier" ? "supplier" : "customer"}`}
                       </button>
                     </div>
                   )}
@@ -745,7 +754,7 @@ export default function FinanceDashboard() {
             <p className="finance-eyebrow">JOHDEN FINANCE</p>
             <h2 id="create-title">
               {active === "Customers"
-                ? "Add a customer"
+                ? `Add a ${contactType === "supplier" ? "supplier" : "customer"}`
                 : active === "Quotes"
                   ? "Create a quotation"
                   : `Create ${createLabel}`}
@@ -754,7 +763,7 @@ export default function FinanceDashboard() {
             {active === "Customers" ? (
               <form onSubmit={saveCustomer}>
                 <label>
-                  Customer name *
+                  {contactType === "supplier" ? "Supplier name *" : "Customer name *"}
                   <input
                     required
                     maxLength={160}
