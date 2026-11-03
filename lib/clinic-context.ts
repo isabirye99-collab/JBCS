@@ -21,7 +21,9 @@ export async function getClinicContext() {
   const now = Date.now();
   const trialValid = subscription?.status === "trialing" && subscription?.trial_ends_at && new Date(subscription.trial_ends_at).getTime() > now;
   const paidValid = subscription?.status === "active" && (!subscription.current_period_ends_at || new Date(subscription.current_period_ends_at).getTime() > now);
-  if (!trialValid && !paidValid) return { error: "The clinic workspace subscription is not active. Contact Johden support.", status: 402 as const };
+  // Owner setup access is allowed without creating a subscription. Paid features must enforce entitlements separately.
+  const setupMode = !trialValid && !paidValid;
+  if (setupMode && membership.role !== "owner") return { error: "The clinic workspace subscription is not active. Contact Johden support.", status: 402 as const };
 
-  return { session, url, serviceKey, workspaceId: workspace.id as string, workspaceName: workspace.name as string, role: membership.role as string };
+  return { session, url, serviceKey, workspaceId: workspace.id as string, workspaceName: workspace.name as string, role: membership.role as string, setupMode };
 }
