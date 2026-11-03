@@ -187,3 +187,8 @@ body{font-size:16px;line-height:1.75}
  .home-page .hero-image-badge{left:-10px;bottom:8px;padding:11px 13px}
  .home-page .hero-image-badge strong{font-size:11px}
 }
+
+/* Consistent active navigation state across every page */
+.desktop-nav a{transition:color .18s ease}
+.desktop-nav a[aria-current="page"]{color:var(--red)!important;font-weight:800}
+.desktop-nav a:hover{color:var(--red)}
