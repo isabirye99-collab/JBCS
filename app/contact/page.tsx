@@ -1,21 +1,14 @@
 import type { Metadata } from "next";
+import Image from "next/image";
+import InquiryForm from "./InquiryForm";
 
-export const metadata: Metadata = { title: "Let’s Talk" };
+export const metadata: Metadata = { title: "Contact Johden", description: "Send a service inquiry or request a consultation with Johden Business Consultancy Services." };
 
 export default function Page() {
-  return (
-    <main className="inner-page">
-      <header className="site-header">
-        <a className="brand" href="/"><span className="brand-mark">J<span>.</span></span><span className="brand-copy"><strong>JOHDEN</strong><small>BUSINESS CONSULTANCY SERVICES</small></span></a>
-        <nav className="desktop-nav" aria-label="Main navigation"><a href="/">Home</a><a href="/about">About</a><a href="/services">Services</a><a href="/technology">Technology</a><a href="/contact">Contact</a></nav>
-        <a className="button button-dark header-cta" href="/contact">Let’s talk ↗</a>
-      </header>
-      <section className="inner-hero"><div className="eyebrow dark-eyebrow"><span /> START A CONVERSATION</div><h1>Let’s <em>Talk</em></h1><p>Share your goals with Johden and let’s explore how we can help you take the next step.</p></section>
-      <section className="inner-content">
-        <div className="contact-panel"><h2>Tell us what you’re working on.</h2><p>We’ll help you identify a practical next step for your business, brand, research or technology project.</p><a className="button button-gold" href="https://johden.my.canva.site/" target="_blank" rel="noreferrer">Contact Johden ↗</a><p className="contact-note">Until official contact details are confirmed, this link opens the existing Johden website.</p></div>
-        <a className="button button-outline" href="/contact">Discuss your project ↗</a>
-      </section>
-      <footer className="site-footer"><a className="brand footer-brand" href="/"><span className="brand-mark">J<span>.</span></span><span className="brand-copy"><strong>JOHDEN</strong><small>BUSINESS CONSULTANCY SERVICES</small></span></a><p>Strategy. Growth. Technology.</p><div className="footer-links"><a href="/">Home</a><a href="/services">Services</a><a href="/about">About</a><a href="/contact">Contact</a></div><small>© {new Date().getFullYear()} Johden Business Consultancy Services. All rights reserved.</small></footer>
-    </main>
-  );
+  return <main className="inner-page">
+    <header className="site-header"><a className="brand" href="/" aria-label="Johden home"><Image src="/johden-logo.svg" alt="Johden Business Consultancy Services" width={290} height={98} priority/></a><nav className="desktop-nav" aria-label="Main navigation"><a href="/">Home</a><a href="/services">Services</a><a href="/about">About Johden</a><a href="/technology">Technology</a></nav><a className="button button-primary header-cta" href="#contact-form">Let’s talk <span>↗</span></a></header>
+    <section className="inner-hero"><span className="eyebrow dark"><i/> START A CONVERSATION</span><h1>Let’s make your next step <em>clear.</em></h1><p>Tell us what you’re working on, or request a consultation. We’ll help you explore the right next step.</p><div className="contact-benefits"><span>✓ Personalised guidance</span><span>✓ Clear next steps</span><span>✓ No-obligation inquiry</span></div></section>
+    <section className="contact-layout" id="contact-form"><div className="contact-side"><span className="eyebrow dark"><i/> HOW WE CAN HELP</span><h2>Start with a conversation.</h2><p>Share as much or as little as you know. You do not need to have every detail figured out before reaching out.</p><div className="contact-promise"><span>01</span><div><strong>Tell us about your needs</strong><p>Choose a service and give us a little context.</p></div></div><div className="contact-promise"><span>02</span><div><strong>We’ll discuss the options</strong><p>We can clarify scope, priorities and potential next steps.</p></div></div><div className="contact-promise"><span>03</span><div><strong>Agree on the way forward</strong><p>Move ahead only when the approach is clear.</p></div></div><div className="contact-help"><strong>Prefer WhatsApp?</strong><p>The form prepares a message and opens WhatsApp, where you can select Johden’s official business chat before sending.</p></div></div><InquiryForm/></section>
+    <footer className="site-footer"><div className="footer-main"><a className="footer-logo" href="/"><Image src="/johden-logo.svg" alt="Johden Business Consultancy Services" width={260} height={88}/></a><p>For academics and business solutions.</p><div className="footer-links"><a href="/">Home</a><a href="/services">Services</a><a href="/about">About</a><a href="/contact">Contact</a></div></div><div className="footer-bottom"><span>© {new Date().getFullYear()} Johden Business Consultancy Services. All rights reserved.</span><span>Business. Creativity. Technology.</span></div></footer>
+  </main>;
 }
