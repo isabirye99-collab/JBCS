@@ -11,6 +11,7 @@ export default function Page() {
           <a href="/about">About</a>
           <a href="/services">Services</a>
           <a href="/technology">Technology</a>
+          <a href="/invoicing">Invoicing</a>
           <a href="/contact" aria-current="page">Contact</a>
           <a href="/feedback">Feedback</a>
         </nav><a className="button button-primary header-cta" href="#contact-form">Let’s talk <span>↗</span></a></header>
