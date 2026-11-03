@@ -156,3 +156,34 @@ body{font-size:16px;line-height:1.75}
  .home-page>.footer-service-strip{padding:18px 6%}
  .home-page>.site-footer,.inner-page>.site-footer{padding:16px 5%}
 }
+
+/* Homepage hero visual refresh: real photography, no oversized logo card or decorative clutter */
+.home-page .hero{grid-template-columns:minmax(0,1fr) minmax(0,.95fr);gap:clamp(32px,5vw,78px);min-height:620px;padding:74px clamp(28px,7.2vw,112px) 82px;max-width:1600px;margin:0 auto}
+.home-page .hero-content{width:100%;max-width:600px;min-width:0}
+.home-page .hero h1{font-size:clamp(44px,4.4vw,66px);line-height:1.08;max-width:610px}
+.home-page .hero-lede{font-size:16px;max-width:490px}
+.home-page .hero-visual{width:100%;min-width:0;min-height:470px;display:block;padding:0;position:relative}
+.home-page .hero-visual-shape{width:100%;height:440px;max-width:none;border-radius:20px;background-image:linear-gradient(180deg,rgba(25,22,24,.04) 25%,rgba(25,22,24,.78) 100%),url('https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=1400&q=90');background-size:cover;background-position:center;display:block;overflow:hidden;box-shadow:0 24px 60px rgba(46,25,28,.13)}
+.home-page .hero-visual-shape:before{display:none}
+.home-page .hero-photo-caption{left:32px;right:24px;top:auto;bottom:34px;color:#fff;text-shadow:none}
+.home-page .hero-photo-caption span{font-size:10px;letter-spacing:.13em}
+.home-page .hero-photo-caption strong{font-size:clamp(27px,2.8vw,38px);line-height:1.13;margin-top:12px;letter-spacing:-.035em}
+.home-page .hero-visual-logo,.home-page .visual-arc,.home-page .hero-note,.home-page .visual-caption{display:none!important}
+.home-page .hero-image-badge{position:absolute;left:-28px;bottom:20px;display:flex;align-items:center;gap:12px;background:#fff;border:1px solid #eee5e6;padding:14px 18px;box-shadow:0 14px 36px rgba(46,25,28,.12);max-width:calc(100% - 12px)}
+.home-page .hero-image-badge-icon{display:grid;place-items:center;flex:0 0 36px;height:36px;background:#fff0f1;color:var(--red);font-size:20px}
+.home-page .hero-image-badge small,.home-page .hero-image-badge strong{display:block}
+.home-page .hero-image-badge small{font-size:9px;color:#82777c;letter-spacing:.1em}
+.home-page .hero-image-badge strong{font:700 12px 'Manrope',sans-serif;color:var(--ink);margin-top:3px}
+.home-page .home-intro{padding-top:82px;padding-bottom:88px}
+@media(max-width:1000px){.home-page .hero{padding:58px 6%;gap:28px}.home-page .hero-visual{min-height:400px}.home-page .hero-visual-shape{height:380px}.home-page .hero-image-badge{left:-12px}}
+@media(max-width:720px){
+ .home-page .hero{grid-template-columns:minmax(0,1fr);padding:48px 6% 58px;gap:30px;min-height:0}
+ .home-page .hero h1{font-size:clamp(42px,10.5vw,57px)}
+ .home-page .hero-lede{font-size:15px}
+ .home-page .hero-visual{min-height:340px;margin:0 0 0 10px}
+ .home-page .hero-visual-shape{height:320px;border-radius:16px;background-position:center}
+ .home-page .hero-photo-caption{left:22px;bottom:24px}
+ .home-page .hero-photo-caption strong{font-size:28px}
+ .home-page .hero-image-badge{left:-10px;bottom:8px;padding:11px 13px}
+ .home-page .hero-image-badge strong{font-size:11px}
+}
