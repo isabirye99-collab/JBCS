@@ -100,7 +100,7 @@ export async function POST(request: NextRequest) {
     new Date(`${paymentDate}T00:00:00Z`).toISOString().slice(0, 10) === paymentDate;
 
   if (
-    !/^[0-9a-f-]{36}$/i.test(invoiceId) ||
+    !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(invoiceId) ||
     !validPaymentDate ||
     !Number.isFinite(amount) ||
     amount <= 0 ||
