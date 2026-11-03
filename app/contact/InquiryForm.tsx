@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 
 type FormMode = "inquiry" | "consultation";
 
@@ -15,7 +15,7 @@ export default function InquiryForm() {
   const [details, setDetails] = useState("");
   const [notice, setNotice] = useState("");
 
-  function submitForm(event: React.FormEvent<HTMLFormElement>) {
+  function submitForm(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const heading = mode === "consultation" ? "CONSULTATION REQUEST" : "SERVICE INQUIRY";
     const lines = [
