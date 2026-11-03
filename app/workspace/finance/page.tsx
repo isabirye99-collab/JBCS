@@ -108,6 +108,48 @@ export default function WorkspaceFinancePage() {
     finally { setBusy(false); }
   }
 
+  async function issueInvoice(invoice: Invoice) {
+    if (!window.confirm(`Issue invoice ${invoice.invoice_number}? This will make it available for payment recording.`)) return;
+    setBusy(true); setError(""); setNotice("");
+    try {
+      const response = await fetch("/api/saas/invoices/issue", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: invoice.id }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Could not issue invoice.");
+      setNotice(`Invoice ${invoice.invoice_number} issued. It has not been emailed to the customer.`);
+      await load();
+    } catch (e) { setError(e instanceof Error ? e.message : "Unable to issue invoice."); }
+    finally { setBusy(false); }
+  }
+
+  async function recordPayment(invoice: Invoice) {
+    const balance = Math.max(0, Number(invoice.total || 0) - Number(invoice.amount_paid || 0));
+    if (balance <= 0) { setError("This invoice has no outstanding balance."); return; }
+    const amountText = window.prompt(`Outstanding balance: ${money(balance, invoice.currency)}\nEnter payment amount in ${invoice.currency}:`, balance.toFixed(2));
+    if (amountText === null) return;
+    const amount = Number(amountText);
+    if (!Number.isFinite(amount) || amount <= 0) { setError("Enter a valid positive payment amount."); return; }
+    const method = window.prompt("Payment method: cash, bank_transfer, mobile_money, card, cheque, other", "bank_transfer");
+    if (method === null) return;
+    const paymentDate = window.prompt("Payment date (YYYY-MM-DD)", new Date().toISOString().slice(0, 10));
+    if (paymentDate === null) return;
+    const reference = window.prompt("Payment reference (optional)", "") ?? "";
+    setBusy(true); setError(""); setNotice("");
+    try {
+      const response = await fetch("/api/saas/payments", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ invoice_id: invoice.id, amount, method, payment_date: paymentDate, payment_reference: reference }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Could not record payment.");
+      setNotice(`Payment recorded for ${invoice.invoice_number}. New status: ${data.payment.status.replace("_", " ")}.`);
+      await load();
+    } catch (e) { setError(e instanceof Error ? e.message : "Unable to record payment."); }
+    finally { setBusy(false); }
+  }
+
   async function createExpense(event: FormEvent<HTMLFormElement>) {
     event.preventDefault(); setBusy(true); setError(""); setNotice("");
     try {
@@ -179,7 +221,7 @@ export default function WorkspaceFinancePage() {
         <label style={{display:"block",marginTop:16}}>Search customers<input value={customerSearch} onChange={e=>setCustomerSearch(e.target.value)} placeholder="Search by name or email" /></label>
         {filteredCustomers.length===0 ? <p style={{marginTop:16}}>{customers.length===0?"Your directory is empty. Add your first customer above.":"No customers match that search."}</p> : <div style={{overflowX:"auto",marginTop:12}}><table style={{width:"100%",borderCollapse:"collapse",textAlign:"left"}}><thead><tr><th style={{padding:10}}>Customer</th><th style={{padding:10}}>Email</th><th style={{padding:10}}>Action</th></tr></thead><tbody>{filteredCustomers.map(customer=><tr key={customer.id}><td style={{padding:10}}>{customer.name}</td><td style={{padding:10}}>{customer.email||"—"}</td><td style={{padding:10}}><button type="button" onClick={()=>{setSelectedCustomer(customer.id);setNotice(customer.name+" selected for the invoice form.");window.scrollTo({top:0,behavior:"smooth"});}}>Use for invoice</button></td></tr>)}</tbody></table></div>}
       </article>
-      <div id="invoice-list" className="invoice-list-panel" style={{marginTop:32,background:"#fff",border:"1px solid #ece7e6",borderRadius:12,padding:20}}><div className="invoice-list-heading"><div><span className="eyebrow dark"><i/> BILLING REGISTER</span><h2>Invoices</h2><p>Search, review, and print invoices saved in this workspace.</p></div><input aria-label="Search invoices" value={invoiceSearch} onChange={e=>setInvoiceSearch(e.target.value)} placeholder="Search invoice, customer or status" /></div>{filteredInvoices.length===0 ? <p>{invoiceSearch ? "No invoices match your search." : "No invoices yet. Create your first draft above."}</p> : <div style={{overflowX:"auto"}}><table style={{width:"100%",borderCollapse:"collapse",textAlign:"left"}}><thead><tr><th style={{padding:12}}>Invoice</th><th style={{padding:12}}>Date</th><th style={{padding:12}}>Customer</th><th style={{padding:12}}>Total</th><th style={{padding:12}}>Status</th><th style={{padding:12}}>Actions</th></tr></thead><tbody>{filteredInvoices.map(i=><tr key={i.id}><td style={{padding:12}}>{i.invoice_number}</td><td style={{padding:12}}>{i.issue_date}</td><td style={{padding:12}}>{i.business_contacts?.name || "Customer"}</td><td style={{padding:12}}>{money(i.total,i.currency)}</td><td style={{padding:12}}>{i.status}</td><td style={{padding:12,display:"flex",gap:10,flexWrap:"wrap"}}>{i.status === "draft" && <button type="button" disabled={busy} onClick={() => editDraftInvoice(i)}>Edit draft</button>}<Link href={`/workspace/invoices/${i.id}/print`} target="_blank">Print / Save PDF</Link></td></tr>)}</tbody></table></div>}</div>
+      <div id="invoice-list" className="invoice-list-panel" style={{marginTop:32,background:"#fff",border:"1px solid #ece7e6",borderRadius:12,padding:20}}><div className="invoice-list-heading"><div><span className="eyebrow dark"><i/> BILLING REGISTER</span><h2>Invoices</h2><p>Search, review, and print invoices saved in this workspace.</p></div><input aria-label="Search invoices" value={invoiceSearch} onChange={e=>setInvoiceSearch(e.target.value)} placeholder="Search invoice, customer or status" /></div>{filteredInvoices.length===0 ? <p>{invoiceSearch ? "No invoices match your search." : "No invoices yet. Create your first draft above."}</p> : <div style={{overflowX:"auto"}}><table style={{width:"100%",borderCollapse:"collapse",textAlign:"left"}}><thead><tr><th style={{padding:12}}>Invoice</th><th style={{padding:12}}>Date</th><th style={{padding:12}}>Customer</th><th style={{padding:12}}>Total</th><th style={{padding:12}}>Status</th><th style={{padding:12}}>Actions</th></tr></thead><tbody>{filteredInvoices.map(i=><tr key={i.id}><td style={{padding:12}}>{i.invoice_number}</td><td style={{padding:12}}>{i.issue_date}</td><td style={{padding:12}}>{i.business_contacts?.name || "Customer"}</td><td style={{padding:12}}>{money(i.total,i.currency)}</td><td style={{padding:12}}>{i.status}</td><td style={{padding:12,display:"flex",gap:10,flexWrap:"wrap"}}>{i.status === "draft" && <><button type="button" disabled={busy} onClick={() => editDraftInvoice(i)}>Edit draft</button><button type="button" disabled={busy} onClick={() => issueInvoice(i)}>Issue invoice</button></>}{["sent","part_paid","overdue"].includes(i.status) && Number(i.total || 0) > Number(i.amount_paid || 0) && <button type="button" disabled={busy} onClick={() => recordPayment(i)}>Record payment</button>}<Link href={`/workspace/invoices/${i.id}/print`} target="_blank">Print / Save PDF</Link></td></tr>)}</tbody></table></div>}</div>
       <div id="expense-list" style={{marginTop:32,background:"#fff",border:"1px solid #ece7e6",borderRadius:12,padding:20}}><h2>Expenses</h2>{expenses.length===0 ? <p>No expenses recorded yet.</p> : <div style={{overflowX:"auto"}}><table style={{width:"100%",borderCollapse:"collapse",textAlign:"left"}}><thead><tr><th style={{padding:12}}>Date</th><th style={{padding:12}}>Category</th><th style={{padding:12}}>Description</th><th style={{padding:12}}>Amount</th><th style={{padding:12}}>Method</th></tr></thead><tbody>{expenses.map(e=><tr key={e.id}><td style={{padding:12}}>{e.expense_date}</td><td style={{padding:12}}>{e.category}</td><td style={{padding:12}}>{e.description}</td><td style={{padding:12}}>{money(e.amount,e.currency)}</td><td style={{padding:12}}>{e.payment_method.replace("_"," ")}</td></tr>)}</tbody></table></div>}</div>
       <p style={{marginTop:20,fontSize:13,opacity:.8}}>This is an initial workspace module. Email delivery, payment recording and subscription checkout remain disabled until provider credentials and secure payment webhooks are configured and tested.</p>
     </section>
