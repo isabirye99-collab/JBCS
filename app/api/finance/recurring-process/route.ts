@@ -3,8 +3,20 @@ import { verifyAdmin } from "@/lib/admin-auth";
 
 export const dynamic = "force-dynamic";
 
-export async function POST() {
-  if (!(await verifyAdmin())) {
+function kampalaDate() {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Africa/Kampala",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date());
+}
+
+export async function POST(request: Request) {
+  const cronSecret = process.env.CRON_SECRET;
+  const authorization = request.headers.get("authorization");
+  const isScheduledCall = Boolean(cronSecret && authorization === `Bearer ${cronSecret}`);
+  if (!isScheduledCall && !(await verifyAdmin())) {
     return NextResponse.json({ error: "Unauthorised" }, { status: 401 });
   }
   const url = process.env.SUPABASE_URL?.replace(/\/+$/, "");
@@ -16,7 +28,7 @@ export async function POST() {
     const response = await fetch(`${url}/rest/v1/rpc/process_jbcs_due_recurring_finance`, {
       method: "POST",
       headers: { apikey: key, Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ p_today: new Date().toISOString().slice(0, 10) }),
+      body: JSON.stringify({ p_today: kampalaDate() }),
       cache: "no-store",
     });
     if (!response.ok) {
