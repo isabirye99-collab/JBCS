@@ -2,7 +2,7 @@ name: Johden website CI
 
 on:
   push:
-    branches: [main, feature/finance-billing]
+    branches: [main, feature/finance-billing, feature/invoicing-saas-portal]
   pull_request:
     branches: [main]
 
