@@ -30,8 +30,8 @@ export default function InquiryForm() {
       "Requirements: " + (details || "I would like to discuss my requirements."),
     ];
     const message = lines.join("\n");
-    setNotice("Your message is ready. WhatsApp will open so you can choose Johden's official business chat and send it.");
-    window.open("https://wa.me/?text=" + encodeURIComponent(message), "_blank", "noopener,noreferrer");
+    setNotice("Opening WhatsApp chat with Johden. Review your message and tap Send.");
+    window.open("https://wa.me/256702846597?text=" + encodeURIComponent(message), "_blank", "noopener,noreferrer");
   }
 
   return (
