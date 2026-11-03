@@ -23,7 +23,7 @@ export default function InvoicingPage() {
         <nav className="desktop-nav" aria-label="Main navigation">
           <a href="/">Home</a><a href="/services">Services</a><a href="/technology">Technology</a><a href="/invoicing" aria-current="page">Invoicing</a><a href="/contact">Contact</a>
         </nav>
-        <a className="button button-secondary header-cta" href="#account-access">Sign in / Create account</a>
+        <a className="button button-secondary header-cta" href="/login">Sign in / Create account</a>
       </header>
 
       <section className="inner-hero invoice-product-hero">
@@ -31,7 +31,7 @@ export default function InvoicingPage() {
         <h1>Invoices, expenses and payments. <em>All in one place.</em></h1>
         <p>Spend less time chasing paperwork and more time running your business. Johden's billing workspace is being developed for businesses, consultants and growing teams.</p>
         <div className="hero-actions">
-          <a className="button button-primary" href="#account-access">Get started <span>↗</span></a>
+          <a className="button button-primary" href="/login">Get started <span>↗</span></a>
           <a className="button button-secondary" href="#features">Explore features</a>
         </div>
         <div className="invoice-product-trust"><span>✓ Multi-currency workflows</span><span>✓ Customer and supplier records</span><span>✓ Invoice and expense tracking</span></div>
@@ -52,17 +52,17 @@ export default function InvoicingPage() {
 
       <section className="invoice-product-band">
         <div><span className="eyebrow"><i /> SIMPLE WORKFLOWS, BETTER VISIBILITY</span><h2>Your business finances, <em>with more clarity.</em></h2><p>Prepare invoices, keep an eye on outstanding balances and organise routine finance work in a dedicated workspace.</p></div>
-        <a className="button button-light" href="#account-access">Join the platform <span>↗</span></a>
+        <a className="button button-light" href="/login">Join the platform <span>↗</span></a>
       </section>
 
       <section className="invoice-access-section" id="account-access">
-        <div><span className="eyebrow dark"><i /> YOUR BUSINESS WORKSPACE</span><h2>Ready to manage your <em>invoicing?</em></h2><p>Account registration, secure company workspaces and subscription billing are being prepared for public launch. We will open self-service access after those controls are completed and tested.</p></div>
+        <div><span className="eyebrow dark"><i /> YOUR BUSINESS WORKSPACE</span><h2>Ready to manage your <em>invoicing?</em></h2><p>Create a secure account for your company, receive a 14-day trial, and prepare for annual billing in UGX or USD. Paid subscription checkout is being completed separately.</p></div>
         <div className="invoice-access-card">
           <h3>Access options</h3>
-          <p>Existing JBCS internal access remains separate while the multi-company customer portal is prepared.</p>
-          <a className="button button-primary" href="/contact?service=invoicing">Request early access <span>↗</span></a>
+          <p>Create a new business workspace or sign in to an existing one. Your workspace is separated from Johden internal operations.</p>
+          <a className="button button-primary" href="/login">Create account / Sign in <span>↗</span></a>
           <a className="invoice-access-link" href="https://wa.me/256702846597?text=Hello%20Johden%2C%20I%20am%20interested%20in%20your%20online%20invoicing%20platform." target="_blank" rel="noopener noreferrer">Ask us on WhatsApp ↗</a>
-          <small>Self-service sign-up and paid plans will be enabled after account isolation, permissions and subscription payments are implemented.</small>
+          <small>New accounts begin with a 14-day trial. Annual paid-plan checkout is not yet enabled; we will not charge you until payment setup is ready.</small>
         </div>
       </section>
 
