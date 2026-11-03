@@ -36,7 +36,7 @@ export default function FinanceDashboard() {
         <div className="finance-workspace"><span className="workspace-mark">J</span><span><b>Johden Finance</b><small>Business workspace</small></span><span className="workspace-chevron">⌄</span></div>
         <p className="finance-nav-label">WORKSPACE</p>
         <nav className="finance-nav" aria-label="Finance navigation">
-          {nav.map((item) => <button key={item.label} className={active === item.label ? "finance-nav-item active" : "finance-nav-item"} onClick={() => { setActive(item.label); setNotice(""); }}><span className="finance-nav-icon">{item.icon}</span>{item.label}{item.label === "Invoices" && <span className="nav-count">4</span>}</button>)}
+          {nav.map((item) => <button key={item.label} className={active === item.label ? "finance-nav-item active" : "finance-nav-item"} onClick={() => { if (item.label === "Customers") { window.location.href = "/finance/customers"; return; } setActive(item.label); setNotice(""); }}><span className="finance-nav-icon">{item.icon}</span>{item.label}{item.label === "Invoices" && <span className="nav-count">4</span>}</button>)}
         </nav>
         <div className="finance-sidebar-bottom"><div className="finance-help-icon">?</div><div><b>Need a hand?</b><small>Contact your workspace admin</small></div></div>
         <a className="finance-back-link" href="/">← Back to Johden website</a>
