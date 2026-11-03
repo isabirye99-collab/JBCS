@@ -14,7 +14,7 @@ export default function Home() {
     <header className="site-header">
       <a className="brand" href="/" aria-label="Johden home"><Image src="/johden-logo.svg" alt="Johden Business Consultancy Services — For Academics and Business Solutions" width={310} height={105} priority /></a>
       <nav className="desktop-nav" aria-label="Main navigation"><a href="/services">Services</a><a href="/about">About Johden</a><a href="/technology">Technology</a><a href="/contact">Contact</a></nav>
-      <a className="button button-primary header-cta" href="/contact">Let’s talk <span>↗</span></a>
+      <a className="button button-primary header-cta" href="https://wa.me/256702846597" target="_blank" rel="noopener noreferrer">Let’s talk <span>↗</span></a>
     </header>
     <section className="hero">
       <div className="hero-content">
@@ -31,6 +31,6 @@ export default function Home() {
     <section className="section process-section"><div className="section-heading"><div><span className="eyebrow dark"><i/> HOW WE WORK</span><h2>A clear path from<br/><em>challenge to progress.</em></h2></div><p>No unnecessary complexity. Just a straightforward, collaborative process that keeps your priorities at the centre.</p></div><div className="process-grid"><article><span>01</span><h3>Tell us your goal</h3><p>Share your idea, challenge or opportunity through a short inquiry.</p></article><article><span>02</span><h3>Get a clear plan</h3><p>We discuss your needs, agree on scope and recommend a practical approach.</p></article><article><span>03</span><h3>Move forward</h3><p>Work together with clear deliverables and a shared understanding of next steps.</p></article></div></section>
     <section className="cta-section"><div><span className="eyebrow"><i/> LET’S START A CONVERSATION</span><h2>What would progress<br/><em>look like for you?</em></h2><p>Tell us where you want to go. We’ll help you explore a practical way to get there.</p></div><div className="cta-actions"><a className="button button-light" href="/contact">Make an inquiry <span>↗</span></a><a className="cta-secondary" href="/contact">Request a consultation <span>→</span></a></div><div className="cta-ring ring-one"/><div className="cta-ring ring-two"/></section>
     <footer className="site-footer"><div className="footer-main"><a className="footer-logo" href="/"><Image src="/johden-logo.svg" alt="Johden Business Consultancy Services" width={280} height={95}/></a><p>For academics and business solutions.<br/>Practical expertise for meaningful progress.</p><div className="footer-links"><a href="/services">Services</a><a href="/about">About</a><a href="/technology">Technology</a><a href="/contact">Contact</a></div></div><div className="footer-bottom"><span>© {new Date().getFullYear()} Johden Business Consultancy Services. All rights reserved.</span><span>Business. Creativity. Technology.</span></div></footer>
-    <a className="floating-contact" href="/contact" aria-label="Contact Johden"><span>↗</span><b>Talk to us</b></a>
+    <a className="floating-contact" href="https://wa.me/256702846597" target="_blank" rel="noopener noreferrer" aria-label="Chat with Johden on WhatsApp"><span>↗</span><b>Talk to us</b></a>
   </main>;
 }
