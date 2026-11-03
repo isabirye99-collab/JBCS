@@ -115,3 +115,20 @@ body{font-size:16px;line-height:1.75}
 .footer-service-strip i{display:block;width:5px;height:5px;border-radius:50%;background:#f58220;flex:0 0 auto}
 .site-footer{margin-top:0}
 @media(max-width:720px){.footer-service-strip{padding:19px 6%;gap:10px 13px;font-size:10px;letter-spacing:.04em}.footer-service-strip i{width:4px;height:4px}}
+
+/* Focused homepage and minimal shared footer */
+.home-intro{padding:76px 8% 82px;text-align:center;background:#fff9f8;border-top:1px solid #f5e9e8}
+.home-intro>.eyebrow{justify-content:center}
+.home-intro h2{font:700 clamp(34px,4vw,48px)/1.2 'Manrope',sans-serif;letter-spacing:-.045em;margin:18px 0 12px}
+.home-intro h2 em,.home-contact-band h2 em{font-style:normal;color:var(--red)}
+.home-intro>p{max-width:650px;margin:0 auto;color:var(--muted);font-size:15px;line-height:1.9}
+.home-intro-actions{display:flex;align-items:center;justify-content:center;gap:25px;flex-wrap:wrap;margin-top:26px}
+.home-contact-band{display:flex;align-items:center;justify-content:space-between;gap:35px;padding:65px 9%;background:var(--dark);color:#fff}
+.home-contact-band .eyebrow{color:#fff}
+.home-contact-band h2{font:700 clamp(35px,4vw,48px)/1.15 'Manrope',sans-serif;letter-spacing:-.045em;margin:17px 0}
+.home-contact-band p{max-width:500px;color:#d0c9cd;font-size:14px;line-height:1.9}
+.home-contact-actions{display:flex;flex-direction:column;align-items:flex-start;gap:17px;min-width:210px}
+.home-whatsapp{color:#fff;font-size:12px;font-weight:700}
+.site-footer{padding:20px 7.5%;background:#fff}
+.footer-bottom{display:flex;justify-content:center;text-align:center;padding:8px 0 0;border:0;font-size:10px;color:#8b8488}
+@media(max-width:720px){.home-intro{padding:58px 6%}.home-intro h2{font-size:34px}.home-intro>p{font-size:14px}.home-intro-actions{gap:17px}.home-contact-band{padding:52px 6%;flex-direction:column;align-items:flex-start;gap:15px}.home-contact-band h2{font-size:36px}.home-contact-actions{gap:15px}.site-footer{padding:17px 5%}}
