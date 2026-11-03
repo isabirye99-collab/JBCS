@@ -26,7 +26,7 @@ export default function FinanceOperations({ section, onNotice }: { section: Sect
   const [showForm, setShowForm] = useState(false);
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
-  const [expense, setExpense] = useState({ expense_date: today(), category: "Office supplies", description: "", amount: "", currency: "UGX", exchange_rate: "1", payment_method: "cash", supplier_contact_id: "", notes: "" });
+  const [expense, setExpense] = useState({ expense_date: today(), category: "Office supplies", description: "", amount: "", currency: "UGX", exchange_rate: "1", payment_method: "cash", supplier_contact_id: "", receipt_url: "", notes: "" });
   const [payment, setPayment] = useState({ invoice_id: "", payment_date: today(), amount: "", method: "cash", payment_reference: "", notes: "" });
 
   const load = useCallback(async () => {
@@ -104,6 +104,7 @@ export default function FinanceOperations({ section, onNotice }: { section: Sect
         <div style={fieldStyle}><label htmlFor="expense-rate">Exchange rate to base currency</label><input id="expense-rate" style={inputStyle} type="number" min="0.000001" step="any" required value={expense.exchange_rate} onChange={e => setExpense({ ...expense, exchange_rate: e.target.value })}/></div>
         <div style={fieldStyle}><label htmlFor="expense-supplier">Supplier (optional)</label><select id="expense-supplier" style={selectStyle} value={expense.supplier_contact_id} onChange={e => setExpense({ ...expense, supplier_contact_id: e.target.value })}><option value="">No supplier selected</option>{suppliers.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}</select></div>
         <div style={fieldStyle}><label htmlFor="expense-method">Payment method</label><select id="expense-method" style={selectStyle} value={expense.payment_method} onChange={e => setExpense({ ...expense, payment_method: e.target.value })}>{methods.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}</select></div>
+        <div style={fieldStyle}><label htmlFor="expense-receipt">Receipt URL (optional)</label><input id="expense-receipt" style={inputStyle} type="url" maxLength={2000} value={expense.receipt_url} onChange={e => setExpense({ ...expense, receipt_url: e.target.value })} placeholder="https://..."/></div>
         <div style={fieldStyle}><label htmlFor="expense-notes">Notes</label><textarea id="expense-notes" style={inputStyle} rows={2} value={expense.notes} onChange={e => setExpense({ ...expense, notes: e.target.value })}/></div>
       </> : <>
         <div style={fieldStyle}><label htmlFor="payment-invoice">Invoice</label><select id="payment-invoice" style={selectStyle} required value={payment.invoice_id} onChange={e => { const invoice = invoices.find(i => i.id === e.target.value); setPayment({ ...payment, invoice_id: e.target.value, amount: invoice ? String(Math.max(0, Number(invoice.total)-Number(invoice.amount_paid))) : "" }); }}><option value="">Select an outstanding invoice</option>{invoices.filter(i => !["void","paid"].includes(i.status) && Number(i.total)>Number(i.amount_paid)).map(i => <option key={i.id} value={i.id}>{i.invoice_number} — {i.business_contacts?.name || "Customer"} — {money(Number(i.total)-Number(i.amount_paid), i.currency)}</option>)}</select></div>
