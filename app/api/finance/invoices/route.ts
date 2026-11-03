@@ -140,7 +140,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  if (issueDate && dueDate && dueDate < issueDate) {
+  if (dueDate && dueDate < (issueDate || new Date().toISOString().slice(0, 10))) {
     return NextResponse.json(
       { error: "The due date cannot be before the issue date." },
       { status: 400 }
