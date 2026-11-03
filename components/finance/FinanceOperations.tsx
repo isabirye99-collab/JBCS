@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 type Section = "Expenses" | "Payments" | "Reports";
-type Invoice = { id: string; invoice_number: string; currency: string; total: number; amount_paid: number; status: string; business_contacts?: { name: string } | null };
+type Invoice = { id: string; invoice_number: string; currency: string; exchange_rate?: number; total: number; amount_paid: number; status: string; business_contacts?: { name: string } | null };
 type Supplier = { id: string; name: string };
 type Expense = { id: string; expense_date: string; category: string; description: string; amount: number; currency: string; payment_method: string | null; receipt_url?: string | null; business_contacts?: { name: string } | null };
 type Payment = { id: string; invoice_id: string; payment_reference: string | null; payment_date: string; amount: number; currency: string; method: string; invoices?: { invoice_number: string } | null };
@@ -27,7 +27,7 @@ export default function FinanceOperations({ section, onNotice }: { section: Sect
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
   const [expense, setExpense] = useState({ expense_date: today(), category: "Office supplies", description: "", amount: "", currency: "UGX", exchange_rate: "1", payment_method: "cash", supplier_contact_id: "", receipt_url: "", notes: "" });
-  const [payment, setPayment] = useState({ invoice_id: "", payment_date: today(), amount: "", method: "cash", payment_reference: "", notes: "" });
+  const [payment, setPayment] = useState({ invoice_id: "", payment_date: today(), amount: "", exchange_rate: "1", method: "cash", payment_reference: "", notes: "" });
 
   const load = useCallback(async () => {
     setLoading(true); setError("");
@@ -72,7 +72,7 @@ export default function FinanceOperations({ section, onNotice }: { section: Sect
       if (!r.ok) throw new Error(d.error || "Unable to save record.");
       setShowForm(false); onNotice(isExpense ? "Expense saved successfully." : "Payment recorded successfully.");
       if (isExpense) setExpense({ expense_date: today(), category: "Office supplies", description: "", amount: "", currency: "UGX", exchange_rate: "1", payment_method: "cash", supplier_contact_id: "", receipt_url: "", notes: "" });
-      else setPayment({ invoice_id: "", payment_date: today(), amount: "", method: "cash", payment_reference: "", notes: "" });
+      else setPayment({ invoice_id: "", payment_date: today(), amount: "", exchange_rate: "1", method: "cash", payment_reference: "", notes: "" });
       await load();
     } catch (e) { setError(e instanceof Error ? e.message : "Unable to save record."); }
     finally { setSaving(false); }
@@ -141,9 +141,10 @@ export default function FinanceOperations({ section, onNotice }: { section: Sect
         <div style={fieldStyle}><label htmlFor="expense-receipt">Receipt URL (optional)</label><input id="expense-receipt" style={inputStyle} type="url" maxLength={2000} value={expense.receipt_url} onChange={e => setExpense({ ...expense, receipt_url: e.target.value })} placeholder="https://..."/></div>
         <div style={fieldStyle}><label htmlFor="expense-notes">Notes</label><textarea id="expense-notes" style={inputStyle} rows={2} value={expense.notes} onChange={e => setExpense({ ...expense, notes: e.target.value })}/></div>
       </> : <>
-        <div style={fieldStyle}><label htmlFor="payment-invoice">Invoice</label><select id="payment-invoice" style={selectStyle} required value={payment.invoice_id} onChange={e => { const invoice = invoices.find(i => i.id === e.target.value); setPayment({ ...payment, invoice_id: e.target.value, amount: invoice ? String(Math.max(0, Number(invoice.total)-Number(invoice.amount_paid))) : "" }); }}><option value="">Select an outstanding invoice</option>{invoices.filter(i => !["void","paid"].includes(i.status) && Number(i.total)>Number(i.amount_paid)).map(i => <option key={i.id} value={i.id}>{i.invoice_number} — {i.business_contacts?.name || "Customer"} — {money(Number(i.total)-Number(i.amount_paid), i.currency)}</option>)}</select></div>
+        <div style={fieldStyle}><label htmlFor="payment-invoice">Invoice</label><select id="payment-invoice" style={selectStyle} required value={payment.invoice_id} onChange={e => { const invoice = invoices.find(i => i.id === e.target.value); setPayment({ ...payment, invoice_id: e.target.value, amount: invoice ? String(Math.max(0, Number(invoice.total)-Number(invoice.amount_paid))) : "", exchange_rate: invoice ? String(Number(invoice.exchange_rate) > 0 ? invoice.exchange_rate : 1) : "1" }); }}><option value="">Select an outstanding invoice</option>{invoices.filter(i => !["void","paid"].includes(i.status) && Number(i.total)>Number(i.amount_paid)).map(i => <option key={i.id} value={i.id}>{i.invoice_number} — {i.business_contacts?.name || "Customer"} — {money(Number(i.total)-Number(i.amount_paid), i.currency)}</option>)}</select></div>
         <div style={fieldStyle}><label htmlFor="payment-date">Payment date</label><input id="payment-date" style={inputStyle} type="date" required value={payment.payment_date} onChange={e => setPayment({ ...payment, payment_date: e.target.value })}/></div>
         <div style={fieldStyle}><label htmlFor="payment-amount">Amount received</label><input id="payment-amount" style={inputStyle} type="number" min="0.01" step="0.01" required value={payment.amount} onChange={e => setPayment({ ...payment, amount: e.target.value })}/></div>
+        <div style={fieldStyle}><label htmlFor="payment-rate">Exchange rate to base currency</label><input id="payment-rate" style={inputStyle} type="number" min="0.000001" step="any" required value={payment.exchange_rate} onChange={e => setPayment({ ...payment, exchange_rate: e.target.value })}/></div>
         <div style={fieldStyle}><label htmlFor="payment-method">Payment method</label><select id="payment-method" style={selectStyle} value={payment.method} onChange={e => setPayment({ ...payment, method: e.target.value })}>{methods.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}</select></div>
         <div style={fieldStyle}><label htmlFor="payment-ref">Reference</label><input id="payment-ref" style={inputStyle} maxLength={200} value={payment.payment_reference} onChange={e => setPayment({ ...payment, payment_reference: e.target.value })} placeholder="Receipt or transaction reference"/></div>
         <div style={fieldStyle}><label htmlFor="payment-notes">Notes</label><textarea id="payment-notes" style={inputStyle} rows={2} value={payment.notes} onChange={e => setPayment({ ...payment, notes: e.target.value })}/></div>
