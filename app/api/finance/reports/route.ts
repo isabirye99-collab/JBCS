@@ -64,7 +64,10 @@ export async function GET(request: NextRequest) {
   const to = request.nextUrl.searchParams.get("to");
 
   const validDate = (value: string | null) =>
-    !value || /^\d{4}-\d{2}-\d{2}$/.test(value);
+    !value ||
+    (/^\d{4}-\d{2}-\d{2}$/.test(value) &&
+      !Number.isNaN(Date.parse(`${value}T00:00:00Z`)) &&
+      new Date(`${value}T00:00:00Z`).toISOString().slice(0, 10) === value);
 
   if (!validDate(from) || !validDate(to) || (from && to && from > to)) {
     return fail("Enter a valid reporting date range.");
@@ -92,8 +95,8 @@ export async function GET(request: NextRequest) {
         order: `${dateField}.desc`,
       });
 
-     if (from) params.append(dateField, `gte.${from}`);
-if (to) params.append(dateField, `lte.${to}`);
+      if (from) params.append(dateField, `gte.${from}`);
+      if (to) params.append(dateField, `lte.${to}`);
       const response = await fetch(
         `${url}/rest/v1/${table}?${params.toString()}`,
         { headers, cache: "no-store" }
