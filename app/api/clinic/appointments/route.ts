@@ -19,7 +19,7 @@ export async function POST(request: Request) {
   const timezoneOffset = Number(body.timezone_offset_minutes);
   const reason = clean(body.reason, 500);
   if (!/^[0-9a-f-]{36}$/i.test(patientId)) return NextResponse.json({ error: "Choose a registered patient." }, { status: 400 });
-  const localDateMatch = /^(\\d{4})-(\\d{2})-(\\d{2})T(\\d{2}):(\\d{2})$/.exec(appointmentAt);
+  const localDateMatch = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/.exec(appointmentAt);
   const date = localDateMatch && Number.isInteger(timezoneOffset) && timezoneOffset >= -840 && timezoneOffset <= 840
     ? new Date(Date.UTC(Number(localDateMatch[1]), Number(localDateMatch[2]) - 1, Number(localDateMatch[3]), Number(localDateMatch[4]), Number(localDateMatch[5])) + timezoneOffset * 60_000)
     : new Date(NaN);
