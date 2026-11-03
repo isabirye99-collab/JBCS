@@ -69,7 +69,7 @@ export default async function ClinicWorkspacePage() {
       {ctx.setupMode && <section role="status" style={{ marginBottom: 20, padding: 16, borderRadius: 12, border: "1px solid #f0c36d", background: "#fff8e6", color: "#694b10" }}><strong>Owner setup mode</strong><p style={{ margin: "6px 0 0" }}>You can configure the clinic and register patients without a subscription being created. No paid subscription is active. Subscription checks must remain enabled for paid features.</p></section>}
       <section id="overview" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))", gap: 14 }}>
         {[
-          ["Registered patients", patients.length, "Patient directory preview"],
+          ["Recent patients shown", patients.length, "Latest 8 patient records at most"],
           ["Appointments today", todayAppointments.length, "From recent appointment records"],
           ["Unpaid charges", unpaidCharges.length, "Outstanding charge entries"],
           ["Low-stock items", lowStock.length, "At or below reorder level"],
