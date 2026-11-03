@@ -36,21 +36,26 @@ export default async function ClinicWorkspacePage() {
   }
 
   const wid = encodeURIComponent(ctx.workspaceId);
-  const [patients, patientDirectory, appointments, charges, receipts, chargePayments, inventory] = await Promise.all([
+  // Derive the reporting day from Kampala time, not the server UTC date.
+  const dateParts = new Intl.DateTimeFormat("en-CA", { timeZone: "Africa/Kampala", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(new Date());
+  const datePart = (type: string) => dateParts.find((part) => part.type === type)?.value || "";
+  const today = `${datePart("year")}-${datePart("month")}-${datePart("day")}`;
+  const dayStart = new Date(`${today}T00:00:00+03:00`).toISOString();
+  const nextDay = new Date(new Date(dayStart).getTime() + 86_400_000).toISOString();
+  const [patients, patientDirectory, appointments, todayAppointmentRows, charges, receipts, todayReceipts, chargePayments, inventory] = await Promise.all([
     rows(ctx.url, ctx.serviceKey, `patients?workspace_id=eq.${wid}&select=id,patient_number,full_name,phone,created_at&order=created_at.desc&limit=8`),
     rows(ctx.url, ctx.serviceKey, `patients?workspace_id=eq.${wid}&select=id,patient_number,full_name&order=full_name.asc&limit=500`),
     rows(ctx.url, ctx.serviceKey, `clinic_appointments?workspace_id=eq.${wid}&select=id,patient_id,appointment_at,status,reason&order=appointment_at.desc&limit=8`),
+    rows(ctx.url, ctx.serviceKey, `clinic_appointments?workspace_id=eq.${wid}&appointment_at=gte.${encodeURIComponent(dayStart)}&appointment_at=lt.${encodeURIComponent(nextDay)}&select=id&limit=10000`),
     rows(ctx.url, ctx.serviceKey, `clinic_charges?workspace_id=eq.${wid}&select=id,patient_id,description,quantity,unit_price,currency,status,charge_date&order=charge_date.desc&limit=1000`),
     rows(ctx.url, ctx.serviceKey, `clinic_receipts?workspace_id=eq.${wid}&select=id,patient_id,charge_id,receipt_number,amount,currency,payment_method,receipt_date&order=receipt_date.desc&limit=1000`),
+    rows(ctx.url, ctx.serviceKey, `clinic_receipts?workspace_id=eq.${wid}&receipt_date=gte.${encodeURIComponent(dayStart)}&receipt_date=lt.${encodeURIComponent(nextDay)}&select=id,amount,currency,receipt_date&order=receipt_date.desc&limit=1000`),
     rows(ctx.url, ctx.serviceKey, `clinic_receipts?workspace_id=eq.${wid}&select=charge_id,amount&charge_id=not.is.null&limit=5000`),
     rows(ctx.url, ctx.serviceKey, `inventory_items?workspace_id=eq.${wid}&select=id,item_name,quantity_on_hand,reorder_level,unit,expiry_date&order=item_name.asc&limit=1000`),
   ]);
 
-  const today = new Date().toISOString().slice(0, 10);
-  const todayAppointments = appointments.filter(a => String(a.appointment_at || "").slice(0, 10) === today);
-  const unpaidCharges = charges.filter(c => c.status === "unpaid" || c.status === "part_paid");
+  const todayAppointments = todayAppointmentRows.length;  const unpaidCharges = charges.filter(c => c.status === "unpaid" || c.status === "part_paid");
   const lowStock = inventory.filter(i => Number(i.quantity_on_hand) <= Number(i.reorder_level));
-  const todayReceipts = receipts.filter(r => String(r.receipt_date || "").slice(0, 10) === today);
   const todayReceiptTotals = todayReceipts.reduce((totals: Record<string, number>, r) => { const currency = String(r.currency || "UGX").trim(); totals[currency] = (totals[currency] || 0) + Number(r.amount || 0); return totals; }, {});
   const patientNames = new Map(patientDirectory.map(p => [p.id, p.full_name]));
   const paidByCharge = new Map<string, number>();
@@ -78,7 +83,7 @@ export default async function ClinicWorkspacePage() {
       <section id="overview" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))", gap: 14 }}>
         {[
           ["Recent patients shown", patients.length, "Latest 8 patient records at most"],
-          ["Appointments today", todayAppointments.length, "From recent appointment records"],
+          ["Appointments today", todayAppointments, "Scheduled today (Kampala time; capped at 10,000)"],
           ["Unpaid charges", unpaidCharges.length, "Outstanding charge entries"],
           ["Low-stock items", lowStock.length, "At or below reorder level"],
         ].map(([label, value, detail]) => <article key={String(label)} style={{ background: "#fff", border: "1px solid #e7eaf0", borderRadius: 14, padding: 20 }}><div style={{ color: "#687080", fontSize: 12 }}>{label}</div><strong style={{ display: "block", fontSize: 32, margin: "12px 0 6px" }}>{value}</strong><small style={{ color: "#87909e" }}>{detail}</small></article>)}
