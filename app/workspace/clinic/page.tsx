@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { getClinicContext } from "@/lib/clinic-context";
 import PatientRegistrationForm from "@/components/clinic/PatientRegistrationForm";
 import AppointmentForm from "@/components/clinic/AppointmentForm";
+import ClinicChargeForm from "@/components/clinic/ClinicChargeForm";
 
 export const dynamic = "force-dynamic";
 
