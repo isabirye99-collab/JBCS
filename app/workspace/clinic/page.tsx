@@ -65,6 +65,7 @@ export default async function ClinicWorkspacePage() {
         <div><div style={{ color: "#b42332", fontWeight: 800, fontSize: 11, letterSpacing: ".14em" }}>CLINIC MANAGEMENT</div><h1 style={{ fontSize: "clamp(28px,3vw,38px)", margin: "8px 0" }}>Clinic billing & operations</h1><p style={{ color: "#687080", margin: 0 }}>Welcome, {ctx.session.user.email}. Clinic records are isolated to this workspace.</p></div>
         <span style={{ background: "#e4f5ea", color: "#17663a", borderRadius: 30, padding: "8px 13px", fontSize: 12, fontWeight: 800 }}>Workspace verified</span>
       </header>
+      {ctx.setupMode && <section role="status" style={{ marginBottom: 20, padding: 16, borderRadius: 12, border: "1px solid #f0c36d", background: "#fff8e6", color: "#694b10" }}><strong>Owner setup mode</strong><p style={{ margin: "6px 0 0" }}>You can configure the clinic and register patients without a subscription being created. No paid subscription is active. Subscription checks must remain enabled for paid features.</p></section>}
       <section id="overview" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))", gap: 14 }}>
         {[
           ["Registered patients", patients.length, "Patient directory preview"],
