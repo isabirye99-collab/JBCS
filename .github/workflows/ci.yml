@@ -2,9 +2,9 @@ name: Johden website CI
 
 on:
   push:
-    branches: [main, feature/finance-billing, feature/invoicing-saas-portal]
+    branches: [main, feature/finance-billing, feature/invoicing-saas-portal, fix/clinic-dashboard-kampala-metrics]
   pull_request:
-    branches: [main]
+    branches: [main, feature/invoicing-saas-portal]
 
 jobs:
   build:

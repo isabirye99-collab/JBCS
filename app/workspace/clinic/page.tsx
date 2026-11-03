@@ -21,6 +21,18 @@ async function rows(url: string, key: string, path: string): Promise<Row[]> {
   return Array.isArray(data) ? data : [];
 }
 
+async function exactCount(url: string, key: string, path: string): Promise<number> {
+  const response = await fetch(url + "/rest/v1/" + path, {
+    method: "HEAD",
+    headers: { apikey: key, Authorization: "Bearer " + key, Prefer: "count=exact", Range: "0-0" },
+    cache: "no-store",
+  });
+  if (!response.ok) return 0;
+  const contentRange = response.headers.get("content-range") || "";
+  const total = contentRange.split("/").at(-1);
+  return total && total !== "*" ? Number(total) || 0 : 0;
+}
+
 export default async function ClinicWorkspacePage() {
   const ctx = await getClinicContext();
   if ("error" in ctx) {
@@ -36,21 +48,27 @@ export default async function ClinicWorkspacePage() {
   }
 
   const wid = encodeURIComponent(ctx.workspaceId);
-  const [patients, patientDirectory, appointments, charges, receipts, chargePayments, inventory] = await Promise.all([
+  // Derive the reporting day from Kampala time, not the server UTC date.
+  const dateParts = new Intl.DateTimeFormat("en-CA", { timeZone: "Africa/Kampala", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(new Date());
+  const datePart = (type: string) => dateParts.find((part) => part.type === type)?.value || "";
+  const today = `${datePart("year")}-${datePart("month")}-${datePart("day")}`;
+  const dayStart = new Date(`${today}T00:00:00+03:00`).toISOString();
+  const nextDay = new Date(new Date(dayStart).getTime() + 86_400_000).toISOString();
+  const [patients, patientDirectory, appointments, todayAppointments, charges, receipts, todayReceipts, chargePayments, inventory] = await Promise.all([
     rows(ctx.url, ctx.serviceKey, `patients?workspace_id=eq.${wid}&select=id,patient_number,full_name,phone,created_at&order=created_at.desc&limit=8`),
     rows(ctx.url, ctx.serviceKey, `patients?workspace_id=eq.${wid}&select=id,patient_number,full_name&order=full_name.asc&limit=500`),
     rows(ctx.url, ctx.serviceKey, `clinic_appointments?workspace_id=eq.${wid}&select=id,patient_id,appointment_at,status,reason&order=appointment_at.desc&limit=8`),
+    exactCount(ctx.url, ctx.serviceKey, `clinic_appointments?workspace_id=eq.${wid}&appointment_at=gte.${encodeURIComponent(dayStart)}&appointment_at=lt.${encodeURIComponent(nextDay)}`),
     rows(ctx.url, ctx.serviceKey, `clinic_charges?workspace_id=eq.${wid}&select=id,patient_id,description,quantity,unit_price,currency,status,charge_date&order=charge_date.desc&limit=1000`),
     rows(ctx.url, ctx.serviceKey, `clinic_receipts?workspace_id=eq.${wid}&select=id,patient_id,charge_id,receipt_number,amount,currency,payment_method,receipt_date&order=receipt_date.desc&limit=1000`),
+    rows(ctx.url, ctx.serviceKey, `clinic_receipts?workspace_id=eq.${wid}&receipt_date=gte.${encodeURIComponent(dayStart)}&receipt_date=lt.${encodeURIComponent(nextDay)}&select=id,amount,currency,receipt_date&order=receipt_date.desc&limit=1000`),
     rows(ctx.url, ctx.serviceKey, `clinic_receipts?workspace_id=eq.${wid}&select=charge_id,amount&charge_id=not.is.null&limit=5000`),
     rows(ctx.url, ctx.serviceKey, `inventory_items?workspace_id=eq.${wid}&select=id,item_name,quantity_on_hand,reorder_level,unit,expiry_date&order=item_name.asc&limit=1000`),
   ]);
 
-  const today = new Date().toISOString().slice(0, 10);
-  const todayAppointments = appointments.filter(a => String(a.appointment_at || "").slice(0, 10) === today);
   const unpaidCharges = charges.filter(c => c.status === "unpaid" || c.status === "part_paid");
   const lowStock = inventory.filter(i => Number(i.quantity_on_hand) <= Number(i.reorder_level));
-  const todayReceipts = receipts.filter(r => String(r.receipt_date || "").slice(0, 10) === today);
+  const todayReceiptsMayBeTruncated = todayReceipts.length === 1000;
   const todayReceiptTotals = todayReceipts.reduce((totals: Record<string, number>, r) => { const currency = String(r.currency || "UGX").trim(); totals[currency] = (totals[currency] || 0) + Number(r.amount || 0); return totals; }, {});
   const patientNames = new Map(patientDirectory.map(p => [p.id, p.full_name]));
   const paidByCharge = new Map<string, number>();
@@ -78,7 +96,7 @@ export default async function ClinicWorkspacePage() {
       <section id="overview" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))", gap: 14 }}>
         {[
           ["Recent patients shown", patients.length, "Latest 8 patient records at most"],
-          ["Appointments today", todayAppointments.length, "From recent appointment records"],
+          ["Appointments today", todayAppointments, "Scheduled today (exact count; Kampala time)"],
           ["Unpaid charges", unpaidCharges.length, "Outstanding charge entries"],
           ["Low-stock items", lowStock.length, "At or below reorder level"],
         ].map(([label, value, detail]) => <article key={String(label)} style={{ background: "#fff", border: "1px solid #e7eaf0", borderRadius: 14, padding: 20 }}><div style={{ color: "#687080", fontSize: 12 }}>{label}</div><strong style={{ display: "block", fontSize: 32, margin: "12px 0 6px" }}>{value}</strong><small style={{ color: "#87909e" }}>{detail}</small></article>)}
@@ -103,7 +121,7 @@ export default async function ClinicWorkspacePage() {
         <h2 style={{ marginTop: 0 }}>Add a patient charge</h2><p style={{ color: "#687080" }}>Record a service or item against a registered patient. New charges remain unpaid until a payment is recorded.</p><ClinicChargeForm patients={patientDirectory.map(p => ({ id: p.id, patient_number: p.patient_number, full_name: p.full_name }))} /><hr style={{ border: 0, borderTop: "1px solid #e7eaf0", margin: "26px 0" }} /><h2 style={{ marginTop: 0 }}>Outstanding patient charges</h2>
         {unpaidCharges.length ? <div style={{ overflowX: "auto" }}><table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}><thead><tr>{["Date","Patient","Charge","Amount","Status"].map(x=><th key={x} style={{ padding: 11, borderBottom: "1px solid #e7eaf0" }}>{x}</th>)}</tr></thead><tbody>{unpaidCharges.slice(0,30).map(c=><tr key={c.id}><td style={{ padding: 11 }}>{c.charge_date}</td><td style={{ padding: 11 }}>{patientNames.get(c.patient_id)||"Patient record"}</td><td style={{ padding: 11 }}>{c.description}</td><td style={{ padding: 11 }}>{money(Math.max(0, Number(c.quantity)*Number(c.unit_price) - (paidByCharge.get(c.id) || 0)), c.currency)}</td><td style={{ padding: 11 }}>{c.status}</td></tr>)}</tbody></table></div> : <p>No unpaid charges are available.</p>}
       </section>
-      <section id="receipts" style={{ marginTop: 20, background: "#fff", border: "1px solid #e7eaf0", borderRadius: 14, padding: 22 }}><h2 style={{ marginTop: 0 }}>Record a payment</h2><p style={{ color: "#687080" }}>Record a payment actually received and issue a numbered receipt. Linked payments are checked against the charge balance.</p><ClinicReceiptForm patients={patientDirectory.map(p => ({ id: p.id, patient_number: p.patient_number, full_name: p.full_name }))} charges={charges.map(c => ({ id: c.id, patient_id: c.patient_id, description: c.description, quantity: c.quantity, unit_price: c.unit_price, currency: c.currency, status: c.status }))} /><hr style={{ border: 0, borderTop: "1px solid #e7eaf0", margin: "26px 0" }} /><h2 style={{ marginTop: 0 }}>Recent cash receipts</h2><p style={{ color: "#687080" }}>Today’s recorded receipts by currency: {Object.keys(todayReceiptTotals).length ? Object.entries(todayReceiptTotals).map(([currency,total]) => `${money(total,currency)}`).join(" · ") : money(0,"UGX")}.</p>{receipts.length ? <div style={{ overflowX: "auto" }}><table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}><thead><tr>{["Receipt","Date","Patient","Method","Amount"].map(x=><th key={x} style={{ padding: 11, borderBottom: "1px solid #e7eaf0" }}>{x}</th>)}</tr></thead><tbody>{receipts.slice(0,8).map(r=><tr key={r.id}><td style={{ padding: 11 }}>{r.receipt_number}</td><td style={{ padding: 11 }}>{String(r.receipt_date||"").slice(0,10)}</td><td style={{ padding: 11 }}>{patientNames.get(r.patient_id)||"Patient record"}</td><td style={{ padding: 11 }}>{r.payment_method}</td><td style={{ padding: 11 }}>{money(r.amount,r.currency)}</td></tr>)}</tbody></table></div> : <p>No receipts recorded yet.</p>}</section>
+      <section id="receipts" style={{ marginTop: 20, background: "#fff", border: "1px solid #e7eaf0", borderRadius: 14, padding: 22 }}><h2 style={{ marginTop: 0 }}>Record a payment</h2><p style={{ color: "#687080" }}>Record a payment actually received and issue a numbered receipt. Linked payments are checked against the charge balance.</p><ClinicReceiptForm patients={patientDirectory.map(p => ({ id: p.id, patient_number: p.patient_number, full_name: p.full_name }))} charges={charges.map(c => ({ id: c.id, patient_id: c.patient_id, description: c.description, quantity: c.quantity, unit_price: c.unit_price, currency: c.currency, status: c.status }))} /><hr style={{ border: 0, borderTop: "1px solid #e7eaf0", margin: "26px 0" }} /><h2 style={{ marginTop: 0 }}>Recent cash receipts</h2><p style={{ color: "#687080" }}>Today’s recorded receipts by currency: {Object.keys(todayReceiptTotals).length ? Object.entries(todayReceiptTotals).map(([currency,total]) => `${money(total,currency)}`).join(" · ") : money(0,"UGX")}.{todayReceiptsMayBeTruncated ? " Warning: at least 1,000 receipts today; displayed totals may be incomplete." : ""}</p>{receipts.length ? <div style={{ overflowX: "auto" }}><table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}><thead><tr>{["Receipt","Date","Patient","Method","Amount"].map(x=><th key={x} style={{ padding: 11, borderBottom: "1px solid #e7eaf0" }}>{x}</th>)}</tr></thead><tbody>{receipts.slice(0,8).map(r=><tr key={r.id}><td style={{ padding: 11 }}>{r.receipt_number}</td><td style={{ padding: 11 }}>{String(r.receipt_date||"").slice(0,10)}</td><td style={{ padding: 11 }}>{patientNames.get(r.patient_id)||"Patient record"}</td><td style={{ padding: 11 }}>{r.payment_method}</td><td style={{ padding: 11 }}>{money(r.amount,r.currency)}</td></tr>)}</tbody></table></div> : <p>No receipts recorded yet.</p>}</section>
       <section id="inventory" style={{ marginTop: 20, background: "#fff", border: "1px solid #e7eaf0", borderRadius: 14, padding: 22 }}><h2 style={{ marginTop: 0 }}>Medicines & supplies</h2>{inventory.length ? <div style={{ overflowX: "auto" }}><table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}><thead><tr>{["Item","Quantity","Reorder level","Unit","Expiry"].map(x=><th key={x} style={{ padding: 11, borderBottom: "1px solid #e7eaf0" }}>{x}</th>)}</tr></thead><tbody>{inventory.slice(0,30).map(i=><tr key={i.id}><td style={{ padding: 11 }}>{i.item_name}</td><td style={{ padding: 11 }}>{i.quantity_on_hand}</td><td style={{ padding: 11 }}>{i.reorder_level}</td><td style={{ padding: 11 }}>{i.unit}</td><td style={{ padding: 11 }}>{i.expiry_date||"—"}</td></tr>)}</tbody></table></div> : <p>No inventory items are available yet.</p>}</section>
       <footer style={{ padding: "28px 0", color: "#78808e", fontSize: 12 }}>Johnpaul Medical Center · Private clinic workspace · Financial data displayed in UGX. Confirm currency before adding multi-currency clinic services.</footer>
     </div>
