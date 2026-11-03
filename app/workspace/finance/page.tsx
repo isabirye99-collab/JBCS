@@ -121,8 +121,19 @@ export default function WorkspaceFinancePage() {
 
   const money = (value: number, code: string) => new Intl.NumberFormat("en-UG", { style: "currency", currency: code, maximumFractionDigits: 2 }).format(Number(value || 0));
   const draftCount = invoices.filter(invoice => invoice.status === "draft").length;
-  const invoiceTotal = invoices.reduce((sum, invoice) => sum + Number(invoice.total || 0), 0);
-  const expenseTotal = expenses.reduce((sum, expense) => sum + Number(expense.amount || 0), 0);
+  // Never add amounts in different currencies together: show a separate subtotal per currency.
+  const invoiceTotalsByCurrency = invoices.reduce<Record<string, number>>((totals, invoice) => {
+    const code = invoice.currency || "UGX";
+    totals[code] = (totals[code] || 0) + Number(invoice.total || 0);
+    return totals;
+  }, {});
+  const expenseTotalsByCurrency = expenses.reduce<Record<string, number>>((totals, expense) => {
+    const code = expense.currency || "UGX";
+    totals[code] = (totals[code] || 0) + Number(expense.amount || 0);
+    return totals;
+  }, {});
+  const formatTotals = (totals: Record<string, number>) =>
+    Object.entries(totals).sort(([a], [b]) => a.localeCompare(b)).map(([code, amount]) => money(amount, code)).join(" · ") || money(0, "UGX");
   const filteredCustomers = customers.filter(customer => (customer.name + " " + (customer.email || "")).toLowerCase().includes(customerSearch.toLowerCase()));
   const filteredInvoices = invoices.filter(invoice => [invoice.invoice_number, invoice.business_contacts?.name || "", invoice.status, invoice.issue_date].join(" ").toLowerCase().includes(invoiceSearch.toLowerCase()));
 
@@ -155,8 +166,8 @@ export default function WorkspaceFinancePage() {
       <div className="invoice-feature-grid" style={{marginBottom:24}}>
         <article className="invoice-feature-card"><span className="invoice-feature-number">CUSTOMERS</span><h3>{customers.length}</h3><p>Customer records in this workspace</p></article>
         <article className="invoice-feature-card"><span className="invoice-feature-number">DRAFTS</span><h3>{draftCount}</h3><p>Invoices waiting for your review</p></article>
-        <article className="invoice-feature-card"><span className="invoice-feature-number">INVOICES</span><h3>{invoices.length}</h3><p>Combined recorded total: {money(invoiceTotal, currency)}</p></article>
-        <article className="invoice-feature-card"><span className="invoice-feature-number">EXPENSE ENTRIES</span><h3>{expenses.length}</h3><p>Combined recorded total: {money(expenseTotal, expenseCurrency)}</p></article>
+        <article className="invoice-feature-card"><span className="invoice-feature-number">INVOICES</span><h3>{invoices.length}</h3><p>Recorded totals: {formatTotals(invoiceTotalsByCurrency)}</p></article>
+        <article className="invoice-feature-card"><span className="invoice-feature-number">EXPENSE ENTRIES</span><h3>{expenses.length}</h3><p>Recorded totals: {formatTotals(expenseTotalsByCurrency)}</p></article>
       </div>
       <div className="invoice-feature-grid" id="customers">
         <article className="invoice-feature-card" id="add-customer"><h3>Add a customer</h3><form className="admin-client-form" onSubmit={createCustomer}><label>Customer or company name<input required minLength={2} maxLength={160} value={customerName} onChange={e=>setCustomerName(e.target.value)} /></label><label>Email (optional)<input type="email" maxLength={254} value={customerEmail} onChange={e=>setCustomerEmail(e.target.value)} /></label><button type="submit" disabled={busy}>Save customer</button></form></article>
