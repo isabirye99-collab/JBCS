@@ -35,14 +35,14 @@ export default function LoginPage() {
 
   const switchMode = (next: Mode) => { setMode(next); setError(""); setMessage(""); };
   return <main style={{minHeight:"100vh",display:"grid",gridTemplateColumns:"minmax(0,1.05fr) minmax(340px,.95fr)",background:"#ffffff",color:"#262326",fontFamily:"DM Sans, Arial, sans-serif"}}>
-    <section style={{padding:"clamp(28px,6vw,80px)",display:"flex",flexDirection:"column",justifyContent:"space-between",background:"linear-gradient(145deg,#262326 0%,#30292d 72%,#8e101f 150%)",color:"#fff"}}>
+    <section style={{padding:"clamp(28px,6vw,80px)",display:"flex",flexDirection:"column",justifyContent:"space-between",background:"radial-gradient(ellipse at 82% 72%,#8e101f 0%,transparent 38%),linear-gradient(145deg,#262326 0%,#30292d 72%,#8e101f 150%)",color:"#fff"}}>
       <Link href="/" aria-label="Johden Business Consultancy Services home" style={{display:"inline-flex",alignItems:"center",background:"#fff",padding:"10px 14px",borderRadius:4,width:"fit-content"}}><Image src="/johden-logo.svg" alt="Johden Business Consultancy Services" width={250} height={85} priority style={{width:"clamp(190px,22vw,250px)",height:"auto"}} /></Link>
       <div style={{maxWidth:560,padding:"60px 0"}}>
         <span style={{fontSize:12,letterSpacing:".16em",fontWeight:700,color:"#f58220"}}>FINANCE, MADE CLEARER</span>
         <h1 style={{fontSize:"clamp(38px,5vw,66px)",lineHeight:1.04,letterSpacing:"-.055em",margin:"22px 0"}}>More control over the money side of your business.</h1>
         <p style={{fontSize:17,lineHeight:1.8,color:"#f1ecee",maxWidth:480}}>Bring customer records, invoices and everyday expenses into one organised workspace, built for consultants and growing businesses.</p>
-        <div style={{display:"grid",gap:14,marginTop:32,color:"#ffffff"}}>
-          {["Create and organise customer records","Prepare professional draft invoices","Record expenses in multiple currencies","Keep each company's workspace separate"].map(item=><div key={item} style={{display:"flex",gap:12,alignItems:"center"}}><span style={{color:"#e9b5a8",fontSize:18}}>✓</span>{item}</div>)}
+        <div style={{display:"grid",gridTemplateColumns:"repeat(2,minmax(0,1fr))",gap:12,marginTop:32,color:"#ffffff"}}>
+          {["Create and organise customer records","Prepare professional draft invoices","Record expenses in multiple currencies","Keep each company's workspace separate"].map(item=><div key={item} style={{display:"flex",gap:10,alignItems:"flex-start",padding:"13px 12px",background:"#ffffff10",border:"1px solid #ffffff22",borderRadius:8,fontSize:13,lineHeight:1.5}}><span style={{color:"#f58220",fontSize:18}}>✓</span><span>{item}</span></div>)}
         </div>
       </div>
       <small style={{color:"#d6cfd2"}}>© {new Date().getFullYear()} Johden Business Consultancy Services</small>
