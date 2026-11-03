@@ -118,7 +118,7 @@ export async function POST(request: NextRequest) {
     return error("Invalid quotation validity date.", 400);
   }
 
-  if (issueDate && validUntil && validUntil < issueDate) {
+  if (validUntil && validUntil < (issueDate || new Date().toISOString().slice(0, 10))) {
     return error("The validity date cannot be before the issue date.", 400);
   }
 
