@@ -1,0 +1,155 @@
+/* JBCS billing workspace visual refinement — scoped to the private finance page */
+.invoice-product-page{background:#f7f7f9;color:#282428}
+.invoice-product-page>.site-header{padding:0 clamp(18px,4vw,64px);height:76px;box-shadow:0 2px 12px #30232805}
+.invoice-product-page>.site-header .brand{font-size:13px;letter-spacing:.025em;white-space:nowrap}
+.invoice-product-page>.site-header .desktop-nav{gap:clamp(12px,2vw,26px);font-size:12px}
+.invoice-product-page>.invoice-product-hero{padding:clamp(32px,5vw,62px) clamp(20px,6vw,88px);display:grid;grid-template-columns:minmax(0,1.1fr) minmax(240px,.8fr);gap:32px;align-items:center;background:linear-gradient(120deg,#fff7f5 0%,#fff 55%,#fff0ed 100%);border-bottom:1px solid #f0e3e4}
+.invoice-product-page .invoice-hero-copy{max-width:700px}
+.invoice-product-page .invoice-product-hero h1{font-size:clamp(34px,4.2vw,56px);line-height:1.12;letter-spacing:-.05em;margin:18px 0}
+.invoice-product-page .invoice-product-hero p{font-size:15px;line-height:1.85;max-width:620px}
+.invoice-product-page .invoice-hero-art{max-width:420px;justify-self:center;width:100%;position:relative}
+.invoice-product-page .invoice-hero-art svg{width:100%;height:auto;display:block;filter:drop-shadow(0 12px 20px #5c18200b)}
+.invoice-product-page .invoice-art-caption{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid #f0e5e5;border-radius:10px;padding:12px 15px;box-shadow:0 8px 24px #3023280b;max-width:260px;margin:-10px 0 0 auto;position:relative}
+.invoice-product-page .invoice-art-caption>span{display:grid;place-items:center;width:32px;height:32px;background:#eaf8ef;color:#218650;border-radius:50%;font-weight:800}
+.invoice-product-page .invoice-art-caption b,.invoice-product-page .invoice-art-caption small{display:block}
+.invoice-product-page .invoice-art-caption b{font-size:12px}
+.invoice-product-page .invoice-art-caption small{font-size:10px;color:#817981}
+.invoice-product-page>.inner-content{max-width:1500px;margin:auto;padding:clamp(24px,4vw,52px) clamp(16px,5vw,70px) 70px}
+.invoice-product-page .invoice-feature-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.invoice-product-page .invoice-feature-card{background:#fff;border:1px solid #eae6e8;border-radius:12px;padding:23px;box-shadow:0 5px 20px #30232806;min-width:0}
+.invoice-product-page .invoice-feature-card h3{font:800 18px/1.35 Manrope,sans-serif;letter-spacing:-.025em;margin:0 0 14px}
+.invoice-product-page .invoice-feature-card p{font-size:13px;color:#716a72;line-height:1.7}
+.invoice-product-page .invoice-feature-number{font-size:10px;letter-spacing:.12em;font-weight:800;color:#8a8089}
+.invoice-product-page .invoice-feature-card>h3:not(:first-child){margin-top:10px}
+.invoice-product-page .invoice-feature-card .admin-client-form{display:grid;gap:13px}
+.invoice-product-page .admin-client-form label,.invoice-product-page label{display:grid;gap:6px;font-size:12px;font-weight:700;color:#494249;min-width:0}
+.invoice-product-page .admin-client-form input,.invoice-product-page .admin-client-form select,.invoice-product-page input,.invoice-product-page select{width:100%;min-width:0;min-height:42px;padding:10px 12px;border:1px solid #e3dcdf;border-radius:7px;background:#fff;color:#292429;outline:none}
+.invoice-product-page input:focus,.invoice-product-page select:focus{border-color:#f3192d;box-shadow:0 0 0 3px #f3192d12}
+.invoice-product-page .admin-client-form button,.invoice-product-page table button{border:0;border-radius:7px;background:#f3192d;color:#fff;padding:11px 14px;font-size:12px;font-weight:800;cursor:pointer}
+.invoice-product-page button:disabled{opacity:.55;cursor:not-allowed}
+.invoice-product-page .invoice-list-panel,.invoice-product-page #expense-list{border:1px solid #eae6e8!important;border-radius:12px!important;padding:clamp(15px,2.5vw,26px)!important;box-shadow:0 5px 22px #30232806}
+.invoice-product-page .invoice-list-heading{display:flex;justify-content:space-between;align-items:flex-end;gap:18px;flex-wrap:wrap;margin-bottom:18px}
+.invoice-product-page .invoice-list-heading h2{font:800 28px/1.2 Manrope,sans-serif;letter-spacing:-.04em;margin:8px 0}
+.invoice-product-page .invoice-list-heading p{font-size:12px;color:#716a72;margin:0}
+.invoice-product-page .invoice-list-heading input{max-width:310px}
+.invoice-product-page table{min-width:650px;border-collapse:separate!important;border-spacing:0!important}
+.invoice-product-page table th{background:#faf8f9;color:#827982;font-size:10px;letter-spacing:.07em;text-transform:uppercase;font-weight:800}
+.invoice-product-page table th,.invoice-product-page table td{border-bottom:1px solid #eee9ec;padding:13px 12px!important;font-size:12px;vertical-align:middle}
+.invoice-product-page table tbody tr:hover{background:#fff9f8}
+.invoice-product-page table a{color:#c91024;font-weight:800;white-space:nowrap}
+.invoice-product-page #overview{margin-bottom:22px!important}
+.invoice-product-page #overview h2{font-size:clamp(25px,3vw,34px)!important;letter-spacing:-.04em}
+.invoice-product-page .admin-error,.invoice-product-page .admin-success{padding:12px 15px;border-radius:8px;font-size:12px}
+.invoice-product-page .admin-error{background:#fff0f1;color:#a81122;border:1px solid #f6cbd0}
+.invoice-product-page .admin-success{background:#edf9f0;color:#176c3b;border:1px solid #c9ebd2}
+.invoice-product-page #expense-list h2{font:800 22px Manrope,sans-serif;margin:0 0 15px}
+.invoice-product-page>.site-footer{background:#fff;border-top:1px solid #eee8ea}
+@media(max-width:850px){.invoice-product-page>.invoice-product-hero{grid-template-columns:1fr}.invoice-product-page .invoice-hero-art{max-width:340px}.invoice-product-page .invoice-feature-grid{grid-template-columns:1fr}.invoice-product-page>.site-header{height:auto;min-height:70px;flex-wrap:wrap;padding:12px 18px}.invoice-product-page>.site-header .desktop-nav{order:3;width:100%;overflow:auto}.invoice-product-page .invoice-list-heading input{max-width:none;width:100%}}
+@media(max-width:520px){.invoice-product-page .invoice-feature-card{padding:17px}.invoice-product-page .invoice-product-hero h1{font-size:36px}.invoice-product-page .invoice-art-caption{margin-top:-2px}.invoice-product-page #overview{align-items:flex-start!important}.invoice-product-page #overview>.button{width:100%}}
+
+
+/* Finance application layout refresh: compact accounting workspace, not a marketing landing page */
+.invoice-product-page{background:#f5f6f8!important;color:#29252a}
+.invoice-product-page>.site-header{height:68px;position:sticky;top:0;z-index:30;background:#fff;border-bottom:1px solid #e7e8ec;padding:0 clamp(16px,3vw,42px);box-shadow:0 2px 8px #1e293b08}
+.invoice-product-page>.site-header .brand{font-size:13px;font-weight:800;letter-spacing:.04em}
+.invoice-product-page>.site-header .desktop-nav{gap:6px;font-size:12px}
+.invoice-product-page>.site-header .desktop-nav a{padding:9px 12px;border-radius:7px;color:#5d5961}
+.invoice-product-page>.site-header .desktop-nav a:hover,.invoice-product-page>.site-header .desktop-nav a:focus{background:#fff0f1;color:#b9162a}
+.invoice-product-page>.site-header .button{padding:9px 13px;border-radius:7px}
+.invoice-product-page>.invoice-product-hero{display:none!important}
+.invoice-product-page>.inner-content{max-width:1600px;margin:0 auto;padding:30px clamp(16px,3vw,42px) 64px}
+.invoice-product-page #overview{background:transparent;margin-bottom:20px!important;align-items:center}
+.invoice-product-page #overview .eyebrow{font-size:9px}
+.invoice-product-page #overview h2{font-size:clamp(25px,2.5vw,34px)!important;margin-top:5px!important;color:#29252a}
+.invoice-product-page #overview>.button{border-radius:7px;padding:11px 16px}
+.invoice-product-page .invoice-feature-grid{gap:16px}
+.invoice-product-page .invoice-feature-card{border:1px solid #e5e7eb;border-radius:11px;padding:20px;background:#fff;box-shadow:0 2px 7px #20283805}
+.invoice-product-page .invoice-feature-card h3{font-size:25px;line-height:1.25;margin:8px 0 5px;color:#29252a}
+.invoice-product-page .invoice-feature-card p{font-size:12px;line-height:1.6;margin:0;color:#77717a}
+.invoice-product-page .invoice-feature-number{font-size:9px;letter-spacing:.1em;color:#77717a}
+.invoice-product-page .invoice-feature-grid#customers{align-items:start}
+.invoice-product-page #customers .invoice-feature-card h3{font-size:18px;margin:0 0 17px}
+.invoice-product-page .invoice-feature-card .admin-client-form{gap:14px}
+.invoice-product-page .admin-client-form label,.invoice-product-page label{font-size:12px;color:#464149}
+.invoice-product-page input,.invoice-product-page select,.invoice-product-page textarea{border:1px solid #dfe2e7;border-radius:7px;min-height:42px;padding:10px 12px;font-size:12px}
+.invoice-product-page .admin-client-form button,.invoice-product-page table button{border-radius:7px;padding:11px 15px;background:#c9192d;color:#fff}
+.invoice-product-page .invoice-list-panel,.invoice-product-page #expense-list{margin-top:22px!important;background:#fff;border:1px solid #e5e7eb!important;border-radius:11px!important;padding:22px!important;box-shadow:0 2px 7px #20283805}
+.invoice-product-page .invoice-list-heading{align-items:center}
+.invoice-product-page .invoice-list-heading h2{font-size:24px;letter-spacing:-.03em;margin:5px 0}
+.invoice-product-page .invoice-list-heading p{font-size:12px}
+.invoice-product-page .invoice-list-heading input{max-width:340px}
+.invoice-product-page table{min-width:680px}
+.invoice-product-page table th{background:#f8f8fa;color:#77717a;font-size:10px;letter-spacing:.05em}
+.invoice-product-page table th,.invoice-product-page table td{padding:14px 12px!important;border-bottom:1px solid #eef0f3;font-size:12px}
+.invoice-product-page table tbody tr:last-child td{border-bottom:0}
+.invoice-product-page table tbody tr:hover{background:#fff8f8}
+.invoice-product-page table a{color:#bd172b}
+.invoice-product-page #expense-list h2{font-size:22px;margin-bottom:16px}
+.invoice-product-page>.site-footer{background:#fff;border-top:1px solid #e7e8ec}
+@media(max-width:850px){.invoice-product-page>.site-header{height:auto;min-height:66px;padding:10px 16px}.invoice-product-page>.site-header .desktop-nav{gap:2px}.invoice-product-page>.site-header .desktop-nav a{padding:8px}.invoice-product-page>.inner-content{padding:22px 15px 48px}.invoice-product-page .invoice-feature-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.invoice-product-page .invoice-list-heading input{max-width:none;width:100%}}
+@media(max-width:520px){.invoice-product-page .invoice-feature-grid{grid-template-columns:1fr}.invoice-product-page .invoice-feature-card{padding:17px}.invoice-product-page #overview{gap:12px}.invoice-product-page #overview>.button{width:100%}.invoice-product-page .invoice-list-panel,.invoice-product-page #expense-list{padding:15px!important}.invoice-product-page>.site-header .brand{font-size:11px}.invoice-product-page>.site-header form .button{padding:8px 10px}}
+
+
+/* Accounting-app shell inspired by the original Johden finance design */
+.finance-shell{display:flex!important;align-items:stretch;min-height:100vh;background:#f5f6f8!important}
+.finance-shell>.finance-side-rail{width:244px;flex:0 0 244px;min-height:100vh;background:#292629;color:#fff;padding:22px 15px 18px;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto}
+.finance-side-brand{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:#fff;border-radius:6px;padding:12px 8px;margin:0 3px 22px;color:#c9192d}
+.finance-side-brand span{font:800 20px/1.1 Manrope,Arial,sans-serif;letter-spacing:.07em}
+.finance-side-brand small{font-size:8px;letter-spacing:.16em;color:#625b62}
+.finance-side-workspace{display:flex;align-items:center;gap:10px;padding:11px 9px;background:#3a363a;border:1px solid #4a4549;border-radius:8px}
+.finance-side-mark{width:34px;height:34px;flex:0 0 34px;display:grid;place-items:center;border-radius:8px;background:#c9192d;color:#fff;font-weight:800}
+.finance-side-workspace b,.finance-side-workspace small,.finance-side-bottom b,.finance-side-bottom small{display:block}
+.finance-side-workspace b,.finance-side-bottom b{font-size:11px;color:#fff}
+.finance-side-workspace small,.finance-side-bottom small{font-size:9px;color:#b9b1b7;margin-top:3px}
+.finance-side-label{margin:26px 10px 9px;color:#a69da5;font-size:9px;font-weight:800;letter-spacing:.16em}
+.finance-side-nav{display:grid;gap:5px}
+.finance-side-nav a{display:flex;align-items:center;gap:11px;padding:11px 12px;border-radius:7px;color:#d2cbd1;font-size:12px;font-weight:600;transition:background .15s,color .15s}
+.finance-side-nav a>span{width:19px;text-align:center;font-size:17px}
+.finance-side-nav a i{font-style:normal;margin-left:auto;background:#ffffff20;border-radius:12px;padding:2px 7px;font-size:10px}
+.finance-side-nav a:hover{background:#3a363a;color:#fff}
+.finance-side-nav a.selected{background:#c9192d;color:#fff;box-shadow:0 5px 16px #f3192d35}
+.finance-side-bottom{display:flex;align-items:center;gap:10px;border-top:1px solid #484247;padding:17px 5px 12px;margin-top:auto}
+.finance-side-back{font-size:10px;color:#d0c7ce;padding:12px 7px 9px}
+.finance-side-back:hover{color:#fff}
+.finance-side-signout{width:100%;text-align:left;background:transparent;border:1px solid #4a4549;border-radius:7px;color:#e6dfe4;padding:10px 12px;font-size:11px;cursor:pointer}
+.finance-side-signout:hover{background:#3a363a;color:#fff}
+.finance-app-main{min-width:0;flex:1}
+.finance-app-main>.site-header{display:none!important}
+.finance-app-main>.inner-content{padding-top:30px}
+.finance-shell .finance-anchor{display:block;position:relative;top:-18px}
+@media(max-width:900px){.finance-shell>.finance-side-rail{width:205px;flex-basis:205px;padding:16px 10px}.finance-side-nav a{padding:10px 8px}.finance-app-main>.inner-content{padding:24px 16px 48px}}
+@media(max-width:650px){.finance-shell{display:block!important}.finance-shell>.finance-side-rail{position:relative;top:auto;width:100%;height:auto;min-height:0;padding:12px;overflow:visible}.finance-side-brand{align-items:flex-start;margin:0 0 12px;padding:9px 12px;width:max-content;min-width:155px}.finance-side-brand span{font-size:16px}.finance-side-workspace,.finance-side-label,.finance-side-bottom,.finance-side-back,.finance-side-rail>form{display:none}.finance-side-label:first-of-type{display:none}.finance-side-nav{display:flex;gap:5px;overflow-x:auto;padding:3px 0 6px}.finance-side-nav a{white-space:nowrap;flex:0 0 auto;padding:9px 11px;background:#3a363a}.finance-side-nav a.selected{background:#c9192d}.finance-side-nav a i{display:none}.finance-side-nav+.finance-side-label{display:none}.finance-side-nav+.finance-side-label+.finance-side-nav{display:none}.finance-app-main>.inner-content{padding:22px 13px 40px}}
+
+
+/* Final polish pass: stronger accounting hierarchy, form rhythm and readable registers */
+.finance-shell .finance-app-main{background:#f5f6f8}
+.finance-shell .finance-app-main>.inner-content{max-width:1480px;margin:0 auto}
+.finance-shell .finance-app-main #overview{padding:2px 0 18px;border-bottom:1px solid #e6e8ed}
+.finance-shell .finance-app-main #overview h2{font-weight:800;line-height:1.16}
+.finance-shell .finance-app-main .invoice-feature-card{transition:border-color .16s ease,box-shadow .16s ease}
+.finance-shell .finance-app-main .invoice-feature-card:focus-within{border-color:#e6b4ba;box-shadow:0 0 0 3px #c9192d0b}
+.finance-shell .finance-app-main .invoice-feature-card form button,
+.finance-shell .finance-app-main table button{min-height:40px;font-weight:700;transition:background .15s ease,transform .15s ease}
+.finance-shell .finance-app-main .invoice-feature-card form button:hover,
+.finance-shell .finance-app-main table button:hover{background:#a91527}
+.finance-shell .finance-app-main .invoice-list-panel,
+.finance-shell .finance-app-main #expense-list{overflow:hidden}
+.finance-shell .finance-app-main .invoice-list-panel>div:last-child,
+.finance-shell .finance-app-main #expense-list>div{max-width:100%;overflow-x:auto}
+.finance-shell .finance-app-main table{width:100%;font-variant-numeric:tabular-nums}
+.finance-shell .finance-app-main table td{color:#39343b}
+.finance-shell .finance-app-main table td:first-child{font-weight:650}
+.finance-shell .finance-app-main .invoice-list-heading{padding-bottom:15px;border-bottom:1px solid #eef0f3}
+.finance-shell .finance-app-main .invoice-list-heading input{background:#fbfbfc}
+.finance-shell .finance-app-main .admin-error,.finance-shell .finance-app-main .admin-success{margin:0 0 14px}
+.finance-shell .finance-side-nav a:focus-visible,
+.finance-shell .finance-side-brand:focus-visible,
+.finance-shell .finance-side-signout:focus-visible{outline:2px solid #ffb2bc;outline-offset:3px}
+@media(max-width:650px){
+  .finance-shell .finance-app-main #overview{align-items:flex-start!important}
+  .finance-shell .finance-app-main #overview h2{font-size:27px!important}
+  .finance-shell .finance-app-main .invoice-list-heading{align-items:stretch}
+  .finance-shell .finance-app-main .invoice-list-heading>div{width:100%}
+  .finance-shell .finance-app-main .invoice-list-heading input{width:100%;max-width:none}
+  .finance-shell .finance-app-main .invoice-feature-card form>div{grid-template-columns:minmax(0,1fr)!important}
+}
