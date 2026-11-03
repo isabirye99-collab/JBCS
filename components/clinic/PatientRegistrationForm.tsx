@@ -21,8 +21,10 @@ export default function PatientRegistrationForm() {
       });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || "Patient registration failed.");
-      setMessage(`Patient registered successfully. Patient number: ${result.patient.patient_number}`);
+      setMessage(`Patient registered successfully. Patient number: ${result.patient.patient_number}. Refreshing the patient list…`);
       form.reset();
+      // The directory is server-rendered; reload it so the new record appears immediately.
+      window.setTimeout(() => window.location.reload(), 900);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Patient registration failed.");
     } finally {
