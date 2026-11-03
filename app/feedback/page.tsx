@@ -7,7 +7,8 @@ type Feedback = { id: string; name: string; service: string; message: string; cr
 type Client = { id: string; name: string; logo_url: string; website_url: string | null; description: string | null };
 
 export default function FeedbackPage() {
-  const [items, setItems] = useState<Feedback[]>([]);\n  const [clients, setClients] = useState<Client[]>([]);
+  const [items, setItems] = useState<Feedback[]>([]);
+  const [clients, setClients] = useState<Client[]>([]);
   const [name, setName] = useState("");
   const [service, setService] = useState("");
   const [message, setMessage] = useState("");
