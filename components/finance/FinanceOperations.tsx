@@ -9,7 +9,7 @@ type Expense = { id: string; expense_date: string; category: string; description
 type Payment = { id: string; invoice_id: string; payment_reference: string | null; payment_date: string; amount: number; currency: string; method: string; invoices?: { invoice_number: string } | null };
 type Report = { summary: { invoiceCount: number; paymentCount: number; expenseCount: number; outstandingInvoiceCount: number; overdueInvoiceCount: number; invoicedByCurrency: Record<string, number>; collectedByCurrency: Record<string, number>; expensesByCurrency: Record<string, number>; outstandingByCurrency: Record<string, number> }; invoices: unknown[]; payments: unknown[]; expenses: unknown[] };
 const methods = [{ value: "cash", label: "Cash" }, { value: "bank_transfer", label: "Bank transfer" }, { value: "mobile_money", label: "Mobile money" }, { value: "card", label: "Card" }, { value: "cheque", label: "Cheque" }, { value: "other", label: "Other" }];
-const today = () => new Date().toISOString().slice(0, 10);
+const today = () => { const date = new Date(); date.setMinutes(date.getMinutes() - date.getTimezoneOffset()); return date.toISOString().slice(0, 10); };
 const money = (amount: number, currency = "UGX") => new Intl.NumberFormat("en-UG", { style: "currency", currency: /^[A-Z]{3}$/.test(currency) ? currency : "UGX", maximumFractionDigits: 2 }).format(Number(amount) || 0);
 const dateLabel = (value: string) => value ? new Date(value.slice(0, 10) + "T00:00:00").toLocaleDateString("en-GB") : "—";
 
@@ -32,6 +32,9 @@ export default function FinanceOperations({ section, onNotice }: { section: Sect
   const load = useCallback(async () => {
     setLoading(true); setError("");
     try {
+      if (section === "Reports" && from && to && from > to) {
+        throw new Error("The start date must be on or before the end date.");
+      }
       if (section === "Expenses") {
         const [r, sr] = await Promise.all([fetch("/api/finance/expenses", { cache: "no-store" }), fetch("/api/finance/customers?type=supplier", { cache: "no-store" })]);
         const [d, sd] = await Promise.all([r.json(), sr.json()]);
@@ -103,7 +106,7 @@ export default function FinanceOperations({ section, onNotice }: { section: Sect
     document.body.appendChild(link);
     link.click();
     link.remove();
-    URL.revokeObjectURL(url);
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
 
   const inputStyle = { width: "100%", padding: "11px 12px", border: "1px solid var(--finance-border, #d8dee8)", borderRadius: 8, background: "var(--finance-input, #fff)", color: "inherit", font: "inherit" };
