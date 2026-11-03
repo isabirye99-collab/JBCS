@@ -39,6 +39,7 @@ export default async function WorkspacePage() {
             <p>Workspace currency: {workspace.base_currency || "UGX"}</p>
             <p>Subscription: {trialEnded ? "Trial period ended" : subscription?.status || "No subscription record"}</p>
             <p>Billing: annual, {subscription?.billing_currency || "UGX"}</p>
+            <p><Link className="invoice-access-link" href="/workspace/finance">Open customers and invoices ↗</Link></p>
             {subscription?.trial_ends_at && <p>Trial ends: {new Date(subscription.trial_ends_at).toLocaleDateString("en-GB", { dateStyle: "medium", timeZone: "Africa/Kampala" })}</p>}
             <small>Customer invoicing and paid subscription checkout will be enabled after tenant-aware finance APIs and a payment provider are configured and tested.</small>
           </article>;
