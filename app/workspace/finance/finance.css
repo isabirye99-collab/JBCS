@@ -119,3 +119,37 @@
 .finance-shell .finance-anchor{display:block;position:relative;top:-18px}
 @media(max-width:900px){.finance-shell>.finance-side-rail{width:205px;flex-basis:205px;padding:16px 10px}.finance-side-nav a{padding:10px 8px}.finance-app-main>.inner-content{padding:24px 16px 48px}}
 @media(max-width:650px){.finance-shell{display:block!important}.finance-shell>.finance-side-rail{position:relative;top:auto;width:100%;height:auto;min-height:0;padding:12px;overflow:visible}.finance-side-brand{align-items:flex-start;margin:0 0 12px;padding:9px 12px;width:max-content;min-width:155px}.finance-side-brand span{font-size:16px}.finance-side-workspace,.finance-side-label,.finance-side-bottom,.finance-side-back,.finance-side-rail>form{display:none}.finance-side-label:first-of-type{display:none}.finance-side-nav{display:flex;gap:5px;overflow-x:auto;padding:3px 0 6px}.finance-side-nav a{white-space:nowrap;flex:0 0 auto;padding:9px 11px;background:#3a363a}.finance-side-nav a.selected{background:#c9192d}.finance-side-nav a i{display:none}.finance-side-nav+.finance-side-label{display:none}.finance-side-nav+.finance-side-label+.finance-side-nav{display:none}.finance-app-main>.inner-content{padding:22px 13px 40px}}
+
+
+/* Final polish pass: stronger accounting hierarchy, form rhythm and readable registers */
+.finance-shell .finance-app-main{background:#f5f6f8}
+.finance-shell .finance-app-main>.inner-content{max-width:1480px;margin:0 auto}
+.finance-shell .finance-app-main #overview{padding:2px 0 18px;border-bottom:1px solid #e6e8ed}
+.finance-shell .finance-app-main #overview h2{font-weight:800;line-height:1.16}
+.finance-shell .finance-app-main .invoice-feature-card{transition:border-color .16s ease,box-shadow .16s ease}
+.finance-shell .finance-app-main .invoice-feature-card:focus-within{border-color:#e6b4ba;box-shadow:0 0 0 3px #c9192d0b}
+.finance-shell .finance-app-main .invoice-feature-card form button,
+.finance-shell .finance-app-main table button{min-height:40px;font-weight:700;transition:background .15s ease,transform .15s ease}
+.finance-shell .finance-app-main .invoice-feature-card form button:hover,
+.finance-shell .finance-app-main table button:hover{background:#a91527}
+.finance-shell .finance-app-main .invoice-list-panel,
+.finance-shell .finance-app-main #expense-list{overflow:hidden}
+.finance-shell .finance-app-main .invoice-list-panel>div:last-child,
+.finance-shell .finance-app-main #expense-list>div{max-width:100%;overflow-x:auto}
+.finance-shell .finance-app-main table{width:100%;font-variant-numeric:tabular-nums}
+.finance-shell .finance-app-main table td{color:#39343b}
+.finance-shell .finance-app-main table td:first-child{font-weight:650}
+.finance-shell .finance-app-main .invoice-list-heading{padding-bottom:15px;border-bottom:1px solid #eef0f3}
+.finance-shell .finance-app-main .invoice-list-heading input{background:#fbfbfc}
+.finance-shell .finance-app-main .admin-error,.finance-shell .finance-app-main .admin-success{margin:0 0 14px}
+.finance-shell .finance-side-nav a:focus-visible,
+.finance-shell .finance-side-brand:focus-visible,
+.finance-shell .finance-side-signout:focus-visible{outline:2px solid #ffb2bc;outline-offset:3px}
+@media(max-width:650px){
+  .finance-shell .finance-app-main #overview{align-items:flex-start!important}
+  .finance-shell .finance-app-main #overview h2{font-size:27px!important}
+  .finance-shell .finance-app-main .invoice-list-heading{align-items:stretch}
+  .finance-shell .finance-app-main .invoice-list-heading>div{width:100%}
+  .finance-shell .finance-app-main .invoice-list-heading input{width:100%;max-width:none}
+  .finance-shell .finance-app-main .invoice-feature-card form>div{grid-template-columns:minmax(0,1fr)!important}
+}
