@@ -18,6 +18,7 @@ export default function AdminPage() {
   const [logo, setLogo] = useState("");
   const [website, setWebsite] = useState("");
   const [description, setDescription] = useState("");
+  const [uploadingLogo, setUploadingLogo] = useState(false);
 
   async function load() {
     setLoading(true); setError("");
@@ -36,6 +37,20 @@ export default function AdminPage() {
   async function logout() {
     await fetch("/api/admin/session", { method: "DELETE" });
     router.replace("/admin/login"); router.refresh();
+  }
+
+  async function uploadLogo(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    setError(""); setNotice(""); setUploadingLogo(true);
+    try {
+      const form = new FormData(); form.append("file", file);
+      const response = await fetch("/api/admin/upload", { method: "POST", body: form });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Logo upload failed.");
+      setLogo(data.url); setNotice("Logo uploaded. Save the client to keep it in the directory.");
+    } catch (e) { setError(e instanceof Error ? e.message : "Logo upload failed."); }
+    finally { setUploadingLogo(false); event.target.value = ""; }
   }
 
   async function saveClient(event: React.FormEvent<HTMLFormElement>) {
@@ -84,7 +99,7 @@ export default function AdminPage() {
       {error && <p className="admin-error admin-notice" role="alert">{error}</p>}
       {notice && <p className="admin-success admin-notice" role="status">{notice}</p>}
       {tab === "overview" && <><div className="admin-stat-grid"><article><span>Client organizations</span><strong>{clients.length}</strong><small>{clients.filter(c => c.is_published).length} published on website</small></article><article><span>Feedback submissions</span><strong>{feedback.length}</strong><small>{feedback.filter(f => f.status === "pending").length} awaiting review</small></article><article><span>Approved testimonials</span><strong>{feedback.filter(f => f.status === "approved").length}</strong><small>Visible on the feedback page</small></article></div><div className="admin-panel"><h2>Start managing your website</h2><p>Add client organizations with their logos and official websites, then publish them when you are ready. Review feedback before approving it for public display.</p><button onClick={() => setTab("clients")}>Manage clients</button><button className="secondary" onClick={() => setTab("feedback")}>Review feedback</button></div></>}
-      {tab === "clients" && <div className="admin-columns"><form className="admin-panel admin-client-form" onSubmit={saveClient}><h2>Add a client</h2><p>New clients are saved as hidden until you publish them.</p><label>Organization name<input value={name} onChange={e => setName(e.target.value)} required maxLength={120}/></label><label>Logo image URL<input type="url" placeholder="https://…" value={logo} onChange={e => setLogo(e.target.value)} required/></label><label>Official website URL<input type="url" placeholder="https://example.com" value={website} onChange={e => setWebsite(e.target.value)}/></label><label>Short description<textarea value={description} onChange={e => setDescription(e.target.value)} maxLength={500} rows={3}/></label><button type="submit">Save client</button></form><div className="admin-panel"><h2>Client directory</h2>{clients.length === 0 ? <p>No clients added yet.</p> : <div className="admin-list">{clients.map(client => <article key={client.id} className="admin-list-item"><img src={client.logo_url} alt="" loading="lazy"/><div className="admin-list-copy"><strong>{client.name}</strong><span>{client.website_url || "No website link added"}</span><small>{client.is_published ? "Published" : "Hidden"}</small></div><button className="secondary" onClick={() => void toggleClient(client)}>{client.is_published ? "Hide" : "Publish"}</button><button className="danger" onClick={() => void removeClient(client)}>Remove</button></article>)}</div>}</div></div>}
+      {tab === "clients" && <div className="admin-columns"><form className="admin-panel admin-client-form" onSubmit={saveClient}><h2>Add a client</h2><p>New clients are saved as hidden until you publish them.</p><label>Organization name<input value={name} onChange={e => setName(e.target.value)} required maxLength={120}/></label><label>Upload client logo<input type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" onChange={uploadLogo} disabled={uploadingLogo}/><small className="admin-field-help">{uploadingLogo ? "Uploading logo…" : "JPG, PNG, WebP or SVG · maximum 5 MB"}</small></label><label>Logo image URL<input type="url" placeholder="Upload a logo above or paste an https:// image URL" value={logo} onChange={e => setLogo(e.target.value)} required/></label>{logo && <div className="admin-logo-preview"><img src={logo} alt="Client logo preview"/><span>Logo preview</span></div>}<label>Official website URL<input type="url" placeholder="https://example.com" value={website} onChange={e => setWebsite(e.target.value)}/></label><label>Short description<textarea value={description} onChange={e => setDescription(e.target.value)} maxLength={500} rows={3}/></label><button type="submit">Save client</button></form><div className="admin-panel"><h2>Client directory</h2>{clients.length === 0 ? <p>No clients added yet.</p> : <div className="admin-list">{clients.map(client => <article key={client.id} className="admin-list-item"><img src={client.logo_url} alt="" loading="lazy"/><div className="admin-list-copy"><strong>{client.name}</strong><span>{client.website_url || "No website link added"}</span><small>{client.is_published ? "Published" : "Hidden"}</small></div><button className="secondary" onClick={() => void toggleClient(client)}>{client.is_published ? "Hide" : "Publish"}</button><button className="danger" onClick={() => void removeClient(client)}>Remove</button></article>)}</div>}</div></div>}
       {tab === "feedback" && <div className="admin-panel"><h2>Feedback submissions</h2><p>Only approved feedback is shown publicly.</p>{feedback.length === 0 ? <p>No submissions yet.</p> : <div className="admin-feedback-list">{feedback.map(item => <article key={item.id} className="admin-feedback-item"><div className="admin-feedback-meta"><strong>{item.name || "Customer"}</strong><span>{item.service}</span><span className={`admin-status ${item.status}`}>{item.status}</span><time>{new Date(item.created_at).toLocaleDateString()}</time></div><p>{item.message}</p><div className="admin-actions"><button onClick={() => void setFeedbackStatus(item, "approved")}>Approve</button><button className="secondary" onClick={() => void setFeedbackStatus(item, "pending")}>Set pending</button><button className="danger" onClick={() => void setFeedbackStatus(item, "rejected")}>Reject</button></div></article>)}</div>}</div>}
     </section>
   </main>;
