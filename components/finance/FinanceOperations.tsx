@@ -73,18 +73,14 @@ export default function FinanceOperations({ section, onNotice }: { section: Sect
   const inputStyle = { width: "100%", padding: "11px 12px", border: "1px solid var(--finance-border, #d8dee8)", borderRadius: 8, background: "var(--finance-input, #fff)", color: "inherit", font: "inherit" };
   const fieldStyle = { display: "grid", gap: 6, marginBottom: 14 } as const;
   const selectStyle = inputStyle;
-  const reportRows: Array<{ label: string; currency: string; amount: number }> = report
-    ? [
-        ["Invoiced", report.summary.invoicedByCurrency],
-        ["Collected", report.summary.collectedByCurrency],
-        ["Expenses", report.summary.expensesByCurrency],
-        ["Outstanding", report.summary.outstandingByCurrency],
-      ].flatMap(([label, values]) =>
-        Object.entries(values as Record<string, number>).map(([currency, amount]) => ({
-          label: label as string,
-          currency,
-          amount,
-        })),
+  const reportRows = report
+    ? Object.entries({
+        Invoiced: report.summary.invoicedByCurrency,
+        Collected: report.summary.collectedByCurrency,
+        Expenses: report.summary.expensesByCurrency,
+        Outstanding: report.summary.outstandingByCurrency,
+      }).flatMap(([label, values]) =>
+        Object.entries(values).map(([currency, amount]) => ({ label, currency, amount })),
       )
     : [];
 
