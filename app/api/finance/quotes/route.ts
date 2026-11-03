@@ -50,7 +50,7 @@ export async function GET() {
       return error("JBCS workspace not found or inactive.", 503);
     }
 
-    const quoteUrl = ${url}/rest/v1/quotes?workspace_id=eq.${encodeURIComponent(workspaceId)}&select=id,quote_number,contact_id,issue_date,valid_until,currency,exchange_rate,subtotal,tax_amount,total,status,notes,created_at,business_contacts(name),document_items(id,description,quantity,unit_price,tax_rate,line_total)&order=created_at.desc;
+    const quoteUrl = `${url}/rest/v1/quotes?workspace_id=eq.${encodeURIComponent(workspaceId)}&select=id,quote_number,contact_id,issue_date,valid_until,currency,exchange_rate,subtotal,tax_amount,total,status,notes,created_at,business_contacts(name),document_items(id,description,quantity,unit_price,tax_rate,line_total)&order=created_at.desc`;
     const quotes: Record<string, unknown>[] = [];
     const pageSize = 500;
 
