@@ -4,12 +4,17 @@ const base = process.env.SUPABASE_URL;
 const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 export async function GET() {
-  if (!base || !key) return NextResponse.json({ feedback: [] });
-  const response = await fetch(`${base}/rest/v1/jbcs_feedback?select=id,name,service,message,created_at&status=eq.approved&order=created_at.desc`, {
-    headers: { apikey: key, Authorization: `Bearer ${key}` }, cache: "no-store"
-  });
-  if (!response.ok) return NextResponse.json({ error: "Unable to load feedback." }, { status: 502 });
-  return NextResponse.json({ feedback: await response.json() });
+  if (!base || !key) return NextResponse.json({ feedback: [], clients: [] });
+  const headers = { apikey: key, Authorization: `Bearer ${key}` };
+  const [feedbackResponse, clientsResponse] = await Promise.all([
+    fetch(`${base}/rest/v1/jbcs_feedback?select=id,name,service,message,created_at&status=eq.approved&order=created_at.desc`, { headers, cache: "no-store" }),
+    fetch(`${base}/rest/v1/jbcs_clients?select=id,name,logo_url,website_url,description&is_published=eq.true&order=sort_order.asc,name.asc`, { headers, cache: "no-store" })
+  ]);
+  if (!feedbackResponse.ok) return NextResponse.json({ error: "Unable to load feedback." }, { status: 502 });
+  const feedback = await feedbackResponse.json();
+  // Keep approved testimonials available even before the client directory migration is applied.
+  const clients = clientsResponse.ok ? await clientsResponse.json() : [];
+  return NextResponse.json({ feedback, clients });
 }
 
 export async function POST(request: NextRequest) {
