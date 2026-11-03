@@ -46,3 +46,45 @@
 .invoice-product-page>.site-footer{background:#fff;border-top:1px solid #eee8ea}
 @media(max-width:850px){.invoice-product-page>.invoice-product-hero{grid-template-columns:1fr}.invoice-product-page .invoice-hero-art{max-width:340px}.invoice-product-page .invoice-feature-grid{grid-template-columns:1fr}.invoice-product-page>.site-header{height:auto;min-height:70px;flex-wrap:wrap;padding:12px 18px}.invoice-product-page>.site-header .desktop-nav{order:3;width:100%;overflow:auto}.invoice-product-page .invoice-list-heading input{max-width:none;width:100%}}
 @media(max-width:520px){.invoice-product-page .invoice-feature-card{padding:17px}.invoice-product-page .invoice-product-hero h1{font-size:36px}.invoice-product-page .invoice-art-caption{margin-top:-2px}.invoice-product-page #overview{align-items:flex-start!important}.invoice-product-page #overview>.button{width:100%}}
+
+
+/* Finance application layout refresh: compact accounting workspace, not a marketing landing page */
+.invoice-product-page{background:#f5f6f8!important;color:#29252a}
+.invoice-product-page>.site-header{height:68px;position:sticky;top:0;z-index:30;background:#fff;border-bottom:1px solid #e7e8ec;padding:0 clamp(16px,3vw,42px);box-shadow:0 2px 8px #1e293b08}
+.invoice-product-page>.site-header .brand{font-size:13px;font-weight:800;letter-spacing:.04em}
+.invoice-product-page>.site-header .desktop-nav{gap:6px;font-size:12px}
+.invoice-product-page>.site-header .desktop-nav a{padding:9px 12px;border-radius:7px;color:#5d5961}
+.invoice-product-page>.site-header .desktop-nav a:hover,.invoice-product-page>.site-header .desktop-nav a:focus{background:#fff0f1;color:#b9162a}
+.invoice-product-page>.site-header .button{padding:9px 13px;border-radius:7px}
+.invoice-product-page>.invoice-product-hero{display:none!important}
+.invoice-product-page>.inner-content{max-width:1600px;margin:0 auto;padding:30px clamp(16px,3vw,42px) 64px}
+.invoice-product-page #overview{background:transparent;margin-bottom:20px!important;align-items:center}
+.invoice-product-page #overview .eyebrow{font-size:9px}
+.invoice-product-page #overview h2{font-size:clamp(25px,2.5vw,34px)!important;margin-top:5px!important;color:#29252a}
+.invoice-product-page #overview>.button{border-radius:7px;padding:11px 16px}
+.invoice-product-page .invoice-feature-grid{gap:16px}
+.invoice-product-page .invoice-feature-card{border:1px solid #e5e7eb;border-radius:11px;padding:20px;background:#fff;box-shadow:0 2px 7px #20283805}
+.invoice-product-page .invoice-feature-card h3{font-size:25px;line-height:1.25;margin:8px 0 5px;color:#29252a}
+.invoice-product-page .invoice-feature-card p{font-size:12px;line-height:1.6;margin:0;color:#77717a}
+.invoice-product-page .invoice-feature-number{font-size:9px;letter-spacing:.1em;color:#77717a}
+.invoice-product-page .invoice-feature-grid#customers{align-items:start}
+.invoice-product-page #customers .invoice-feature-card h3{font-size:18px;margin:0 0 17px}
+.invoice-product-page .invoice-feature-card .admin-client-form{gap:14px}
+.invoice-product-page .admin-client-form label,.invoice-product-page label{font-size:12px;color:#464149}
+.invoice-product-page input,.invoice-product-page select,.invoice-product-page textarea{border:1px solid #dfe2e7;border-radius:7px;min-height:42px;padding:10px 12px;font-size:12px}
+.invoice-product-page .admin-client-form button,.invoice-product-page table button{border-radius:7px;padding:11px 15px;background:#c9192d;color:#fff}
+.invoice-product-page .invoice-list-panel,.invoice-product-page #expense-list{margin-top:22px!important;background:#fff;border:1px solid #e5e7eb!important;border-radius:11px!important;padding:22px!important;box-shadow:0 2px 7px #20283805}
+.invoice-product-page .invoice-list-heading{align-items:center}
+.invoice-product-page .invoice-list-heading h2{font-size:24px;letter-spacing:-.03em;margin:5px 0}
+.invoice-product-page .invoice-list-heading p{font-size:12px}
+.invoice-product-page .invoice-list-heading input{max-width:340px}
+.invoice-product-page table{min-width:680px}
+.invoice-product-page table th{background:#f8f8fa;color:#77717a;font-size:10px;letter-spacing:.05em}
+.invoice-product-page table th,.invoice-product-page table td{padding:14px 12px!important;border-bottom:1px solid #eef0f3;font-size:12px}
+.invoice-product-page table tbody tr:last-child td{border-bottom:0}
+.invoice-product-page table tbody tr:hover{background:#fff8f8}
+.invoice-product-page table a{color:#bd172b}
+.invoice-product-page #expense-list h2{font-size:22px;margin-bottom:16px}
+.invoice-product-page>.site-footer{background:#fff;border-top:1px solid #e7e8ec}
+@media(max-width:850px){.invoice-product-page>.site-header{height:auto;min-height:66px;padding:10px 16px}.invoice-product-page>.site-header .desktop-nav{gap:2px}.invoice-product-page>.site-header .desktop-nav a{padding:8px}.invoice-product-page>.inner-content{padding:22px 15px 48px}.invoice-product-page .invoice-feature-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.invoice-product-page .invoice-list-heading input{max-width:none;width:100%}}
+@media(max-width:520px){.invoice-product-page .invoice-feature-grid{grid-template-columns:1fr}.invoice-product-page .invoice-feature-card{padding:17px}.invoice-product-page #overview{gap:12px}.invoice-product-page #overview>.button{width:100%}.invoice-product-page .invoice-list-panel,.invoice-product-page #expense-list{padding:15px!important}.invoice-product-page>.site-header .brand{font-size:11px}.invoice-product-page>.site-header form .button{padding:8px 10px}}
