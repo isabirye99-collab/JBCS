@@ -4,7 +4,8 @@ import Link from "next/link";
 import { FormEvent, useCallback, useEffect, useState } from "react";
 
 type Customer = { id: string; name: string; email?: string | null };
-type Invoice = { id: string; invoice_number: string; issue_date: string; due_date?: string | null; currency: string; total: number; amount_paid: number; status: string; business_contacts?: { name?: string } | null };\ntype Expense = { id: string; expense_date: string; category: string; description: string; amount: number; currency: string; payment_method: string };
+type Invoice = { id: string; invoice_number: string; issue_date: string; due_date?: string | null; currency: string; total: number; amount_paid: number; status: string; business_contacts?: { name?: string } | null };
+type Expense = { id: string; expense_date: string; category: string; description: string; amount: number; currency: string; payment_method: string };
 
 export default function WorkspaceFinancePage() {
   const [customers, setCustomers] = useState<Customer[]>([]);
