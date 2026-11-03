@@ -47,7 +47,7 @@ export default async function ClinicWorkspacePage() {
 
   const today = new Date().toISOString().slice(0, 10);
   const todayAppointments = appointments.filter(a => String(a.appointment_at || "").slice(0, 10) === today);
-  const unpaidCharges = charges.filter(c => c.status === "unpaid");
+  const unpaidCharges = charges.filter(c => c.status === "unpaid" || c.status === "part_paid");
   const lowStock = inventory.filter(i => Number(i.quantity_on_hand) <= Number(i.reorder_level));
   const todayReceipts = receipts.filter(r => String(r.receipt_date || "").slice(0, 10) === today);
   const patientNames = new Map(patientDirectory.map(p => [p.id, p.full_name]));
