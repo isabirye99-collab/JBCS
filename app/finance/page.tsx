@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import InvoiceForm from "@/components/finance/InvoiceForm";
 import QuoteForm from "@/components/finance/QuoteForm";
 import FinanceOperations from "@/components/finance/FinanceOperations";
+import RecurringFinance from "@/components/finance/RecurringFinance";
 
 type NavItem = { label: string; icon: string };
 
@@ -58,6 +59,7 @@ const nav: NavItem[] = [
   { label: "Quotes", icon: "▧" },
   { label: "Customers", icon: "♙" },
   { label: "Expenses", icon: "↗" },
+  { label: "Recurring", icon: "⟳" },
   { label: "Payments", icon: "⇄" },
   { label: "Reports", icon: "▥" },
 ];
@@ -563,6 +565,8 @@ export default function FinanceDashboard() {
                 development stages.
               </p>
             </>
+          ) : active === "Recurring" ? (
+            <RecurringFinance onNotice={setNotice} />
           ) : (
             <article className="finance-panel finance-table-panel">
               <div className="finance-panel-heading">
