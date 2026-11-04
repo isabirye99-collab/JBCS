@@ -207,7 +207,7 @@ export default function WorkspaceFinancePage() {
     return { key, label: date.toLocaleDateString("en-UG", { month: "short", timeZone: "Africa/Kampala" }), sales: 0, expenses: 0 };
   });
   chartMonths.forEach(month => {
-    month.sales = invoices.filter(invoice => invoice.currency === "UGX" && String(invoice.issue_date || "").slice(0, 7) === month.key).reduce((sum, invoice) => sum + Number(invoice.total || 0), 0);
+    month.sales = invoices.filter(invoice => invoice.currency === "UGX" && !["draft","void","cancelled"].includes(String(invoice.status).toLowerCase()) && String(invoice.issue_date || "").slice(0, 7) === month.key).reduce((sum, invoice) => sum + Number(invoice.total || 0), 0);
     month.expenses = expenses.filter(expense => expense.currency === "UGX" && String(expense.expense_date || "").slice(0, 7) === month.key).reduce((sum, expense) => sum + Number(expense.amount || 0), 0);
   });
   const chartMax = Math.max(1, ...chartMonths.flatMap(month => [month.sales, month.expenses]));
