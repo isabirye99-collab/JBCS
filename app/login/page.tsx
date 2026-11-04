@@ -26,7 +26,7 @@ export default function LoginPage() {
       });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || "Request could not be completed.");
-      if (mode === "login") { window.location.assign(result.redirectTo || "/workspace"); return; }
+      if (mode === "login") { const requested = new URLSearchParams(window.location.search).get("next"); const safeNext = requested && requested.startsWith("/workspace/") && !requested.startsWith("//") ? requested : result.redirectTo || "/workspace"; window.location.assign(safeNext); return; }
       setMessage(result.message || "Account created. Check your email for next steps.");
       if (!result.requiresEmailConfirmation) window.location.assign("/workspace");
     } catch (e) { setError(e instanceof Error ? e.message : "Something went wrong. Please try again."); }
