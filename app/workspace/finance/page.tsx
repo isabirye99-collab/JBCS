@@ -178,6 +178,36 @@ export default function WorkspaceFinancePage() {
     Object.entries(totals).sort(([a], [b]) => a.localeCompare(b)).map(([code, amount]) => money(amount, code)).join(" · ") || money(0, "UGX");
   const filteredCustomers = customers.filter(customer => (customer.name + " " + (customer.email || "")).toLowerCase().includes(customerSearch.toLowerCase()));
   const filteredInvoices = invoices.filter(invoice => [invoice.invoice_number, invoice.business_contacts?.name || "", invoice.status, invoice.issue_date].join(" ").toLowerCase().includes(invoiceSearch.toLowerCase()));
+  const todayKey = new Date().toLocaleDateString("en-CA", { timeZone: "Africa/Kampala" });
+  const eligibleReceivables = invoices.filter(invoice => !["draft", "void", "cancelled", "paid"].includes(String(invoice.status).toLowerCase()));
+  const outstandingByAge = eligibleReceivables.reduce((buckets, invoice) => {
+    const balance = Math.max(0, Number(invoice.total || 0) - Number(invoice.amount_paid || 0));
+    if (!balance) return buckets;
+    const currencyCode = invoice.currency || "UGX";
+    const due = invoice.due_date ? new Date(invoice.due_date + "T00:00:00") : null;
+    const today = new Date(todayKey + "T00:00:00");
+    const lateDays = due ? Math.max(0, Math.floor((today.getTime() - due.getTime()) / 86400000)) : 0;
+    const bucket = !due || lateDays === 0 ? "current" : lateDays <= 15 ? "days1to15" : lateDays <= 30 ? "days16to30" : lateDays <= 45 ? "days31to45" : "over45";
+    buckets[bucket][currencyCode] = (buckets[bucket][currencyCode] || 0) + balance;
+    return buckets;
+  }, { current: {} as Record<string, number>, days1to15: {} as Record<string, number>, days16to30: {} as Record<string, number>, days31to45: {} as Record<string, number>, over45: {} as Record<string, number> });
+  const currencyTotal = (values: Record<string, number>, code = "UGX") => money(values[code] || 0, code);
+  const receivableTotalUGX = Object.values(outstandingByAge).reduce((sum, values) => sum + (values.UGX || 0), 0);
+  const paidTotalUGX = invoices.reduce((sum, invoice) => sum + (invoice.currency === "UGX" ? Number(invoice.amount_paid || 0) : 0), 0);
+  const chartMonths = Array.from({ length: 12 }, (_, index) => {
+    const date = new Date();
+    date.setDate(1);
+    date.setMonth(date.getMonth() - (11 - index));
+    const key = date.toLocaleDateString("en-CA", { timeZone: "Africa/Kampala" }).slice(0, 7);
+    return { key, label: date.toLocaleDateString("en-UG", { month: "short", timeZone: "Africa/Kampala" }), sales: 0, expenses: 0 };
+  });
+  chartMonths.forEach(month => {
+    month.sales = invoices.filter(invoice => invoice.currency === "UGX" && String(invoice.issue_date || "").slice(0, 7) === month.key).reduce((sum, invoice) => sum + Number(invoice.total || 0), 0);
+    month.expenses = expenses.filter(expense => expense.currency === "UGX" && String(expense.expense_date || "").slice(0, 7) === month.key).reduce((sum, expense) => sum + Number(expense.amount || 0), 0);
+  });
+  const chartMax = Math.max(1, ...chartMonths.flatMap(month => [month.sales, month.expenses]));
+  const chartBars = chartMonths.map((month, index) => ({ ...month, x: 42 + index * 54, salesHeight: month.sales / chartMax * 142, expenseHeight: month.expenses / chartMax * 142 }));
+  const otherCurrencyReceivables = Object.entries(outstandingByAge.current).filter(([code]) => code !== "UGX");
 
   return <main className="inner-page invoice-product-page finance-shell">
     <aside className="finance-side-rail">
@@ -205,12 +235,56 @@ export default function WorkspaceFinancePage() {
     <section className="inner-content">
       <div id="overview" style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:18,flexWrap:"wrap",marginBottom:24}}><div><span className="eyebrow dark"><i/> FINANCE OVERVIEW</span><h2 style={{fontFamily:"Manrope,sans-serif",fontSize:"clamp(28px,3vw,40px)",margin:"10px 0 0"}}>Your business, at a glance.</h2></div><a className="button button-primary" href="#invoice-list">View invoices ↗</a></div>
       {error && <p role="alert" className="admin-error">{error}</p>}{notice && <p role="status" className="admin-success">{notice}</p>}
-      <div className="invoice-feature-grid" style={{marginBottom:24}}>
-        <article className="invoice-feature-card"><span className="invoice-feature-number">CUSTOMERS</span><h3>{customers.length}</h3><p>Customer records in this workspace</p></article>
-        <article className="invoice-feature-card"><span className="invoice-feature-number">DRAFTS</span><h3>{draftCount}</h3><p>Invoices waiting for your review</p></article>
-        <article className="invoice-feature-card"><span className="invoice-feature-number">INVOICES</span><h3>{invoices.length}</h3><p>Recorded totals: {formatTotals(invoiceTotalsByCurrency)}</p></article>
-        <article className="invoice-feature-card"><span className="invoice-feature-number">EXPENSE ENTRIES</span><h3>{expenses.length}</h3><p>Recorded totals: {formatTotals(expenseTotalsByCurrency)}</p></article>
-      </div>
+      <section className="finance-receivables-card" aria-labelledby="receivables-title">
+        <div className="finance-panel-heading"><div><h3 id="receivables-title">Total receivables</h3><p>Outstanding issued invoices · UGX view</p></div><a href="#create-invoice" className="finance-new-link">＋ New invoice</a></div>
+        <div className="finance-receivables-total">{money(receivableTotalUGX, "UGX")}</div>
+        <div className="finance-receivables-track" aria-hidden="true">
+          <span style={{width: `${receivableTotalUGX ? (Object.values(outstandingByAge.current).reduce((a,b)=>a+b,0)/Math.max(1,receivableTotalUGX))*100 : 0}%`}} />
+          <span style={{width: `${receivableTotalUGX ? (Object.values(outstandingByAge.days1to15).reduce((a,b)=>a+b,0)/Math.max(1,receivableTotalUGX))*100 : 0}%`}} />
+          <span style={{width: `${receivableTotalUGX ? (Object.values(outstandingByAge.days16to30).reduce((a,b)=>a+b,0)/Math.max(1,receivableTotalUGX))*100 : 0}%`}} />
+          <span style={{width: `${receivableTotalUGX ? (Object.values(outstandingByAge.days31to45).reduce((a,b)=>a+b,0)/Math.max(1,receivableTotalUGX))*100 : 0}%`}} />
+          <span style={{width: `${receivableTotalUGX ? (Object.values(outstandingByAge.over45).reduce((a,b)=>a+b,0)/Math.max(1,receivableTotalUGX))*100 : 0}%`}} />
+        </div>
+        <div className="finance-ageing-grid">
+          <div><small>Current</small><strong>{currencyTotal(outstandingByAge.current)}</strong></div>
+          <div><small>1–15 days</small><strong>{currencyTotal(outstandingByAge.days1to15)}</strong></div>
+          <div><small>16–30 days</small><strong>{currencyTotal(outstandingByAge.days16to30)}</strong></div>
+          <div><small>31–45 days</small><strong>{currencyTotal(outstandingByAge.days31to45)}</strong></div>
+          <div><small>Above 45 days</small><strong>{currencyTotal(outstandingByAge.over45)}</strong></div>
+        </div>
+        {otherCurrencyReceivables.length>0 && <p className="finance-currency-note">Other currencies currently due: {otherCurrencyReceivables.map(([code,amount])=>money(amount,code)).join(" · ")}. Currency balances are kept separate.</p>}
+      </section>
+      <section className="finance-analytics-grid">
+        <article className="finance-analytics-card">
+          <div className="finance-panel-heading"><div><h3>Sales and expenses</h3><p>Last 12 months · UGX only</p></div><span className="finance-period-label">12 MONTHS</span></div>
+          <div className="finance-chart-layout">
+            <div className="finance-chart" role="img" aria-label="Monthly UGX invoice sales and expenses for the last twelve months">
+              <div className="finance-chart-axis"><span>100%</span><span>75%</span><span>50%</span><span>25%</span><span>0</span></div>
+              <svg viewBox="0 0 700 190" preserveAspectRatio="none" aria-hidden="true">
+                {[18,54,90,126,162].map(y=><line key={y} x1="34" x2="690" y1={y} y2={y} stroke="#e9ebef" strokeDasharray="3 4" />)}
+                {chartBars.map((bar,index)=><g key={bar.key}>
+                  <rect x={bar.x} y={162-bar.salesHeight} width="13" height={bar.salesHeight} rx="2" fill="#3687e8"/>
+                  <rect x={bar.x+16} y={162-bar.expenseHeight} width="13" height={bar.expenseHeight} rx="2" fill="#31bd83"/>
+                  {index%2===0 && <text x={bar.x+14} y="183" textAnchor="middle" fontSize="10" fill="#747b87">{bar.label}</text>}
+                </g>)}
+              </svg>
+            </div>
+            <div className="finance-chart-summary">
+              <div><small>Total sales invoiced</small><strong>{money(chartMonths.reduce((sum,m)=>sum+m.sales,0),"UGX")}</strong></div>
+              <div><small>Payments received</small><strong>{money(paidTotalUGX,"UGX")}</strong></div>
+              <div><small>Total expenses</small><strong>{money(chartMonths.reduce((sum,m)=>sum+m.expenses,0),"UGX")}</strong></div>
+            </div>
+          </div>
+          <div className="finance-chart-legend"><span><i className="sales-dot"/>Sales invoiced</span><span><i className="expenses-dot"/>Expenses</span></div>
+          <p className="finance-data-note">Figures are calculated from records currently loaded in this workspace. Non-UGX values are not converted or combined.</p>
+        </article>
+        <div className="finance-kpi-stack">
+          <article><small>Customers</small><strong>{customers.length}</strong><span>Saved customer records</span></article>
+          <article><small>Draft invoices</small><strong>{draftCount}</strong><span>Awaiting review or issue</span></article>
+          <article><small>Invoices</small><strong>{invoices.length}</strong><span>{formatTotals(invoiceTotalsByCurrency)} total value</span></article>
+          <article><small>Expenses</small><strong>{expenses.length}</strong><span>{formatTotals(expenseTotalsByCurrency)} recorded</span></article>
+        </div>
+      </section>
       <div className="invoice-feature-grid" id="customers">
         <article className="invoice-feature-card" id="add-customer"><h3>Add a customer</h3><form className="admin-client-form" onSubmit={createCustomer}><label>Customer or company name<input required minLength={2} maxLength={160} value={customerName} onChange={e=>setCustomerName(e.target.value)} /></label><label>Email (optional)<input type="email" maxLength={254} value={customerEmail} onChange={e=>setCustomerEmail(e.target.value)} /></label><button type="submit" disabled={busy}>Save customer</button></form></article>
         <article className="invoice-feature-card" id="create-invoice"><h3>Create a draft invoice</h3>{customers.length===0 && <p>Add a customer first to create an invoice.</p>}<form className="admin-client-form" onSubmit={createInvoice}><label>Customer<select required value={selectedCustomer} onChange={e=>setSelectedCustomer(e.target.value)}><option value="">Choose customer</option>{customers.map(c=><option key={c.id} value={c.id}>{c.name}</option>)}</select></label><label>Description<input required maxLength={500} value={description} onChange={e=>setDescription(e.target.value)} /></label><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}><label>Quantity<input required type="number" min="0.001" step="0.001" value={quantity} onChange={e=>setQuantity(e.target.value)} /></label><label>Unit price<input required type="number" min="0" step="0.01" value={unitPrice} onChange={e=>setUnitPrice(e.target.value)} /></label></div><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}><label>Tax rate (%)<input type="number" min="0" max="100" step="0.01" value={taxRate} onChange={e=>setTaxRate(e.target.value)} /></label><label>Currency<select value={currency} onChange={e=>setCurrency(e.target.value)}><option>UGX</option><option>USD</option><option>EUR</option><option>GBP</option><option>KES</option><option>TZS</option></select></label></div><label>Due date (optional)<input type="date" value={dueDate} onChange={e=>setDueDate(e.target.value)} /></label><button type="submit" disabled={busy || !customers.length || !selectedCustomer}>Create draft invoice</button></form></article>
