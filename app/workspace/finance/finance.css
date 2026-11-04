@@ -249,3 +249,20 @@
 .finance-status-overdue{background:#fff0ed;color:#b32624}
 .finance-status-draft{background:#f1f0f2;color:#77717a}
 .finance-status-void,.finance-status-cancelled{background:#f3eeee;color:#8a7373}
+
+
+/* Compact finance home and expanded product navigation */
+.finance-dashboard-heading{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:28px clamp(18px,3vw,42px) 22px;background:#fff;border-bottom:1px solid #e8e9ed}
+.finance-dashboard-heading h1{font:800 clamp(25px,3vw,36px)/1.15 Manrope,sans-serif;letter-spacing:-.045em;margin:9px 0 6px;color:#29252a}
+.finance-dashboard-heading p{font-size:13px;color:#77717a;margin:0;line-height:1.6}
+.finance-dashboard-heading .button{white-space:nowrap}
+.finance-side-nav a.module-pending{opacity:.52;cursor:not-allowed}
+.finance-side-nav a.module-pending small{margin-left:auto;color:#f4b6bd;font-size:8px;font-weight:700;letter-spacing:.04em}
+.finance-side-nav a.module-pending:hover{background:transparent;color:#d2cbd1}
+.finance-side-rail>.finance-side-label:first-of-type{margin-top:22px}
+.finance-shell .finance-side-nav{gap:3px}
+.finance-shell .finance-side-nav a{padding:9px 10px;font-size:11px}
+.finance-shell .finance-side-nav a>span{font-size:15px}
+.finance-shell .finance-app-main>.inner-content{padding-top:24px}
+@media(max-width:900px){.finance-dashboard-heading{padding:22px 18px}.finance-side-rail .finance-side-nav a{font-size:10px}}
+@media(max-width:650px){.finance-dashboard-heading{align-items:flex-start;flex-direction:column;padding:20px 15px}.finance-dashboard-heading .button{width:100%;justify-content:center}.finance-side-rail .finance-side-nav{max-height:150px;overflow:auto;flex-wrap:wrap;justify-content:flex-start}.finance-side-rail .finance-side-nav a{flex:0 0 auto}}
