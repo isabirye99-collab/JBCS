@@ -78,7 +78,7 @@ export default function WorkspaceFinancePage() {
       errors.push(expenseResult.status === "fulfilled" ? expenseResult.value.data.error || "Could not load expenses." : "Could not connect to expenses.");
     }
 
-    setError(errors.join(" "));
+    setError(Array.from(new Set(errors)).join(" "));
   }, [selectedCustomer]);
 
   useEffect(() => { load().catch(e => setError(e instanceof Error ? e.message : "Unable to load workspace data.")); }, [load]);
@@ -261,7 +261,7 @@ export default function WorkspaceFinancePage() {
     </section>
     <section className="inner-content">
       <div id="overview" style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:18,flexWrap:"wrap",marginBottom:24}}><div><span className="eyebrow dark"><i/> FINANCE OVERVIEW</span><h2 style={{fontFamily:"Manrope,sans-serif",fontSize:"clamp(28px,3vw,40px)",margin:"10px 0 0"}}>Your business, at a glance.</h2></div><a className="button button-primary" href="#invoice-list">View invoices ↗</a></div>
-      {error && <p role="alert" className="admin-error">{Array.from(new Set(error.split(" "))).join(" ")}</p>}{notice && <p role="status" className="admin-success">{notice}</p>}
+      {error && <p role="alert" className="admin-error">{error}</p>}{notice && <p role="status" className="admin-success">{notice}</p>}
       <section className="finance-receivables-card" aria-labelledby="receivables-title">
         <div className="finance-panel-heading"><div><h3 id="receivables-title">Total receivables</h3><p>Outstanding issued invoices · UGX view</p></div><a href="#create-invoice" className="finance-new-link">＋ New invoice</a></div>
         <div className="finance-receivables-total">{money(receivableTotalUGX, "UGX")}</div>
