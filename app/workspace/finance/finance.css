@@ -240,3 +240,12 @@
  .finance-ageing-grid>div:nth-child(3){border-right:1px solid #eceef1}
  .finance-chart-legend{padding-left:12px}
 }
+
+.finance-table-subline{display:block;margin-top:4px;color:#8b838d;font-size:10px;font-weight:400}
+.finance-status-pill{display:inline-flex;align-items:center;border-radius:20px;padding:5px 9px;background:#f0f1f3;color:#625b65;font-size:10px;font-weight:800;text-transform:capitalize;white-space:nowrap}
+.finance-status-paid{background:#e8f7ee;color:#187548}
+.finance-status-issued,.finance-status-sent{background:#eaf2ff;color:#245da8}
+.finance-status-part-paid{background:#fff5df;color:#98610a}
+.finance-status-overdue{background:#fff0ed;color:#b32624}
+.finance-status-draft{background:#f1f0f2;color:#77717a}
+.finance-status-void,.finance-status-cancelled{background:#f3eeee;color:#8a7373}
