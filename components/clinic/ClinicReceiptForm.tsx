@@ -1,0 +1,35 @@
+"use client";
+import { useState, type FormEvent } from "react";
+type Patient={id:string;patient_number:string;full_name:string};
+type Charge={id:string;patient_id:string;description:string;quantity:number;unit_price:number;currency:string;status:string};
+type Receipt={receipt_number:string;amount:string|number;currency:string;payment_method:string;receipt_date:string;patient_id:string;charge_id:string|null};
+export default function ClinicReceiptForm({patients,charges}:{patients:Patient[];charges:Charge[]}){
+ const [busy,setBusy]=useState(false),[message,setMessage]=useState(""),[error,setError]=useState(""),[patientId,setPatientId]=useState(""),[chargeId,setChargeId]=useState(""),[currency,setCurrency]=useState("UGX"),[receipt,setReceipt]=useState<Receipt|null>(null);
+ async function submit(e:FormEvent<HTMLFormElement>){e.preventDefault();setBusy(true);setError("");setMessage("");setReceipt(null);const form=e.currentTarget;try{const res=await fetch("/api/clinic/receipts",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(Object.fromEntries(new FormData(form).entries()))});const data=await res.json();if(!res.ok)throw new Error(data.error||"Could not record payment.");setReceipt(data.receipt);setMessage("Payment recorded successfully. Your receipt is ready to print.");form.reset();setPatientId("");setChargeId("");setCurrency("UGX");}catch(e){setError(e instanceof Error?e.message:"Could not record payment.");}finally{setBusy(false);}}
+ const field={width:"100%",padding:11,border:"1px solid #d9dee7",borderRadius:9,background:"#fff",color:"#252b36"} as const;
+ const label={display:"grid",gap:6,fontSize:13,fontWeight:700,color:"#454d5a"} as const;
+ const availableCharges=charges.filter(c=>(c.status==="unpaid"||c.status==="part_paid")&&c.patient_id===patientId);
+ const patient=receipt?patients.find(p=>p.id===receipt.patient_id):null;
+ const paymentLabels:Record<string,string>={cash:"Cash",mobile_money:"Mobile money",bank_transfer:"Bank transfer",card:"Card",other:"Other"};
+ return <div style={{display:"grid",gap:16}}>
+ <form onSubmit={submit} style={{display:"grid",gap:14}}><div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(190px,1fr))",gap:14}}>
+ <label style={label}>Patient *<select name="patient_id" required value={patientId} onChange={e=>{setPatientId(e.target.value);setChargeId("");setCurrency("UGX");}} style={field}><option value="" disabled>Select patient</option>{patients.map(p=><option key={p.id} value={p.id}>{p.full_name} · {p.patient_number}</option>)}</select></label>
+ <label style={label}>Charge<select name="charge_id" value={chargeId} onChange={e=>{const id=e.target.value;setChargeId(id);const selected=availableCharges.find(c=>c.id===id);if(selected)setCurrency(selected.currency.trim().toUpperCase());}} style={field}><option value="">Unallocated payment</option>{availableCharges.map(c=><option key={c.id} value={c.id}>{c.description} · {c.currency} {(Number(c.quantity)*Number(c.unit_price)).toFixed(2)}</option>)}</select></label>
+ <label style={label}>Amount received *<input name="amount" type="number" min="0.01" step="0.01" required style={field} placeholder="0.00"/></label>
+ <label style={label}>Currency *<select name="currency" value={currency} onChange={e=>setCurrency(e.target.value)} style={field}>{["UGX","USD","KES","TZS","EUR","GBP"].map(x=><option key={x}>{x}</option>)}</select></label>
+ <label style={label}>Payment method *<select name="payment_method" defaultValue="cash" style={field}>{[["cash","Cash"],["mobile_money","Mobile money"],["bank_transfer","Bank transfer"],["card","Card"],["other","Other"]].map(([v,t])=><option key={v} value={v}>{t}</option>)}</select></label>
+ <label style={label}>Transaction reference<input name="transaction_reference" maxLength={120} style={field} placeholder="Optional transaction ID"/></label></div>
+ <p style={{fontSize:12,color:"#687080",margin:0}}>Record only payments received. Selecting a charge automatically selects its currency; linked payments must match the outstanding balance.</p>
+ {error&&<p role="alert" style={{color:"#a61b29"}}>{error}</p>}{message&&<p role="status" style={{color:"#17663a"}}>{message}</p>}
+ <button disabled={busy||!patients.length} style={{justifySelf:"start",border:0,borderRadius:9,background:"#ad1d2e",color:"#fff",fontWeight:800,padding:"12px 18px"}}>{busy?"Recording…":"Record payment & issue receipt"}</button></form>
+ {receipt&&<section aria-label="Printable receipt" style={{border:"1px solid #d9dee7",borderRadius:12,padding:24,background:"#fff",color:"#252b36",maxWidth:680}}>
+ <style>{`@media print { body * { visibility:hidden !important; } .jpmc-print-receipt,.jpmc-print-receipt * { visibility:visible !important; } .jpmc-print-receipt { position:absolute !important; inset:0 auto auto 0 !important; width:100% !important; max-width:none !important; border:0 !important; box-shadow:none !important; } .jpmc-no-print { display:none !important; } }`}</style>
+ <div className="jpmc-print-receipt">
+ <div style={{borderBottom:"3px solid #ad1d2e",paddingBottom:14,marginBottom:18}}><p style={{margin:0,color:"#ad1d2e",fontSize:12,fontWeight:800,letterSpacing:1.5}}>JOHNPAUL MEDICAL CENTER</p><h3 style={{margin:"8px 0 4px",fontSize:25}}>OFFICIAL PAYMENT RECEIPT</h3><p style={{margin:0,color:"#687080",fontSize:13}}>Receipt No: {receipt.receipt_number}</p></div>
+ <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(180px,1fr))",gap:16}}><div><p style={{margin:"0 0 4px",fontSize:12,color:"#687080"}}>Received from</p><strong>{patient?.full_name||"Registered patient"}</strong><p style={{margin:"4px 0",fontSize:12}}>{patient?.patient_number||""}</p></div><div><p style={{margin:"0 0 4px",fontSize:12,color:"#687080"}}>Date and time</p><strong>{new Date(receipt.receipt_date).toLocaleString("en-UG",{dateStyle:"medium",timeStyle:"short"})}</strong></div><div><p style={{margin:"0 0 4px",fontSize:12,color:"#687080"}}>Payment method</p><strong>{paymentLabels[receipt.payment_method]||receipt.payment_method}</strong></div></div>
+ <div style={{marginTop:24,padding:18,background:"#f8f8fa",borderRadius:8}}><p style={{margin:"0 0 6px",fontSize:12,color:"#687080"}}>AMOUNT RECEIVED</p><strong style={{fontSize:30,color:"#ad1d2e"}}>{String(receipt.currency).trim()} {Number(receipt.amount).toLocaleString("en-UG",{minimumFractionDigits:2,maximumFractionDigits:2})}</strong></div>
+ <p style={{marginTop:24,fontSize:12,color:"#687080"}}>This receipt confirms payment received by Johnpaul Medical Center. Please retain it for your records.</p><p style={{marginTop:28,paddingTop:12,borderTop:"1px solid #e5e7eb",fontSize:11,color:"#687080"}}>Generated by Johden Business Consultancy Services clinic workspace.</p>
+ </div><button type="button" className="jpmc-no-print" onClick={()=>window.print()} style={{marginTop:18,border:0,borderRadius:9,background:"#ad1d2e",color:"#fff",fontWeight:800,padding:"12px 18px",cursor:"pointer"}}>Print receipt / Save as PDF</button>
+ </section>}
+ </div>;
+}

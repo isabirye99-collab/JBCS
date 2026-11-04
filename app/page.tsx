@@ -11,7 +11,6 @@ export default function Home() {
           <a href="/services">Services</a>
           <a href="/technology">Technology</a>
           <a href="/contact">Contact</a>
-          <a href="/feedback">Feedback</a>
         </nav>
         <a className="button button-primary header-cta" href="https://wa.me/256702846597" target="_blank" rel="noopener noreferrer">Let’s talk <span>↗</span></a>
       </header>
