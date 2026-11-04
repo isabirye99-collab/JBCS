@@ -78,7 +78,7 @@ export default function WorkspaceFinancePage() {
       errors.push(expenseResult.status === "fulfilled" ? expenseResult.value.data.error || "Could not load expenses." : "Could not connect to expenses.");
     }
 
-    setError(Array.from(new Set(errors)).join(" "));
+    setError(errors.length ? Array.from(new Set(errors))[0] : "");
   }, [selectedCustomer]);
 
   useEffect(() => { load().catch(e => setError(e instanceof Error ? e.message : "Unable to load workspace data.")); }, [load]);
@@ -227,18 +227,18 @@ export default function WorkspaceFinancePage() {
       <p className="finance-side-label">WORKSPACE</p>
       <nav className="finance-side-nav" aria-label="Finance navigation">
         <a className="selected" href="#overview"><span>▦</span> Overview</a>
-        <a href="#customers"><span>♙</span> Customers <i>{customers.length}</i></a>
-        <a href="#items-module" aria-disabled="true" className="module-pending"><span>▧</span> Items <small>Planned</small></a>
-        <a href="#quotes-module" aria-disabled="true" className="module-pending"><span>▧</span> Quotes <small>Planned</small></a>
+        <Link href="#customers"><span>♙</span> Customers <i>{customers.length}</i></Link>
+        <Link href="/workspace/finance/items"><span>▧</span> Items</Link>
+        <Link href="/workspace/finance/quotes"><span>▧</span> Quotes</Link>
         <a href="#invoice-list"><span>▤</span> Invoices <i>{invoices.length}</i></a>
-        <a href="#receipts-module" aria-disabled="true" className="module-pending"><span>▤</span> Sales Receipts <small>Planned</small></a>
-        <a href="#recurring-invoices-module" aria-disabled="true" className="module-pending"><span>⟳</span> Recurring Invoices <small>Planned</small></a>
-        <a href="#payments-module" aria-disabled="true" className="module-pending"><span>⇄</span> Payments Received <small>Planned</small></a>
-        <a href="#credit-notes-module" aria-disabled="true" className="module-pending"><span>▱</span> Credit Notes <small>Planned</small></a>
+        <Link href="/workspace/finance/receipts"><span>▤</span> Sales Receipts</Link>
+        <Link href="/workspace/finance/recurring"><span>⟳</span> Recurring Invoices</Link>
+        <a href="#invoice-list"><span>⇄</span> Payments Received</a>
+        <Link href="/workspace/finance/credit-notes"><span>▱</span> Credit Notes</Link>
         <a href="#expense-list"><span>↗</span> Expenses</a>
-        <a href="#recurring-expenses-module" aria-disabled="true" className="module-pending"><span>⟳</span> Recurring Expenses <small>Planned</small></a>
-        <a href="#time-tracking-module" aria-disabled="true" className="module-pending"><span>◷</span> Time Tracking <small>Planned</small></a>
-        <a href="#reports-module" aria-disabled="true" className="module-pending"><span>▥</span> Reports <small>Planned</small></a>
+        <Link href="/workspace/finance/recurring"><span>⟳</span> Recurring Expenses</Link>
+        <Link href="/workspace/finance/time-tracking"><span>◷</span> Time Tracking</Link>
+        <a href="#overview"><span>▥</span> Reports</a>
       </nav>
       <p className="finance-side-label">QUICK ACTIONS</p>
       <nav className="finance-side-nav">
