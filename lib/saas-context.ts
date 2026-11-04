@@ -1,3 +1,4 @@
+import { cookies } from "next/headers";
 import { getSaasSession, supabaseConfig } from "@/lib/saas-auth";
 
 export async function getSaasContext() {
@@ -7,16 +8,21 @@ export async function getSaasContext() {
   if (!url || !serviceKey) return { error: "Account services are not configured.", status: 503 as const };
 
   const response = await fetch(
-    `${url}/rest/v1/workspace_members?user_id=eq.${encodeURIComponent(session.user.id)}&is_active=eq.true&select=workspace_id,role,business_workspaces!inner(id,name,slug,base_currency,is_active,workspace_subscriptions(status,trial_ends_at,current_period_ends_at))&limit=10`,
+    `${url}/rest/v1/workspace_members?user_id=eq.${encodeURIComponent(session.user.id)}&is_active=eq.true&select=workspace_id,role,business_workspaces!inner(id,name,slug,base_currency,is_active,workspace_subscriptions(status,trial_ends_at,current_period_ends_at))&limit=50`,
     { headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` }, cache: "no-store" }
   );
   if (!response.ok) return { error: "Could not verify workspace access.", status: 503 as const };
   const rows = await response.json();
   const memberships = Array.isArray(rows) ? rows.filter((row: any) => row.business_workspaces?.is_active === true) : [];
   if (!memberships.length) return { error: "No active business workspace is linked to this account.", status: 403 as const };
-  if (memberships.length > 1) return { error: "This account has multiple workspaces. Workspace selection must be completed before accessing finance data.", status: 409 as const };
 
-  const membership = memberships[0];
+  const selectedId = (await cookies()).get("johden_selected_workspace")?.value;
+  let membership = selectedId ? memberships.find((row: any) => row.workspace_id === selectedId && row.business_workspaces?.id === selectedId) : null;
+  if (!membership && memberships.length === 1) membership = memberships[0];
+  if (!membership) {
+    return { error: "Choose one of your authorised workspaces before accessing finance data.", status: 409 as const };
+  }
+
   const workspace = membership.business_workspaces;
   const subValue = workspace.workspace_subscriptions;
   const subscription = Array.isArray(subValue) ? subValue[0] : subValue;
