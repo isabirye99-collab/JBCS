@@ -36,6 +36,14 @@ export default function WorkspaceFinancePage() {
   const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [dialog, setDialog] = useState<"edit" | "payment" | null>(null);
+  const [activeInvoice, setActiveInvoice] = useState<Invoice | null>(null);
+  const [editDueDate, setEditDueDate] = useState("");
+  const [editNotes, setEditNotes] = useState("");
+  const [paymentAmount, setPaymentAmount] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("bank_transfer");
+  const [paymentDate, setPaymentDate] = useState(new Date().toISOString().slice(0, 10));
+  const [paymentReference, setPaymentReference] = useState("");
 
   const load = useCallback(async () => {
     // Load each workspace resource independently: a customer or expense
@@ -98,17 +106,18 @@ export default function WorkspaceFinancePage() {
     finally { setBusy(false); }
   }
 
-  async function editDraftInvoice(invoice: Invoice) {
-    const dueDate = window.prompt("Due date (YYYY-MM-DD; leave blank to clear)", invoice.due_date || "");
-    if (dueDate === null) return;
-    const notes = window.prompt("Invoice notes (leave blank to clear)", "");
-    if (notes === null) return;
+  function editDraftInvoice(invoice: Invoice) {
+    setActiveInvoice(invoice); setEditDueDate(invoice.due_date || ""); setEditNotes("");
+    setDialog("edit"); setError(""); setNotice("");
+  }
+
+  async function saveDraftInvoice(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault(); if (!activeInvoice) return;
     setBusy(true); setError(""); setNotice("");
     try {
-      const response = await fetch("/api/saas/invoices", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: invoice.id, due_date: dueDate, notes }) });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Could not update invoice.");
-      setNotice("Draft invoice details updated."); await load();
+      const response = await fetch("/api/saas/invoices", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: activeInvoice.id, due_date: editDueDate, notes: editNotes }) });
+      const data = await response.json(); if (!response.ok) throw new Error(data.error || "Could not update invoice.");
+      setNotice("Draft invoice details updated."); setDialog(null); setActiveInvoice(null); await load();
     } catch (e) { setError(e instanceof Error ? e.message : "Unable to update invoice."); }
     finally { setBusy(false); }
   }
@@ -129,28 +138,25 @@ export default function WorkspaceFinancePage() {
     finally { setBusy(false); }
   }
 
-  async function recordPayment(invoice: Invoice) {
+  function recordPayment(invoice: Invoice) {
     const balance = Math.max(0, Number(invoice.total || 0) - Number(invoice.amount_paid || 0));
     if (balance <= 0) { setError("This invoice has no outstanding balance."); return; }
-    const amountText = window.prompt(`Outstanding balance: ${money(balance, invoice.currency)}\nEnter payment amount in ${invoice.currency}:`, balance.toFixed(2));
-    if (amountText === null) return;
-    const amount = Number(amountText);
-    if (!Number.isFinite(amount) || amount <= 0) { setError("Enter a valid positive payment amount."); return; }
-    const method = window.prompt("Payment method: cash, bank_transfer, mobile_money, card, cheque, other", "bank_transfer");
-    if (method === null) return;
-    const paymentDate = window.prompt("Payment date (YYYY-MM-DD)", new Date().toISOString().slice(0, 10));
-    if (paymentDate === null) return;
-    const reference = window.prompt("Payment reference (optional)", "") ?? "";
+    setActiveInvoice(invoice); setPaymentAmount(balance.toFixed(2)); setPaymentMethod("bank_transfer");
+    setPaymentDate(new Date().toISOString().slice(0, 10)); setPaymentReference("");
+    setDialog("payment"); setError(""); setNotice("");
+  }
+
+  async function submitPayment(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault(); if (!activeInvoice) return;
+    const amount = Number(paymentAmount);
+    const balance = Math.max(0, Number(activeInvoice.total || 0) - Number(activeInvoice.amount_paid || 0));
+    if (!Number.isFinite(amount) || amount <= 0 || amount > balance) { setError("Enter an amount greater than zero and no more than the outstanding balance."); return; }
     setBusy(true); setError(""); setNotice("");
     try {
-      const response = await fetch("/api/saas/payments", {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ invoice_id: invoice.id, amount, method, payment_date: paymentDate, payment_reference: reference }),
-      });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Could not record payment.");
-      setNotice(`Payment recorded for ${invoice.invoice_number}. New status: ${data.payment.status.replace("_", " ")}.`);
-      await load();
+      const response = await fetch("/api/saas/payments", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ invoice_id: activeInvoice.id, amount, method: paymentMethod, payment_date: paymentDate, payment_reference: paymentReference }) });
+      const data = await response.json(); if (!response.ok) throw new Error(data.error || "Could not record payment.");
+      setNotice(`Payment recorded for ${activeInvoice.invoice_number}. New status: ${String(data.payment.status).replace("_", " ")}.`);
+      setDialog(null); setActiveInvoice(null); await load();
     } catch (e) { setError(e instanceof Error ? e.message : "Unable to record payment."); }
     finally { setBusy(false); }
   }
@@ -307,6 +313,25 @@ export default function WorkspaceFinancePage() {
       </article>
       <div id="invoice-list" className="invoice-list-panel" style={{marginTop:32,background:"#fff",border:"1px solid #ece7e6",borderRadius:12,padding:20}}><div className="invoice-list-heading"><div><span className="eyebrow dark"><i/> BILLING REGISTER</span><h2>Invoices</h2><p>Search, review, and print invoices saved in this workspace.</p></div><input aria-label="Search invoices" value={invoiceSearch} onChange={e=>setInvoiceSearch(e.target.value)} placeholder="Search invoice, customer or status" /></div>{filteredInvoices.length===0 ? <p>{invoiceSearch ? "No invoices match your search." : "No invoices yet. Create your first draft above."}</p> : <div style={{overflowX:"auto"}}><table style={{width:"100%",borderCollapse:"collapse",textAlign:"left"}}><thead><tr><th style={{padding:12}}>Invoice</th><th style={{padding:12}}>Date</th><th style={{padding:12}}>Customer</th><th style={{padding:12}}>Total</th><th style={{padding:12}}>Balance</th><th style={{padding:12}}>Status</th><th style={{padding:12}}>Actions</th></tr></thead><tbody>{filteredInvoices.map(i=><tr key={i.id}><td style={{padding:12}}>{i.invoice_number}</td><td style={{padding:12}}>{i.issue_date}</td><td style={{padding:12}}>{i.business_contacts?.name || "Customer"}</td><td style={{padding:12}}>{money(i.total,i.currency)}</td><td style={{padding:12}}><strong>{money(Math.max(0,Number(i.total||0)-Number(i.amount_paid||0)),i.currency)}</strong></td><td style={{padding:12}}><span className={`finance-status-pill finance-status-${String(i.status).toLowerCase().replace(/[^a-z0-9]+/g,"-")}`}>{i.status.replace(/_/g," ")}</span></td><td style={{padding:12,display:"flex",gap:10,flexWrap:"wrap"}}>{i.status === "draft" && <><button type="button" disabled={busy} onClick={() => editDraftInvoice(i)}>Edit draft</button><button type="button" disabled={busy} onClick={() => issueInvoice(i)}>Issue invoice</button></>}{["sent","part_paid","overdue"].includes(i.status) && Number(i.total || 0) > Number(i.amount_paid || 0) && <button type="button" disabled={busy} onClick={() => recordPayment(i)}>Record payment</button>}<Link href={`/workspace/invoices/${i.id}/print`} target="_blank">Print / Save PDF</Link></td></tr>)}</tbody></table></div>}</div>
       <div id="expense-list" style={{marginTop:32,background:"#fff",border:"1px solid #ece7e6",borderRadius:12,padding:20}}><h2>Expenses</h2>{expenses.length===0 ? <p>No expenses recorded yet.</p> : <div style={{overflowX:"auto"}}><table style={{width:"100%",borderCollapse:"collapse",textAlign:"left"}}><thead><tr><th style={{padding:12}}>Date</th><th style={{padding:12}}>Category</th><th style={{padding:12}}>Description</th><th style={{padding:12}}>Amount</th><th style={{padding:12}}>Method</th></tr></thead><tbody>{expenses.map(e=><tr key={e.id}><td style={{padding:12}}>{e.expense_date}</td><td style={{padding:12}}>{e.category}</td><td style={{padding:12}}>{e.description}</td><td style={{padding:12}}>{money(e.amount,e.currency)}</td><td style={{padding:12}}>{e.payment_method.replace("_"," ")}</td></tr>)}</tbody></table></div>}</div>
+      {dialog && activeInvoice && <div role="presentation" onMouseDown={event=>{if(event.target===event.currentTarget&&!busy){setDialog(null);setActiveInvoice(null);}}} style={{position:"fixed",inset:0,zIndex:1000,background:"rgba(24,20,22,.62)",display:"grid",placeItems:"center",padding:20}}>
+        <section role="dialog" aria-modal="true" aria-labelledby="invoice-dialog-title" style={{width:"min(100%,520px)",maxHeight:"90vh",overflowY:"auto",background:"#fff",borderRadius:18,padding:26,boxShadow:"0 24px 80px rgba(0,0,0,.24)"}}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"start",gap:16}}><div><span className="eyebrow dark"><i/> {dialog==="edit"?"DRAFT INVOICE":"PAYMENT ENTRY"}</span><h2 id="invoice-dialog-title" style={{margin:"8px 0 4px"}}>{dialog==="edit"?"Edit invoice":"Record a payment"}</h2><p style={{margin:0,color:"#6d6870"}}>{activeInvoice.invoice_number} · {activeInvoice.business_contacts?.name || "Customer"}</p></div><button type="button" disabled={busy} aria-label="Close dialog" onClick={()=>{setDialog(null);setActiveInvoice(null);}} style={{border:0,background:"#f4f1f1",borderRadius:10,width:38,height:38,fontSize:20}}>×</button></div>
+          {dialog==="edit" ? <form className="admin-client-form" onSubmit={saveDraftInvoice} style={{marginTop:22,display:"grid",gap:16}}>
+            <label>Due date<input type="date" value={editDueDate} onChange={e=>setEditDueDate(e.target.value)} /></label>
+            <label>Invoice notes<textarea rows={4} maxLength={2000} value={editNotes} onChange={e=>setEditNotes(e.target.value)} placeholder="Add payment terms or a note for this invoice" /></label>
+            <p style={{fontSize:13,color:"#777"}}>Only draft invoices can be edited. Leave the due date blank if no due date applies.</p>
+            <div style={{display:"flex",justifyContent:"flex-end",gap:10}}><button type="button" disabled={busy} onClick={()=>{setDialog(null);setActiveInvoice(null);}}>Cancel</button><button className="button button-primary" type="submit" disabled={busy}>{busy?"Saving…":"Save changes"}</button></div>
+          </form> : <form className="admin-client-form" onSubmit={submitPayment} style={{marginTop:22,display:"grid",gap:16}}>
+            <div style={{background:"#fff5f2",padding:14,borderRadius:12}}><small>Outstanding balance</small><strong style={{display:"block",fontSize:22,marginTop:4}}>{money(Math.max(0,Number(activeInvoice.total||0)-Number(activeInvoice.amount_paid||0)),activeInvoice.currency)}</strong></div>
+            <label>Amount received ({activeInvoice.currency})<input type="number" min="0.01" max={Math.max(0,Number(activeInvoice.total||0)-Number(activeInvoice.amount_paid||0))} step="0.01" required value={paymentAmount} onChange={e=>setPaymentAmount(e.target.value)} /></label>
+            <label>Payment method<select required value={paymentMethod} onChange={e=>setPaymentMethod(e.target.value)}><option value="cash">Cash</option><option value="bank_transfer">Bank transfer</option><option value="mobile_money">Mobile money</option><option value="card">Card</option><option value="cheque">Cheque</option><option value="other">Other</option></select></label>
+            <label>Payment date<input type="date" required max={new Date().toISOString().slice(0,10)} value={paymentDate} onChange={e=>setPaymentDate(e.target.value)} /></label>
+            <label>Payment reference (optional)<input maxLength={120} value={paymentReference} onChange={e=>setPaymentReference(e.target.value)} placeholder="Bank or mobile money reference" /></label>
+            <p style={{fontSize:13,color:"#777"}}>This records a payment against the invoice. It does not initiate a bank or mobile-money transfer.</p>
+            <div style={{display:"flex",justifyContent:"flex-end",gap:10}}><button type="button" disabled={busy} onClick={()=>{setDialog(null);setActiveInvoice(null);}}>Cancel</button><button className="button button-primary" type="submit" disabled={busy}>{busy?"Recording…":"Record payment"}</button></div>
+          </form>}
+        </section>
+      </div>}
       <p style={{marginTop:20,fontSize:13,opacity:.8}}>This is an initial workspace module. Email delivery, payment recording and subscription checkout remain disabled until provider credentials and secure payment webhooks are configured and tested.</p>
     </section>
     </div>
