@@ -9,7 +9,7 @@ export default async function PrintableInvoicePage({ params }: { params: Promise
   if ("error" in ctx) redirect("/login");
   const { id } = await params;
   if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id)) notFound();
-  const response = await fetch(`${ctx.url}/rest/v1/invoices?id=eq.${encodeURIComponent(id)}&workspace_id=eq.${encodeURIComponent(ctx.workspaceId)}&select=id,invoice_number,issue_date,due_date,currency,subtotal,tax_amount,total,status,notes,business_contacts(name,email,address,tax_number),document_items(description,quantity,unit_price,tax_rate,line_total)&limit=1`, {
+  const response = await fetch(`${ctx.url}/rest/v1/invoices?id=eq.${encodeURIComponent(id)}&workspace_id=eq.${encodeURIComponent(ctx.workspaceId)}&select=id,invoice_number,issue_date,due_date,currency,subtotal,tax_amount,total,amount_paid,status,notes,business_contacts(name,email,address,tax_number),document_items(description,quantity,unit_price,tax_rate,line_total)&limit=1`, {
     headers: { apikey: ctx.serviceKey, Authorization: `Bearer ${ctx.serviceKey}` }, cache: "no-store",
   });
   if (!response.ok) notFound();
