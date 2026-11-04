@@ -4,7 +4,7 @@ import Link from "next/link";
 import { FormEvent, useCallback, useEffect, useState } from "react";
 
 type Customer = { id: string; name: string; email?: string | null; phone?: string | null; address?: string | null; tax_number?: string | null };
-type Invoice = { id: string; invoice_number: string; issue_date: string; due_date?: string | null; currency: string; total: number; amount_paid: number; status: string; business_contacts?: { name?: string } | null };
+type Invoice = { id: string; invoice_number: string; issue_date: string; due_date?: string | null; notes?: string | null; currency: string; total: number; amount_paid: number; status: string; business_contacts?: { name?: string } | null };
 type Expense = { id: string; expense_date: string; category: string; description: string; amount: number; currency: string; payment_method: string };
 
 export default function WorkspaceFinancePage() {
@@ -107,7 +107,7 @@ export default function WorkspaceFinancePage() {
   }
 
   function editDraftInvoice(invoice: Invoice) {
-    setActiveInvoice(invoice); setEditDueDate(invoice.due_date || ""); setEditNotes("");
+    setActiveInvoice(invoice); setEditDueDate(invoice.due_date || ""); setEditNotes(invoice.notes || "");
     setDialog("edit"); setError(""); setNotice("");
   }
 
@@ -317,7 +317,7 @@ export default function WorkspaceFinancePage() {
         <section role="dialog" aria-modal="true" aria-labelledby="invoice-dialog-title" style={{width:"min(100%,520px)",maxHeight:"90vh",overflowY:"auto",background:"#fff",borderRadius:18,padding:26,boxShadow:"0 24px 80px rgba(0,0,0,.24)"}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"start",gap:16}}><div><span className="eyebrow dark"><i/> {dialog==="edit"?"DRAFT INVOICE":"PAYMENT ENTRY"}</span><h2 id="invoice-dialog-title" style={{margin:"8px 0 4px"}}>{dialog==="edit"?"Edit invoice":"Record a payment"}</h2><p style={{margin:0,color:"#6d6870"}}>{activeInvoice.invoice_number} · {activeInvoice.business_contacts?.name || "Customer"}</p></div><button type="button" disabled={busy} aria-label="Close dialog" onClick={()=>{setDialog(null);setActiveInvoice(null);}} style={{border:0,background:"#f4f1f1",borderRadius:10,width:38,height:38,fontSize:20}}>×</button></div>
           {dialog==="edit" ? <form className="admin-client-form" onSubmit={saveDraftInvoice} style={{marginTop:22,display:"grid",gap:16}}>
-            <label>Due date<input type="date" value={editDueDate} onChange={e=>setEditDueDate(e.target.value)} /></label>
+            <label>Due date<input type="date" min={activeInvoice.issue_date} value={editDueDate} onChange={e=>setEditDueDate(e.target.value)} /></label>
             <label>Invoice notes<textarea rows={4} maxLength={2000} value={editNotes} onChange={e=>setEditNotes(e.target.value)} placeholder="Add payment terms or a note for this invoice" /></label>
             <p style={{fontSize:13,color:"#777"}}>Only draft invoices can be edited. Leave the due date blank if no due date applies.</p>
             <div style={{display:"flex",justifyContent:"flex-end",gap:10}}><button type="button" disabled={busy} onClick={()=>{setDialog(null);setActiveInvoice(null);}}>Cancel</button><button className="button button-primary" type="submit" disabled={busy}>{busy?"Saving…":"Save changes"}</button></div>
