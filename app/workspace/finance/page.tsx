@@ -224,6 +224,8 @@ export default function WorkspaceFinancePage() {
         <a href="#invoice-list"><span>▤</span> Invoices <i>{invoices.length}</i></a>
         <a href="#customers"><span>♙</span> Customers <i>{customers.length}</i></a>
         <a href="#expense-list"><span>↗</span> Expenses</a>
+        <a href="/feedback"><span>✳</span> Client feedback</a>
+        <a href="/contact"><span>✉</span> Contact &amp; support</a>
       </nav>
       <p className="finance-side-label">QUICK ACTIONS</p>
       <nav className="finance-side-nav">
