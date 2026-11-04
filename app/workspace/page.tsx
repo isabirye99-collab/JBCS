@@ -36,7 +36,7 @@ export default async function WorkspacePage() {
           <h1 style={{ fontFamily: "Manrope,sans-serif", fontSize: "clamp(38px,5vw,62px)", lineHeight: 1.08, letterSpacing: "-.05em", maxWidth: 720, margin: "20px 0 18px" }}>Your business. <em style={{ color: "#f3192d", fontStyle: "normal" }}>One organised workspace.</em></h1>
           <p style={{ color: "#69666b", maxWidth: 610, fontSize: 16, lineHeight: 1.85, margin: 0 }}>Welcome back, {session.user.email}. Manage customer records, prepare invoices and keep your business expenses together in one secure place.</p>
           <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginTop: 26 }}>
-            <Link className="button button-primary" href="/workspace/finance">Open Billing &amp; Finance <span>↗</span></Link>
+            <Link className="button button-primary" href="#available-workspaces">Choose a Workspace <span>↓</span></Link>
             <Link className="button button-secondary" href="/contact">Get support</Link>
           </div>
         </div>
@@ -54,7 +54,7 @@ export default async function WorkspacePage() {
       </div>
     </section>
 
-    <section style={{ maxWidth: 1180, margin: "0 auto", padding: "38px 7% 72px" }}>
+    <section id="available-workspaces" style={{ maxWidth: 1180, margin: "0 auto", padding: "38px 7% 72px" }}>
       <div style={{ marginBottom: 22 }}>
         <span className="eyebrow dark"><i /> AVAILABLE WORKSPACES</span>
         <h2 style={{ fontFamily: "Manrope,sans-serif", fontSize: 30, letterSpacing: "-.035em", margin: "8px 0 5px" }}>Choose where to work</h2>
@@ -78,7 +78,7 @@ export default async function WorkspacePage() {
               <div><small style={{ display: "block", color: "#81787d", fontSize: 10 }}>BILLING PLAN</small><strong style={{ fontSize: 12 }}>Annual · {subscription?.billing_currency || "UGX"}</strong></div>
             </div>
             {subscription?.trial_ends_at && <p style={{ color: "#69666b", fontSize: 12, margin: 0 }}>Trial ends {new Date(subscription.trial_ends_at).toLocaleDateString("en-GB", { dateStyle: "medium", timeZone: "Africa/Kampala" })}</p>}
-            <Link className="button button-primary" href="/workspace/finance" style={{ marginTop: "auto", width: "100%" }}>Open Billing &amp; Finance <span>↗</span></Link>
+            <form action="/api/saas/select-workspace" method="post" style={{ marginTop: "auto" }}><input type="hidden" name="workspace_id" value={workspace.id} /><button className="button button-primary" type="submit" style={{ width: "100%" }}>Select this Workspace <span>↗</span></button></form>
           </article>;
         })}
       </div>
