@@ -16,7 +16,7 @@ export default async function WorkspacePage() {
       <span className="eyebrow dark" style={{ marginTop: 24 }}>YOUR PRIVATE WORKSPACE</span>
       <h1>Workspace setup is pending</h1>
       <p>Your account is signed in, but no active business workspace is available for it. Contact Johden support so the account can be checked securely.</p>
-      <Link className="button button-primary" href="/invoicing">Return to invoicing</Link>
+      <Link className="button button-primary" href="/technology">Return to Johden website</Link>
     </section></main>;
   }
 
@@ -25,7 +25,7 @@ export default async function WorkspacePage() {
       <Link className="brand" href="/" aria-label="Johden Business Consultancy Services home">
         <Image src="/johden-logo.svg" alt="Johden Business Consultancy Services" width={250} height={85} priority style={{ width: "230px", height: "auto" }} />
       </Link>
-      <nav className="desktop-nav"><Link href="/workspace">Workspace</Link><Link href="/invoicing">Product site</Link><Link href="/contact">Support</Link></nav>
+      <nav className="desktop-nav"><Link href="/workspace">Workspace</Link><Link href="/technology">Product site</Link><Link href="/contact">Support</Link></nav>
       <form action="/api/saas/logout" method="post"><button className="button button-secondary" formAction="/api/saas/logout">Sign out</button></form>
     </header>
 
@@ -87,7 +87,7 @@ export default async function WorkspacePage() {
         <Link className="button button-secondary" href="/contact">Contact support <span>↗</span></Link>
       </div>
     </section>
-    <footer className="site-footer"><div className="footer-bottom"><span>© {new Date().getFullYear()} Johden Business Consultancy Services</span><Link href="/invoicing">Back to invoicing</Link></div></footer>
+    <footer className="site-footer"><div className="footer-bottom"><span>© {new Date().getFullYear()} Johden Business Consultancy Services</span><Link href="/technology">Back to Johden website</Link></div></footer>
     <style>{`@media(max-width:760px){.workspace-hero-grid{grid-template-columns:1fr!important}}`}</style>
   </main>;
 }
