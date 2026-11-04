@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import InquiryForm from "./InquiryForm";
+import ContactFeedbackForm from "./ContactFeedbackForm";
 
 export const metadata: Metadata = { title: "Contact Johden", description: "Send a service inquiry or request a consultation with Johden Business Consultancy Services." };
 
