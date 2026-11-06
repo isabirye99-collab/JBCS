@@ -160,6 +160,21 @@ export default function InvoiceForm({
         <p>Tax <strong>{money(taxTotal)}</strong></p>
         <p>Total <strong>{money(total)}</strong></p>
       </div>
+      <section className="finance-live-preview" aria-label="Live invoice preview">
+        <div className="finance-live-preview-heading">
+          <img src="/johden-logo.svg" alt="Johden Business Consultancy Services" />
+          <div><span>INVOICE PREVIEW</span><strong>DRAFT</strong></div>
+        </div>
+        <div className="finance-live-preview-meta">
+          <div><small>BILL TO</small><b>{customers.find((customer) => customer.id === contactId)?.name || "Select a customer"}</b></div>
+          <div><small>INVOICE DATE</small><b>{issueDate || "—"}</b></div>
+          <div><small>DUE DATE</small><b>{dueDate || "—"}</b></div>
+        </div>
+        <div className="finance-live-preview-items">
+          {items.map((item, index) => <div key={index}><span>{item.description || "Invoice item"} × {Number(item.quantity) || 0}</span><b>{money((Number(item.quantity) || 0) * (Number(item.unit_price) || 0) * (1 + (Number(item.tax_rate) || 0) / 100))}</b></div>)}
+        </div>
+        <div className="finance-live-preview-total"><span>Total due</span><strong>{money(total)}</strong></div>
+      </section>
       <div className="finance-modal-actions">
         <button type="button" className="finance-secondary-button" onClick={onCancel} disabled={saving}>Cancel</button>
         <button type="submit" className="finance-primary-button" disabled={saving || loading || customers.length === 0}>{saving ? "Saving invoice..." : "Save invoice"}</button>
