@@ -90,6 +90,50 @@ export async function GET() {
   }
 }
 
+
+export async function PATCH(request: NextRequest) {
+  if (!(await verifyAdmin())) {
+    return NextResponse.json({ error: "Unauthorised" }, { status: 401 });
+  }
+  const { url, key } = config();
+  if (!url || !key) {
+    return NextResponse.json({ error: "Finance database configuration is missing." }, { status: 503 });
+  }
+  let body: Record<string, unknown>;
+  try { body = await request.json(); } catch {
+    return NextResponse.json({ error: "Invalid invoice update." }, { status: 400 });
+  }
+  const invoiceId = typeof body.invoice_id === "string" ? body.invoice_id.trim() : "";
+  const status = typeof body.status === "string" ? body.status.trim().toLowerCase() : "";
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(invoiceId) || status !== "sent") {
+    return NextResponse.json({ error: "Only a valid invoice can be marked as sent." }, { status: 400 });
+  }
+  try {
+    const workspaceId = await getWorkspaceId(url, key);
+    if (!workspaceId) return NextResponse.json({ error: "JBCS workspace not found or inactive." }, { status: 503 });
+    const response = await fetch(
+      `${url}/rest/v1/invoices?id=eq.${encodeURIComponent(invoiceId)}&workspace_id=eq.${encodeURIComponent(workspaceId)}&status=eq.draft`,
+      {
+        method: "PATCH",
+        headers: {
+          apikey: key, Authorization: `Bearer ${key}`,
+          "Content-Type": "application/json", Prefer: "return=representation",
+        },
+        body: JSON.stringify({ status: "sent" }),
+        cache: "no-store",
+      }
+    );
+    if (!response.ok) return NextResponse.json({ error: "Could not update the invoice status." }, { status: 502 });
+    const rows = await response.json();
+    if (!Array.isArray(rows) || rows.length !== 1) {
+      return NextResponse.json({ error: "Invoice was not changed. It may no longer be a draft." }, { status: 409 });
+    }
+    return NextResponse.json({ invoice: rows[0] });
+  } catch {
+    return NextResponse.json({ error: "Unable to connect to the finance database." }, { status: 502 });
+  }
+}
+
 export async function POST(request: NextRequest) {
   if (!(await verifyAdmin())) {
     return NextResponse.json({ error: "Unauthorised" }, { status: 401 });
