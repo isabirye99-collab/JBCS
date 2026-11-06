@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { CheckCircle, Printer, Send, X } from "lucide-react";
 
 type Item = { id?: string; description: string; quantity: number; unit_price: number; tax_rate: number; line_total?: number };
 type Invoice = {
@@ -50,10 +49,10 @@ export default function InvoiceDetail({ invoice, onClose, onChanged }: { invoice
       <header className="finance-detail-toolbar">
         <div><strong>{invoice.invoice_number}</strong><span className={"invoice-status " + status}>{invoice.status || "draft"}</span></div>
         <div className="finance-detail-icons">
-          {status === "draft" && <button type="button" className="finance-icon-button" title="Mark as sent" aria-label="Mark as sent" disabled={busy} onClick={markSent}><Send size={16}/></button>}
-          <button type="button" className="finance-icon-button" title="Print invoice" aria-label="Print invoice" onClick={() => window.print()}><Printer size={16}/></button>
-          {balance > 0 && <button type="button" className="finance-icon-button" title="Record payment / mark as paid" aria-label="Record payment or mark as paid" onClick={() => setShowPayment(v => !v)}><CheckCircle size={16}/></button>}
-          <button type="button" className="finance-icon-button" title="Close preview" aria-label="Close preview" onClick={onClose}><X size={16}/></button>
+          {status === "draft" && <button type="button" className="finance-icon-button" title="Mark as sent" aria-label="Mark as sent" disabled={busy} onClick={markSent}><span aria-hidden="true">↗</span></button>}
+          <button type="button" className="finance-icon-button" title="Print invoice" aria-label="Print invoice" onClick={() => window.print()}><span aria-hidden="true">▣</span></button>
+          {balance > 0 && <button type="button" className="finance-icon-button" title="Record payment / mark as paid" aria-label="Record payment or mark as paid" onClick={() => setShowPayment(v => !v)}><span aria-hidden="true">✓</span></button>}
+          <button type="button" className="finance-icon-button" title="Close preview" aria-label="Close preview" onClick={onClose}><span aria-hidden="true">×</span></button>
         </div>
       </header>
       {error && <div className="finance-notice" role="alert">{error}</div>}
