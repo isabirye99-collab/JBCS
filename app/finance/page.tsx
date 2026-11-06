@@ -6,6 +6,7 @@ import InvoiceForm from "@/components/finance/InvoiceForm";
 import QuoteForm from "@/components/finance/QuoteForm";
 import FinanceOperations from "@/components/finance/FinanceOperations";
 import RecurringFinance from "@/components/finance/RecurringFinance";
+import InvoiceDetail from "@/components/finance/InvoiceDetail";
 
 type NavItem = { label: string; icon: string };
 
@@ -35,6 +36,7 @@ type Invoice = {
   notes: string | null;
   created_at: string;
   business_contacts?: { name: string } | null;
+  document_items?: { id?: string; description: string; quantity: number; unit_price: number; tax_rate: number; line_total?: number }[];
 };
 
 type Quote = {
@@ -93,6 +95,7 @@ export default function FinanceDashboard() {
   const [active, setActive] = useState("Overview");
   const [search, setSearch] = useState("");
   const [showCreate, setShowCreate] = useState(false);
+  const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
   const [contactType, setContactType] = useState<"client" | "supplier">("client");
   const [notice, setNotice] = useState("");
 
@@ -522,7 +525,7 @@ export default function FinanceDashboard() {
                 {loadingInvoices ? (
                   <p className="finance-empty">Loading invoices…</p>
                 ) : (
-                  <InvoiceTable rows={invoices.slice(0, 5)} />
+                  <InvoiceTable rows={invoices.slice(0, 5)} onSelect={setSelectedInvoice} />
                 )}
               </article>
 
@@ -622,7 +625,7 @@ export default function FinanceDashboard() {
                   {loadingInvoices ? (
                     <div className="finance-empty">Loading invoices…</div>
                   ) : (
-                    <InvoiceTable rows={filteredInvoices} />
+                    <InvoiceTable rows={filteredInvoices} onSelect={setSelectedInvoice} />
                   )}
                 </>
               ) : active === "Quotes" ? (
@@ -729,6 +732,18 @@ export default function FinanceDashboard() {
           </footer>
         </div>
       </section>
+
+      {selectedInvoice && (
+        <InvoiceDetail
+          invoice={selectedInvoice}
+          onClose={() => setSelectedInvoice(null)}
+          onChanged={() => {
+            setSelectedInvoice(null);
+            setNotice("Invoice updated successfully.");
+            void loadInvoices();
+          }}
+        />
+      )}
 
       {showCreate && (
         <div
@@ -932,7 +947,7 @@ export default function FinanceDashboard() {
   );
 }
 
-function InvoiceTable({ rows }: { rows: Invoice[] }) {
+function InvoiceTable({ rows, onSelect }: { rows: Invoice[]; onSelect: (invoice: Invoice) => void }) {
   if (!rows.length) {
     return (
       <div className="finance-empty">
@@ -957,7 +972,7 @@ function InvoiceTable({ rows }: { rows: Invoice[] }) {
         </thead>
         <tbody>
           {rows.map((row) => (
-            <tr key={row.id}>
+            <tr key={row.id} className="finance-invoice-row" onClick={() => onSelect(row)} tabIndex={0} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); onSelect(row); } }} aria-label={"View invoice " + row.invoice_number}>
               <td>
                 <b className="invoice-id">{row.invoice_number}</b>
               </td>
