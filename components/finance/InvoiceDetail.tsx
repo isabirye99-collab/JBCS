@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { CheckCircle, Eye, Printer, Send, X } from "lucide-react";
+import { CheckCircle, Printer, Send, X } from "lucide-react";
 
 type Item = { id?: string; description: string; quantity: number; unit_price: number; tax_rate: number; line_total?: number };
 type Invoice = {
