@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { Home, Users, FileText, FileCheck, Receipt, ArrowLeftRight, TrendingUp, Truck, Wallet, BarChart3, Package } from "lucide-react";
+import { Home, Users, FileText, FileCheck, Receipt, ArrowLeftRight, TrendingUp, Truck, Wallet, BarChart3, Package, Settings as SettingsIcon } from "lucide-react";
 import { useEffect, useState, type FormEvent, type CSSProperties } from "react";
 
 type Item = {
