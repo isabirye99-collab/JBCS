@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
     const response = NextResponse.json({
       ok: true,
       requiresEmailConfirmation: !auth.access_token,
-      message: auth.access_token ? "Your 14-day trial workspace is ready." : "Check your email to confirm your account. Your 14-day trial workspace has been prepared.",
+      message: auth.access_token ? "Your workspace is ready." : "Check your email to confirm your account. Your workspace has been prepared.",
       workspace,
     }, { status: 201 });
 

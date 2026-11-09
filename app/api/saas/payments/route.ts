@@ -3,6 +3,23 @@ import { getSaasContext } from "@/lib/saas-context";
 
 export const dynamic = "force-dynamic";
 
+export async function GET() {
+  const ctx = await getSaasContext();
+  if ("error" in ctx) return NextResponse.json({ error: ctx.error }, { status: ctx.status });
+
+  const url = `${ctx.url}/rest/v1/payments?workspace_id=eq.${encodeURIComponent(ctx.workspaceId)}&select=id,workspace_id,invoice_id,payment_reference,payment_date,amount,currency,exchange_rate,method,notes,received_by,created_at,invoices(id,invoice_number,issue_date,due_date,total,amount_paid,status,contact_id,business_contacts(name,email,phone))&order=payment_date.desc,created_at.desc&limit=500`;
+  const response = await fetch(url, {
+    headers: { apikey: ctx.serviceKey, Authorization: `Bearer ${ctx.serviceKey}` },
+    cache: "no-store",
+  });
+  if (!response.ok) {
+    const detail = await response.text().catch(() => "");
+    console.error("Payments list request failed", response.status, detail.slice(0, 300));
+    return NextResponse.json({ error: "Unable to load payments." }, { status: 502 });
+  }
+  return NextResponse.json({ payments: await response.json() });
+}
+
 export async function POST(request: import("next/server").NextRequest) {
   const ctx = await getSaasContext();
   if ("error" in ctx) return NextResponse.json({ error: ctx.error }, { status: ctx.status });

@@ -1,3 +1,4 @@
+
 import { NextRequest, NextResponse } from "next/server";
 import { getSaasContext } from "@/lib/saas-context";
 
@@ -5,35 +6,206 @@ export const dynamic = "force-dynamic";
 
 export async function GET() {
   const ctx = await getSaasContext();
-  if ("error" in ctx) return NextResponse.json({ error: ctx.error }, { status: ctx.status });
-  const response = await fetch(`${ctx.url}/rest/v1/business_contacts?workspace_id=eq.${encodeURIComponent(ctx.workspaceId)}&contact_type=eq.client&select=id,name,email,phone,address,tax_number,created_at&order=name.asc&limit=500`, {
-    headers: { apikey: ctx.serviceKey, Authorization: `Bearer ${ctx.serviceKey}` }, cache: "no-store",
+
+  if ("error" in ctx) {
+    return NextResponse.json(
+      { error: ctx.error },
+      { status: ctx.status }
+    );
+  }
+
+  const url = new URL(
+    `${ctx.url}/rest/v1/business_contacts`
+  );
+
+  url.searchParams.set("workspace_id", `eq.${ctx.workspaceId}`);
+  url.searchParams.set("contact_type", "eq.client");
+  url.searchParams.set(
+    "select",
+    "id,name,email,phone,address,tax_number,created_at,is_supplier"
+  );
+  url.searchParams.set("order", "name.asc");
+  url.searchParams.set("limit", "500");
+
+  const response = await fetch(url.toString(), {
+    headers: {
+      apikey: ctx.serviceKey,
+      Authorization: `Bearer ${ctx.serviceKey}`,
+    },
+    cache: "no-store",
   });
-  if (!response.ok) return NextResponse.json({ error: "Unable to load customers." }, { status: 502 });
-  return NextResponse.json({ customers: await response.json() });
+
+  if (!response.ok) {
+    return NextResponse.json(
+      { error: "Unable to load customers." },
+      { status: 502 }
+    );
+  }
+
+  return NextResponse.json({
+    customers: await response.json(),
+  });
 }
 
 export async function POST(request: NextRequest) {
   const ctx = await getSaasContext();
-  if ("error" in ctx) return NextResponse.json({ error: ctx.error }, { status: ctx.status });
+
+  if ("error" in ctx) {
+    return NextResponse.json(
+      { error: ctx.error },
+      { status: ctx.status }
+    );
+  }
+
   let body: Record<string, unknown>;
-  try { body = await request.json(); } catch { return NextResponse.json({ error: "Enter valid customer details." }, { status: 400 }); }
-  const field = (v: unknown, max: number) => typeof v === "string" ? v.trim().slice(0, max) : "";
+
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json(
+      { error: "Enter valid customer details." },
+      { status: 400 }
+    );
+  }
+
+  const field = (value: unknown, max: number) =>
+    typeof value === "string" ? value.trim().slice(0, max) : "";
+
   const name = field(body.name, 160);
   const email = field(body.email, 254).toLowerCase();
   const phone = field(body.phone, 40);
   const address = field(body.address, 500);
   const taxNumber = field(body.tax_number, 100);
-  if (name.length < 2) return NextResponse.json({ error: "Customer name must contain at least two characters." }, { status: 400 });
-  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return NextResponse.json({ error: "Enter a valid email address." }, { status: 400 });
+  const isSupplier = body.is_supplier === true;
 
-  const response = await fetch(`${ctx.url}/rest/v1/business_contacts`, {
-    method: "POST",
-    headers: { apikey: ctx.serviceKey, Authorization: `Bearer ${ctx.serviceKey}`, "Content-Type": "application/json", Prefer: "return=representation" },
-    body: JSON.stringify({ workspace_id: ctx.workspaceId, contact_type: "client", name, email: email || null, phone: phone || null, address: address || null, tax_number: taxNumber || null }),
+  if (name.length < 2) {
+    return NextResponse.json(
+      { error: "Customer name must contain at least two characters." },
+      { status: 400 }
+    );
+  }
+
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return NextResponse.json(
+      { error: "Enter a valid email address." },
+      { status: 400 }
+    );
+  }
+
+  const response = await fetch(
+    `${ctx.url}/rest/v1/business_contacts`,
+    {
+      method: "POST",
+      headers: {
+        apikey: ctx.serviceKey,
+        Authorization: `Bearer ${ctx.serviceKey}`,
+        "Content-Type": "application/json",
+        Prefer: "return=representation",
+      },
+      body: JSON.stringify({
+        workspace_id: ctx.workspaceId,
+        contact_type: "client",
+        name,
+        email: email || null,
+        phone: phone || null,
+        address: address || null,
+        tax_number: taxNumber || null,
+        is_supplier: isSupplier,
+      }),
+      cache: "no-store",
+    }
+  );
+
+  if (!response.ok) {
+    return NextResponse.json(
+      { error: "Could not save the customer." },
+      { status: 502 }
+    );
+  }
+
+  const rows = await response.json();
+
+  return NextResponse.json(
+    { customer: Array.isArray(rows) ? rows[0] : null },
+    { status: 201 }
+  );
+}
+
+export async function PATCH(request: NextRequest) {
+  const ctx = await getSaasContext();
+
+  if ("error" in ctx) {
+    return NextResponse.json(
+      { error: ctx.error },
+      { status: ctx.status }
+    );
+  }
+
+  let body: Record<string, unknown>;
+
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json(
+      { error: "Enter valid customer details." },
+      { status: 400 }
+    );
+  }
+
+  const id =
+    typeof body.id === "string" ? body.id.trim() : "";
+
+  if (
+    !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id) ||
+    typeof body.is_supplier !== "boolean"
+  ) {
+    return NextResponse.json(
+      { error: "A valid customer and supplier status are required." },
+      { status: 400 }
+    );
+  }
+
+  const url = new URL(
+    `${ctx.url}/rest/v1/business_contacts`
+  );
+
+  url.searchParams.set("id", `eq.${id}`);
+  url.searchParams.set("workspace_id", `eq.${ctx.workspaceId}`);
+  url.searchParams.set("contact_type", "eq.client");
+  url.searchParams.set(
+    "select",
+    "id,name,email,phone,address,tax_number,created_at,is_supplier"
+  );
+
+  const response = await fetch(url.toString(), {
+    method: "PATCH",
+    headers: {
+      apikey: ctx.serviceKey,
+      Authorization: `Bearer ${ctx.serviceKey}`,
+      "Content-Type": "application/json",
+      Prefer: "return=representation",
+    },
+    body: JSON.stringify({
+      is_supplier: body.is_supplier,
+    }),
     cache: "no-store",
   });
-  if (!response.ok) return NextResponse.json({ error: "Could not save the customer." }, { status: 502 });
+
+  if (!response.ok) {
+    return NextResponse.json(
+      { error: "Could not update the customer's supplier status." },
+      { status: 502 }
+    );
+  }
+
   const rows = await response.json();
-  return NextResponse.json({ customer: Array.isArray(rows) ? rows[0] : null }, { status: 201 });
+
+  if (!Array.isArray(rows) || rows.length === 0) {
+    return NextResponse.json(
+      { error: "Customer not found in this workspace." },
+      { status: 404 }
+    );
+  }
+
+  return NextResponse.json({ customer: rows[0] });
 }

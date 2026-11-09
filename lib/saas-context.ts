@@ -29,7 +29,14 @@ export async function getSaasContext() {
   const now = Date.now();
   const trialValid = subscription?.status === "trialing" && subscription?.trial_ends_at && new Date(subscription.trial_ends_at).getTime() > now;
   const paidValid = subscription?.status === "active" && (!subscription.current_period_ends_at || new Date(subscription.current_period_ends_at).getTime() > now);
-  if (!trialValid && !paidValid) {
+  // Local development/testing only: explicitly opt in with JBCS_ALLOW_TRIAL_WRITES=true.
+  // This override is intentionally disabled in production; production must use real subscription status.
+  const allowLocalTrialWrites =
+    process.env.NODE_ENV !== "production" &&
+    process.env.JBCS_ALLOW_TRIAL_WRITES === "true";
+  const configuredAdminEmail = process.env.JBCS_ADMIN_EMAIL?.trim().toLowerCase();
+  const isSuperAdmin = Boolean(configuredAdminEmail) && session.user.email.trim().toLowerCase() === configuredAdminEmail;
+  if (!isSuperAdmin && !allowLocalTrialWrites && !trialValid && !paidValid) {
     return { error: "Your trial or subscription is not active. Contact Johden to activate billing.", status: 402 as const };
   }
   if (!["owner", "admin", "finance"].includes(membership.role)) {

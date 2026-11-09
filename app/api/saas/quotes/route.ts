@@ -1,3 +1,96 @@
-import {NextRequest,NextResponse} from "next/server";import {getSaasContext} from "@/lib/saas-context";export const dynamic="force-dynamic";
-export async function GET(){const c=await getSaasContext();if("error"in c)return NextResponse.json({error:c.error},{status:c.status});const r=await fetch(`${c.url}/rest/v1/quotes?workspace_id=eq.${c.workspaceId}&select=*,business_contacts(name)&order=issue_date.desc&limit=500`,{headers:{apikey:c.serviceKey,Authorization:`Bearer ${c.serviceKey}`},cache:"no-store"});if(!r.ok)return NextResponse.json({error:"Could not load quotes."},{status:502});return NextResponse.json({quotes:await r.json()});}
-export async function POST(req:NextRequest){const c=await getSaasContext();if("error"in c)return NextResponse.json({error:c.error},{status:c.status});let b:any;try{b=await req.json()}catch{return NextResponse.json({error:"Invalid quote."},{status:400})}const contact_id=String(b.contact_id||""),currency=String(b.currency||"UGX").toUpperCase(),items=Array.isArray(b.items)?b.items.slice(0,50):[];if(!/^[0-9a-f-]{36}$/i.test(contact_id)||!/^[A-Z]{3}$/.test(currency)||!items.length)return NextResponse.json({error:"Select a customer and at least one line item."},{status:400});const lines=items.map((x:any)=>({description:String(x.description||"").trim().slice(0,500),quantity:Number(x.quantity),unit_price:Number(x.unit_price),tax_rate:Number(x.tax_rate||0)}));if(lines.some((x:any)=>!x.description||!Number.isFinite(x.quantity)||x.quantity<=0||!Number.isFinite(x.unit_price)||x.unit_price<0||!Number.isFinite(x.tax_rate)||x.tax_rate<0||x.tax_rate>100))return NextResponse.json({error:"Check quote line descriptions, quantities, prices and tax."},{status:400});const subtotal=lines.reduce((s:number,x:any)=>s+x.quantity*x.unit_price,0),tax_amount=lines.reduce((s:number,x:any)=>s+x.quantity*x.unit_price*x.tax_rate/100,0),quote_number="Q-"+Date.now();const r=await fetch(`${c.url}/rest/v1/quotes`,{method:"POST",headers:{apikey:c.serviceKey,Authorization:`Bearer ${c.serviceKey}`,"Content-Type":"application/json",Prefer:"return=representation"},body:JSON.stringify({workspace_id:c.workspaceId,created_by:c.session.user.id,contact_id,currency,quote_number,subtotal,tax_amount,total:subtotal+tax_amount,valid_until:b.valid_until||null,notes:String(b.notes||"").slice(0,2000)||null}),cache:"no-store"});if(!r.ok)return NextResponse.json({error:"Could not create quote."},{status:502});const quote=(await r.json())[0];const lineRows=lines.map((x:any)=>({...x,workspace_id:c.workspaceId,document_type:"quote",quote_id:quote.id,line_total:x.quantity*x.unit_price*(1+x.tax_rate/100)}));const lr=await fetch(`${c.url}/rest/v1/document_items`,{method:"POST",headers:{apikey:c.serviceKey,Authorization:`Bearer ${c.serviceKey}`,"Content-Type":"application/json"},body:JSON.stringify(lineRows),cache:"no-store"});if(!lr.ok){await fetch(`${c.url}/rest/v1/quotes?id=eq.${quote.id}&workspace_id=eq.${c.workspaceId}`,{method:"DELETE",headers:{apikey:c.serviceKey,Authorization:`Bearer ${c.serviceKey}`}});return NextResponse.json({error:"Quote header could not save its line items; no incomplete quote was retained."},{status:502});}return NextResponse.json({quote},{status:201});}
+import { NextResponse } from "next/server";
+import { getSaasContext } from "@/lib/saas-context";
+
+export const dynamic = "force-dynamic";
+
+export async function GET() {
+  const c = await getSaasContext();
+  if ("error" in c) return NextResponse.json({ error: c.error }, { status: c.status });
+
+  const url = `${c.url}/rest/v1/quotes?workspace_id=eq.${encodeURIComponent(c.workspaceId)}&select=id,quote_number,contact_id,issue_date,valid_until,currency,subtotal,tax_amount,total,status,notes,created_at,business_contacts(name,email,phone,address),document_items(id,description,quantity,unit_price,tax_rate,line_total)&order=created_at.desc&limit=500`;
+  const response = await fetch(url, {
+    headers: { apikey: c.serviceKey, Authorization: `Bearer ${c.serviceKey}` },
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    return NextResponse.json({ error: "Could not load quotations and their line items." }, { status: 502 });
+  }
+
+  const quotes = await response.json();
+  return NextResponse.json({ quotes: Array.isArray(quotes) ? quotes : [] });
+}
+
+export async function POST(req: Request) {
+  const c = await getSaasContext();
+  if ("error" in c) return NextResponse.json({ error: c.error }, { status: c.status });
+
+  let body: any;
+  try { body = await req.json(); } catch { return NextResponse.json({ error: "Invalid quote." }, { status: 400 }); }
+
+  const contact_id = String(body.contact_id || "");
+  const currency = String(body.currency || "UGX").toUpperCase();
+  const items = Array.isArray(body.items) ? body.items.slice(0, 50) : [];
+  if (!/^[0-9a-f-]{36}$/i.test(contact_id) || !/^[A-Z]{3}$/.test(currency) || !items.length) {
+    return NextResponse.json({ error: "Select a customer and at least one line item." }, { status: 400 });
+  }
+
+  const lines = items.map((item: any) => ({
+    description: String(item.description || "").trim().slice(0, 500),
+    quantity: Number(item.quantity),
+    unit_price: Number(item.unit_price),
+    tax_rate: Number(item.tax_rate || 0),
+  }));
+  if (lines.some((item: any) => !item.description || !Number.isFinite(item.quantity) || item.quantity <= 0 || !Number.isFinite(item.unit_price) || item.unit_price < 0 || !Number.isFinite(item.tax_rate) || item.tax_rate < 0 || item.tax_rate > 100)) {
+    return NextResponse.json({ error: "Check quote line descriptions, quantities, prices and tax." }, { status: 400 });
+  }
+
+  const subtotal = lines.reduce((sum: number, item: any) => sum + item.quantity * item.unit_price, 0);
+  const tax_amount = lines.reduce((sum: number, item: any) => sum + item.quantity * item.unit_price * item.tax_rate / 100, 0);
+  const issueDate = new Date().toISOString().slice(0, 10);
+  const dateKey = issueDate.replace(/-/g, "");
+  const numberResponse = await fetch(
+    `${c.url}/rest/v1/quotes?workspace_id=eq.${encodeURIComponent(c.workspaceId)}&select=quote_number&limit=5000`,
+    { headers: { apikey: c.serviceKey, Authorization: `Bearer ${c.serviceKey}` }, cache: "no-store" },
+  );
+  if (!numberResponse.ok) return NextResponse.json({ error: "Unable to generate a quotation number. Please try again." }, { status: 502 });
+  const existingNumbers: Array<{ quote_number?: string | null }> = await numberResponse.json();
+  const highestSequence = existingNumbers.reduce((highest, row) => {
+    const match = String(row.quote_number || "").match(new RegExp(`^Q${dateKey}-(\\d+)$`, "i"));
+    return match ? Math.max(highest, Number(match[1])) : highest;
+  }, 0);
+  const quote_number = `Q${dateKey}-${String(highestSequence + 1).padStart(3, "0")}`;
+  const headerResponse = await fetch(`${c.url}/rest/v1/quotes`, {
+    method: "POST",
+    headers: { apikey: c.serviceKey, Authorization: `Bearer ${c.serviceKey}`, "Content-Type": "application/json", Prefer: "return=representation" },
+    body: JSON.stringify({
+      workspace_id: c.workspaceId, created_by: c.session.user.id, contact_id, currency,
+      quote_number, issue_date: issueDate, subtotal, tax_amount, total: subtotal + tax_amount,
+      valid_until: body.valid_until || null, notes: String(body.notes || "").slice(0, 2000) || null,
+    }),
+    cache: "no-store",
+  });
+  if (!headerResponse.ok) return NextResponse.json({ error: "Could not create quote." }, { status: 502 });
+  const quote = (await headerResponse.json())[0];
+  if (!quote?.id) return NextResponse.json({ error: "Quote was not returned after creation." }, { status: 502 });
+
+  const lineRows = lines.map((item: any) => ({
+    ...item, workspace_id: c.workspaceId, document_type: "quote", quote_id: quote.id,
+    line_total: item.quantity * item.unit_price * (1 + item.tax_rate / 100),
+  }));
+  const itemsResponse = await fetch(`${c.url}/rest/v1/document_items`, {
+    method: "POST",
+    headers: { apikey: c.serviceKey, Authorization: `Bearer ${c.serviceKey}`, "Content-Type": "application/json", Prefer: "return=representation" },
+    body: JSON.stringify(lineRows),
+    cache: "no-store",
+  });
+  if (!itemsResponse.ok) {
+    await fetch(`${c.url}/rest/v1/quotes?id=eq.${encodeURIComponent(quote.id)}&workspace_id=eq.${encodeURIComponent(c.workspaceId)}`, {
+      method: "DELETE", headers: { apikey: c.serviceKey, Authorization: `Bearer ${c.serviceKey}` }, cache: "no-store",
+    });
+    return NextResponse.json({ error: "Quote line items could not be saved; the incomplete quote was rolled back." }, { status: 502 });
+  }
+
+  const savedItems = await itemsResponse.json();
+  return NextResponse.json({ quote: { ...quote, document_items: Array.isArray(savedItems) ? savedItems : lineRows } }, { status: 201 });
+}

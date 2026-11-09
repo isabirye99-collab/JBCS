@@ -26,12 +26,34 @@ export async function POST(request: import("next/server").NextRequest) {
     return NextResponse.json({ error: "Add a positive invoice total before issuing this invoice." }, { status: 400 });
   }
 
+  // Capture the branding at the moment the invoice is issued so later
+  // workspace design changes cannot rewrite this historical document.
+  const brandingResponse = await fetch(
+    `${ctx.url}/rest/v1/workspace_document_branding?workspace_id=eq.${encodeURIComponent(ctx.workspaceId)}&product_key=eq.billing&select=company_name,legal_name,logo_url,address,phone,email,website,registration_number,tax_number,primary_color,secondary_color,font_family,template_style,logo_position,footer_text,template_options&limit=1`,
+    { headers, cache: "no-store" },
+  );
+  if (!brandingResponse.ok) {
+    return NextResponse.json({ error: "Document branding is not ready. Apply the workspace branding migration before issuing invoices." }, { status: 503 });
+  }
+  const brandingRows = await brandingResponse.json();
+  const brandingSnapshot = Array.isArray(brandingRows) && brandingRows[0]
+    ? brandingRows[0]
+    : {
+        company_name: ctx.workspaceName,
+        primary_color: "#9f1d35",
+        secondary_color: "#d97736",
+        font_family: "Arial",
+        template_style: "modern",
+        logo_position: "left",
+        footer_text: "Thank you for your business.",
+      };
+
   const issued = await fetch(
     `${ctx.url}/rest/v1/invoices?id=eq.${encodeURIComponent(id)}&workspace_id=eq.${encodeURIComponent(ctx.workspaceId)}&status=eq.draft&total=gt.0`,
     {
       method: "PATCH",
       headers: { ...headers, "Content-Type": "application/json", Prefer: "return=representation" },
-      body: JSON.stringify({ status: "sent", updated_at: new Date().toISOString() }),
+      body: JSON.stringify({ status: "sent", branding_snapshot: brandingSnapshot, updated_at: new Date().toISOString() }),
       cache: "no-store",
     },
   );

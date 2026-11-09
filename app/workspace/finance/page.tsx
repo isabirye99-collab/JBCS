@@ -1,350 +1,1367 @@
+
 "use client";
 
+
+import "./finance.css";
 import Link from "next/link";
-import { FormEvent, useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  Activity,
+  ArrowDownRight,
+  ArrowRight,
+  ArrowUpRight,
+  Bell,
+  BriefcaseBusiness,
+  CalendarDays,
+  ChartNoAxesCombined,
+  CheckCircle2,
+  ChevronDown,
+  CircleDollarSign,
+  Clock3,
+  CreditCard,
+  FileBarChart,
+  FilePlus2,
+  FileText,
+  LayoutDashboard,
+  LoaderCircle,
+  Package,
+  Plus,
+  Receipt,
+  RefreshCw,
+  Search,
+  Settings,
+  ShoppingBag,
+  Users,
+  Wallet,
+  XCircle,
+} from "lucide-react";
 
-type Customer = { id: string; name: string; email?: string | null; phone?: string | null; address?: string | null; tax_number?: string | null };
-type Invoice = { id: string; invoice_number: string; issue_date: string; due_date?: string | null; notes?: string | null; currency: string; total: number; amount_paid: number; status: string; business_contacts?: { name?: string } | null };
-type Expense = { id: string; expense_date: string; category: string; description: string; amount: number; currency: string; payment_method: string };
+type Customer = {
+  id: string;
+  name?: string;
+  email?: string | null;
+  phone?: string | null;
+  created_at?: string;
+};
 
-export default function WorkspaceFinancePage() {
+type Invoice = {
+  id: string;
+  invoice_number?: string | null;
+  invoice_no?: string | null;
+  number?: string | null;
+  customer_name?: string | null;
+  customer?: { name?: string } | string | null;
+  total?: number | string | null;
+  total_amount?: number | string | null;
+  amount?: number | string | null;
+  amount_due?: number | string | null;
+  status?: string | null;
+  due_date?: string | null;
+  issue_date?: string | null;
+  created_at?: string | null;
+  currency?: string | null;
+};
+
+type Expense = {
+  id: string;
+  description?: string | null;
+  name?: string | null;
+  category?: string | null;
+  amount?: number | string | null;
+  total?: number | string | null;
+  expense_date?: string | null;
+  date?: string | null;
+  created_at?: string | null;
+};
+
+type SupplierPayment = {
+  id: string;
+  supplier_name?: string | null;
+  expense_description?: string | null;
+  invoice_number?: string | null;
+  payment_date?: string | null;
+  amount?: number | string | null;
+  currency?: string | null;
+  payment_method?: string | null;
+  payment_reference?: string | null;
+  notes?: string | null;
+  created_at?: string | null;
+};
+
+type NavItem = {
+  label: string;
+  href: string;
+  icon: typeof LayoutDashboard;
+};
+
+const navigation: { heading: string; items: NavItem[] }[] = [
+  {
+    heading: "WORKSPACE",
+    items: [
+      {
+        label: "Dashboard",
+        href: "/workspace/finance",
+        icon: LayoutDashboard,
+      },
+      {
+        label: "Customers",
+        href: "/workspace/finance/customers",
+        icon: Users,
+      },
+      
+    ],
+  },
+  {
+    heading: "SALES",
+    items: [
+      {
+        label: "Invoices",
+        href: "/workspace/finance/invoices",
+        icon: FileText,
+      },
+      {
+        label: "Quotes",
+        href: "/workspace/finance/quotes",
+        icon: FilePlus2,
+      },
+      {
+        label: "Sales Receipts",
+        href: "/workspace/finance/receipts",
+        icon: Receipt,
+      },
+      {
+        label: "Payments",
+        href: "/workspace/finance/payments",
+        icon: CreditCard,
+      },
+    ],
+  },
+  {
+    heading: "FINANCE",
+    items: [
+      {
+        label: "Expenses",
+        href: "/workspace/finance/expenses",
+        icon: Wallet,
+      },
+      {
+        label: "Reports",
+        href: "/workspace/finance/reports",
+        icon: FileBarChart,
+      },
+    ],
+  },
+];
+
+function asNumber(value: unknown): number {
+  if (typeof value === "number") {
+    return Number.isFinite(value) ? value : 0;
+  }
+
+  if (typeof value === "string") {
+    const parsed = Number(value.replace(/,/g, "").trim());
+    return Number.isFinite(parsed) ? parsed : 0;
+  }
+
+  return 0;
+}
+
+function invoiceAmount(invoice: Invoice): number {
+  return asNumber(
+    invoice.amount_due ?? invoice.total_amount ?? invoice.total ?? invoice.amount
+  );
+}
+
+function expenseAmount(expense: Expense): number {
+  return asNumber(expense.amount ?? expense.total);
+}
+
+function supplierPaymentAmount(payment: SupplierPayment): number {
+  return asNumber(payment.amount);
+}
+
+function invoiceNumber(invoice: Invoice): string {
+  return (
+    invoice.invoice_number ??
+    invoice.invoice_no ??
+    invoice.number ??
+    `INV-${invoice.id.slice(0, 8).toUpperCase()}`
+  );
+}
+
+function customerName(invoice: Invoice): string {
+  if (typeof invoice.customer === "string") return invoice.customer;
+
+  return (
+    invoice.customer_name ??
+    invoice.customer?.name ??
+    "Customer"
+  );
+}
+
+function dateLabel(value?: string | null): string {
+  if (!value) return "Ã¢â‚¬â€";
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Ã¢â‚¬â€";
+
+  return new Intl.DateTimeFormat("en-UG", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  }).format(date);
+}
+
+function money(value: number, currency = "UGX"): string {
+  try {
+    return new Intl.NumberFormat("en-UG", {
+      style: "currency",
+      currency,
+      maximumFractionDigits: 0,
+    }).format(value);
+  } catch {
+    return `${currency} ${Math.round(value).toLocaleString("en-UG")}`;
+  }
+}
+
+function monthStart(): Date {
+  const now = new Date();
+  return new Date(now.getFullYear(), now.getMonth(), 1);
+}
+
+function isThisMonth(value?: string | null): boolean {
+  if (!value) return false;
+
+  const date = new Date(value);
+  return (
+    !Number.isNaN(date.getTime()) &&
+    date >= monthStart() &&
+    date <= new Date()
+  );
+}
+
+function normalStatus(value?: string | null): string {
+  return (value ?? "unknown").trim().toLowerCase().replace(/[_-]+/g, " ");
+}
+
+function isPaid(invoice: Invoice): boolean {
+  return ["paid", "completed", "complete"].includes(
+    normalStatus(invoice.status)
+  );
+}
+
+function isCancelled(invoice: Invoice): boolean {
+  return ["cancelled", "canceled", "void", "deleted"].includes(
+    normalStatus(invoice.status)
+  );
+}
+
+function isOverdue(invoice: Invoice): boolean {
+  if (isPaid(invoice) || isCancelled(invoice)) return false;
+
+  if (!invoice.due_date) return false;
+
+  const due = new Date(invoice.due_date);
+  if (Number.isNaN(due.getTime())) return false;
+
+  due.setHours(23, 59, 59, 999);
+  return due.getTime() < Date.now();
+}
+
+function StatusBadge({ status }: { status?: string | null }) {
+  const value = normalStatus(status);
+  const overdue = value === "overdue";
+
+  const style =
+    value === "paid" || value === "completed" || value === "complete"
+      ? "bg-emerald-50 text-emerald-700 ring-emerald-200"
+      : overdue
+        ? "bg-rose-50 text-rose-700 ring-rose-200"
+        : value === "draft"
+          ? "bg-slate-100 text-slate-600 ring-slate-200"
+          : value === "cancelled" || value === "canceled" || value === "void"
+            ? "bg-rose-50 text-rose-600 ring-rose-200"
+            : "bg-amber-50 text-amber-700 ring-amber-200";
+
+  return (
+    <span
+      className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold capitalize ring-1 ring-inset ${style}`}
+    >
+      {status ? normalStatus(status) : "Unknown"}
+    </span>
+  );
+}
+
+function MetricCard({
+  title,
+  value,
+  detail,
+  icon: Icon,
+  tone,
+}: {
+  title: string;
+  value: string;
+  detail: string;
+  icon: typeof Users;
+  tone: "blue" | "green" | "amber" | "purple";
+}) {
+  const tones = {
+    blue: "bg-blue-50 text-[#F3192D]",
+    green: "bg-emerald-50 text-emerald-700",
+    amber: "bg-amber-50 text-amber-700",
+    purple: "bg-violet-50 text-violet-700",
+  };
+
+  return (
+    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="text-sm font-medium text-slate-500">{title}</p>
+          <p className="mt-3 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+            {value}
+          </p>
+        </div>
+        <div className={`rounded-xl p-3 ${tones[tone]}`}>
+          <Icon size={21} />
+        </div>
+      </div>
+      <p className="mt-4 text-xs leading-5 text-slate-500">{detail}</p>
+    </div>
+  );
+}
+
+function SectionTitle({
+  title,
+  subtitle,
+  href,
+  linkText = "View all",
+}: {
+  title: string;
+  subtitle: string;
+  href?: string;
+  linkText?: string;
+}) {
+  return (
+    <div className="flex flex-wrap items-end justify-between gap-3">
+      <div>
+        <h2 className="text-lg font-bold tracking-tight text-slate-900">
+          {title}
+        </h2>
+        <p className="mt-1 text-sm text-slate-500">{subtitle}</p>
+      </div>
+      {href && (
+        <Link
+          href={href}
+          className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#F3192D] hover:text-blue-900"
+        >
+          {linkText}
+          <ArrowRight size={15} />
+        </Link>
+      )}
+    </div>
+  );
+}
+
+export default function FinanceDashboardPage() {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [expenses, setExpenses] = useState<Expense[]>([]);
-  const [expenseCategory, setExpenseCategory] = useState("General");
-  const [expenseDescription, setExpenseDescription] = useState("");
-  const [expenseAmount, setExpenseAmount] = useState("0");
-  const [expenseCurrency, setExpenseCurrency] = useState("UGX");
-  const [expenseDate, setExpenseDate] = useState(new Date().toISOString().slice(0, 10));
-  const [expenseMethod, setExpenseMethod] = useState("other");
-  const [customerName, setCustomerName] = useState("");
-  const [customerEmail, setCustomerEmail] = useState("");
-  const [customerPhone, setCustomerPhone] = useState("");
-  const [customerAddress, setCustomerAddress] = useState("");
-  const [customerTaxNumber, setCustomerTaxNumber] = useState("");
-  const [expenseNotes, setExpenseNotes] = useState("");
-  const [selectedCustomer, setSelectedCustomer] = useState("");
-  const [customerSearch, setCustomerSearch] = useState("");
-  const [invoiceSearch, setInvoiceSearch] = useState("");
-  const [globalSearch, setGlobalSearch] = useState("");
-  const [description, setDescription] = useState("Professional services");
-  const [quantity, setQuantity] = useState("1");
-  const [unitPrice, setUnitPrice] = useState("0");
-  const [taxRate, setTaxRate] = useState("0");
-  const [currency, setCurrency] = useState("UGX");
-  const [dueDate, setDueDate] = useState("");
-  const [notice, setNotice] = useState("");
+  const [supplierPayments, setSupplierPayments] = useState<SupplierPayment[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState("");
-  const [busy, setBusy] = useState(false);
-  const [dialog, setDialog] = useState<"edit" | "payment" | null>(null);
-  const [activeInvoice, setActiveInvoice] = useState<Invoice | null>(null);
-  const [editDueDate, setEditDueDate] = useState("");
-  const [editNotes, setEditNotes] = useState("");
-  const [paymentAmount, setPaymentAmount] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState("bank_transfer");
-  const [paymentDate, setPaymentDate] = useState(new Date().toISOString().slice(0, 10));
-  const [paymentReference, setPaymentReference] = useState("");
+  const [accountEmail, setAccountEmail] = useState("");
 
-  const load = useCallback(async () => {
-    // Load each workspace resource independently: a customer or expense
-    // endpoint failure must never hide invoices that loaded successfully.
-    const results = await Promise.allSettled([
-      fetch("/api/saas/customers", { cache: "no-store" }).then(async response => ({ response, data: await response.json() })),
-      fetch("/api/saas/invoices", { cache: "no-store" }).then(async response => ({ response, data: await response.json() })),
-      fetch("/api/saas/expenses", { cache: "no-store" }).then(async response => ({ response, data: await response.json() })),
-    ]);
-    const errors: string[] = [];
-    const customerResult = results[0];
-    const invoiceResult = results[1];
-    const expenseResult = results[2];
+  useEffect(() => {
+    let active = true;
 
-    if (customerResult.status === "fulfilled" && customerResult.value.response.ok) {
-      const list = Array.isArray(customerResult.value.data.customers) ? customerResult.value.data.customers : [];
-      setCustomers(list);
-      if (!selectedCustomer && list.length) setSelectedCustomer(list[0].id);
-    } else {
-      errors.push(customerResult.status === "fulfilled" ? customerResult.value.data.error || "Could not load customers." : "Could not connect to customers.");
-    }
-
-    if (invoiceResult.status === "fulfilled" && invoiceResult.value.response.ok) {
-      setInvoices(Array.isArray(invoiceResult.value.data.invoices) ? invoiceResult.value.data.invoices : []);
-    } else {
-      errors.push(invoiceResult.status === "fulfilled" ? invoiceResult.value.data.error || "Could not load invoices." : "Could not connect to invoices.");
-    }
-
-    if (expenseResult.status === "fulfilled" && expenseResult.value.response.ok) {
-      setExpenses(Array.isArray(expenseResult.value.data.expenses) ? expenseResult.value.data.expenses : []);
-    } else {
-      errors.push(expenseResult.status === "fulfilled" ? expenseResult.value.data.error || "Could not load expenses." : "Could not connect to expenses.");
-    }
-
-    setError(errors.length ? Array.from(new Set(errors))[0] : "");
-  }, [selectedCustomer]);
-
-  useEffect(() => { load().catch(e => setError(e instanceof Error ? e.message : "Unable to load workspace data.")); }, [load]);
-
-  async function createCustomer(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault(); setBusy(true); setError(""); setNotice("");
-    try {
-      const response = await fetch("/api/saas/customers", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: customerName, email: customerEmail, phone: customerPhone, address: customerAddress, tax_number: customerTaxNumber }) });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Could not create customer.");
-      setCustomerName(""); setCustomerEmail(""); setCustomerPhone(""); setCustomerAddress(""); setCustomerTaxNumber(""); setSelectedCustomer(data.customer.id);
-      setNotice("Customer saved to this workspace."); await load();
-    } catch (e) { setError(e instanceof Error ? e.message : "Unable to save customer."); }
-    finally { setBusy(false); }
-  }
-
-  async function createInvoice(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault(); setBusy(true); setError(""); setNotice("");
-    try {
-      const response = await fetch("/api/saas/invoices", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ contact_id: selectedCustomer, currency, due_date: dueDate, items: [{ description, quantity: Number(quantity), unit_price: Number(unitPrice), tax_rate: Number(taxRate) }] }) });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Could not create invoice.");
-      setNotice("Draft invoice created successfully."); setDueDate(""); await load();
-    } catch (e) { setError(e instanceof Error ? e.message : "Unable to create invoice."); }
-    finally { setBusy(false); }
-  }
-
-  function editDraftInvoice(invoice: Invoice) {
-    setActiveInvoice(invoice); setEditDueDate(invoice.due_date || ""); setEditNotes(invoice.notes || "");
-    setDialog("edit"); setError(""); setNotice("");
-  }
-
-  async function saveDraftInvoice(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault(); if (!activeInvoice) return;
-    setBusy(true); setError(""); setNotice("");
-    try {
-      const response = await fetch("/api/saas/invoices", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: activeInvoice.id, due_date: editDueDate, notes: editNotes }) });
-      const data = await response.json(); if (!response.ok) throw new Error(data.error || "Could not update invoice.");
-      setNotice("Draft invoice details updated."); setDialog(null); setActiveInvoice(null); await load();
-    } catch (e) { setError(e instanceof Error ? e.message : "Unable to update invoice."); }
-    finally { setBusy(false); }
-  }
-
-  async function issueInvoice(invoice: Invoice) {
-    if (!window.confirm(`Issue invoice ${invoice.invoice_number}? This will make it available for payment recording.`)) return;
-    setBusy(true); setError(""); setNotice("");
-    try {
-      const response = await fetch("/api/saas/invoices/issue", {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: invoice.id }),
+    fetch("/api/saas/me", {
+      method: "GET",
+      credentials: "same-origin",
+      cache: "no-store",
+    })
+      .then(async (response) => {
+        if (!response.ok) return null;
+        return response.json();
+      })
+      .then((data) => {
+        if (active && typeof data?.email === "string") {
+          setAccountEmail(data.email);
+        }
+      })
+      .catch(() => {
+        // Keep the dashboard usable if account details cannot be loaded.
       });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Could not issue invoice.");
-      setNotice(`Invoice ${invoice.invoice_number} issued. It has not been emailed to the customer.`);
-      await load();
-    } catch (e) { setError(e instanceof Error ? e.message : "Unable to issue invoice."); }
-    finally { setBusy(false); }
-  }
 
-  function recordPayment(invoice: Invoice) {
-    const balance = Math.max(0, Number(invoice.total || 0) - Number(invoice.amount_paid || 0));
-    if (balance <= 0) { setError("This invoice has no outstanding balance."); return; }
-    setActiveInvoice(invoice); setPaymentAmount(balance.toFixed(2)); setPaymentMethod("bank_transfer");
-    setPaymentDate(new Date().toISOString().slice(0, 10)); setPaymentReference("");
-    setDialog("payment"); setError(""); setNotice("");
-  }
+    return () => {
+      active = false;
+    };
+  }, []);
+  const [search, setSearch] = useState("");
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
-  async function submitPayment(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault(); if (!activeInvoice) return;
-    const amount = Number(paymentAmount);
-    const balance = Math.max(0, Number(activeInvoice.total || 0) - Number(activeInvoice.amount_paid || 0));
-    if (!Number.isFinite(amount) || amount <= 0 || amount > balance) { setError("Enter an amount greater than zero and no more than the outstanding balance."); return; }
-    setBusy(true); setError(""); setNotice("");
+  const loadDashboard = useCallback(async (manual = false) => {
+    if (manual) setRefreshing(true);
+    else setLoading(true);
+
+    setError("");
+
     try {
-      const response = await fetch("/api/saas/payments", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ invoice_id: activeInvoice.id, amount, method: paymentMethod, payment_date: paymentDate, payment_reference: paymentReference }) });
-      const data = await response.json(); if (!response.ok) throw new Error(data.error || "Could not record payment.");
-      setNotice(`Payment recorded for ${activeInvoice.invoice_number}. New status: ${String(data.payment.status).replace("_", " ")}.`);
-      setDialog(null); setActiveInvoice(null); await load();
-    } catch (e) { setError(e instanceof Error ? e.message : "Unable to record payment."); }
-    finally { setBusy(false); }
-  }
+      const results = await Promise.allSettled([
+        fetch("/api/saas/customers", {
+          cache: "no-store",
+          credentials: "same-origin",
+        }),
+        fetch("/api/saas/invoices", {
+          cache: "no-store",
+          credentials: "same-origin",
+        }),
+        fetch("/api/saas/expenses", {
+          cache: "no-store",
+          credentials: "same-origin",
+        }),
+        fetch("/api/saas/supplier-payments", {
+          cache: "no-store",
+          credentials: "same-origin",
+        }),
+      ]);
 
-  async function createExpense(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault(); setBusy(true); setError(""); setNotice("");
-    try {
-      const response = await fetch("/api/saas/expenses", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ category: expenseCategory, description: expenseDescription, amount: Number(expenseAmount), currency: expenseCurrency, expense_date: expenseDate, payment_method: expenseMethod, notes: expenseNotes }) });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Could not save expense.");
-      setExpenseDescription(""); setExpenseAmount("0"); setExpenseNotes(""); setNotice("Expense recorded in this workspace."); await load();
-    } catch (e) { setError(e instanceof Error ? e.message : "Unable to save expense."); }
-    finally { setBusy(false); }
-  }
+      const labels = ["customers", "invoices", "expenses", "supplier payments"];
+      const data: Record<string, unknown> = {};
+      const errors: string[] = [];
 
-  const money = (value: number, code: string) => new Intl.NumberFormat("en-UG", { style: "currency", currency: code, maximumFractionDigits: 2 }).format(Number(value || 0));
-  const draftCount = invoices.filter(invoice => invoice.status === "draft").length;
-  // Never add amounts in different currencies together: show a separate subtotal per currency.
-  const invoiceTotalsByCurrency = invoices.reduce<Record<string, number>>((totals, invoice) => {
-    const code = invoice.currency || "UGX";
-    totals[code] = (totals[code] || 0) + Number(invoice.total || 0);
-    return totals;
-  }, {});
-  const expenseTotalsByCurrency = expenses.reduce<Record<string, number>>((totals, expense) => {
-    const code = expense.currency || "UGX";
-    totals[code] = (totals[code] || 0) + Number(expense.amount || 0);
-    return totals;
-  }, {});
-  const formatTotals = (totals: Record<string, number>) =>
-    Object.entries(totals).sort(([a], [b]) => a.localeCompare(b)).map(([code, amount]) => money(amount, code)).join(" · ") || money(0, "UGX");
-  const filteredCustomers = customers.filter(customer => (customer.name + " " + (customer.email || "")).toLowerCase().includes((customerSearch || globalSearch).toLowerCase()));
-  const filteredInvoices = invoices.filter(invoice => [invoice.invoice_number, invoice.business_contacts?.name || "", invoice.status, invoice.issue_date].join(" ").toLowerCase().includes((invoiceSearch || globalSearch).toLowerCase()));
-  const todayKey = new Date().toLocaleDateString("en-CA", { timeZone: "Africa/Kampala" });
-  const eligibleReceivables = invoices.filter(invoice => !["draft", "void", "cancelled", "paid"].includes(String(invoice.status).toLowerCase()));
-  const outstandingByAge = eligibleReceivables.reduce((buckets, invoice) => {
-    const balance = Math.max(0, Number(invoice.total || 0) - Number(invoice.amount_paid || 0));
-    if (!balance) return buckets;
-    const currencyCode = invoice.currency || "UGX";
-    const due = invoice.due_date ? new Date(invoice.due_date + "T00:00:00") : null;
-    const today = new Date(todayKey + "T00:00:00");
-    const lateDays = due ? Math.max(0, Math.floor((today.getTime() - due.getTime()) / 86400000)) : 0;
-    const bucket = !due || lateDays === 0 ? "current" : lateDays <= 15 ? "days1to15" : lateDays <= 30 ? "days16to30" : lateDays <= 45 ? "days31to45" : "over45";
-    buckets[bucket][currencyCode] = (buckets[bucket][currencyCode] || 0) + balance;
-    return buckets;
-  }, { current: {} as Record<string, number>, days1to15: {} as Record<string, number>, days16to30: {} as Record<string, number>, days31to45: {} as Record<string, number>, over45: {} as Record<string, number> });
-  const currencyTotal = (values: Record<string, number>, code = "UGX") => money(values[code] || 0, code);
-  const receivableTotalUGX = Object.values(outstandingByAge).reduce((sum, values) => sum + (values.UGX || 0), 0);
-  const paidTotalUGX = invoices.reduce((sum, invoice) => sum + (invoice.currency === "UGX" ? Number(invoice.amount_paid || 0) : 0), 0);
-  const chartMonths = Array.from({ length: 12 }, (_, index) => {
-    const date = new Date();
-    date.setDate(1);
-    date.setMonth(date.getMonth() - (11 - index));
-    const key = date.toLocaleDateString("en-CA", { timeZone: "Africa/Kampala" }).slice(0, 7);
-    return { key, label: date.toLocaleDateString("en-UG", { month: "short", timeZone: "Africa/Kampala" }), sales: 0, expenses: 0 };
+      for (let index = 0; index < results.length; index++) {
+        const result = results[index];
+        const label = labels[index];
+
+        if (result.status === "rejected") {
+          errors.push(`Could not load ${label}.`);
+          continue;
+        }
+
+        if (!result.value.ok) {
+          let message = "";
+
+          try {
+            const body = await result.value.clone().json();
+            message =
+              typeof body?.error === "string" ? body.error : "";
+          } catch {
+            // Keep the fallback message if the response is not JSON.
+          }
+
+          if (result.value.status === 402) {
+            errors.push(
+              message ||
+                "Your workspace subscription could not be verified. Finance data is temporarily unavailable."
+            );
+          } else if (result.value.status === 401) {
+            errors.push("Your session has expired. Please sign in again.");
+          } else if (result.value.status === 409) {
+            errors.push(
+              message || "Please select an authorised workspace."
+            );
+          } else {
+            errors.push(
+              message || `Could not load ${label} (HTTP ${result.value.status}).`
+            );
+          }
+
+          continue;
+        }
+
+        try {
+          data[label] = await result.value.json();
+        } catch {
+          errors.push(`The ${label} response could not be read.`);
+        }
+      }
+
+      const customerPayload = data.customers as
+        | { customers?: Customer[] }
+        | undefined;
+      const invoicePayload = data.invoices as
+        | { invoices?: Invoice[] }
+        | undefined;
+      const expensePayload = data.expenses as
+        | { expenses?: Expense[] }
+        | undefined;
+      const supplierPaymentPayload = data["supplier payments"] as
+        | { payments?: SupplierPayment[]; migration_required?: boolean }
+        | undefined;
+
+      setCustomers(
+        Array.isArray(customerPayload?.customers)
+          ? customerPayload.customers
+          : []
+      );
+      setInvoices(
+        Array.isArray(invoicePayload?.invoices)
+          ? invoicePayload.invoices
+          : []
+      );
+      setExpenses(
+        Array.isArray(expensePayload?.expenses)
+          ? expensePayload.expenses
+          : []
+      );
+      setSupplierPayments(
+        Array.isArray(supplierPaymentPayload?.payments)
+          ? supplierPaymentPayload.payments
+          : []
+      );
+      if (supplierPaymentPayload?.migration_required) {
+        errors.push("Supplier payment records could not be loaded. Check the supplier payments database setup.");
+      }
+
+      setLastUpdated(new Date());
+
+      if (errors.length) setError([...new Set(errors)].join(" "));
+    } catch {
+      setError("Unable to load your dashboard. Please try again.");
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void loadDashboard();
+  }, [loadDashboard]);
+
+  const stats = useMemo(() => {
+    const activeInvoices = invoices.filter(
+      (invoice) => !isPaid(invoice) && !isCancelled(invoice)
+    );
+
+    const outstanding = activeInvoices.reduce(
+      (sum, invoice) => sum + invoiceAmount(invoice),
+      0
+    );
+
+    const overdueInvoices = activeInvoices.filter(isOverdue);
+
+    const monthlyExpenses = expenses
+      .filter((expense) =>
+        isThisMonth(
+          expense.expense_date ?? expense.date ?? expense.created_at
+        )
+      )
+      .reduce(
+        (sum, expense) => sum + expenseAmount(expense),
+        0
+      );
+
+    const monthlySupplierPayments = supplierPayments
+      .filter((payment) =>
+        isThisMonth(payment.payment_date ?? payment.created_at)
+      )
+      .reduce((sum, payment) => sum + supplierPaymentAmount(payment), 0);
+
+    const monthlySales = invoices
+      .filter(
+        (invoice) =>
+          isPaid(invoice) &&
+          isThisMonth(invoice.issue_date ?? invoice.created_at)
+      )
+      .reduce(
+        (sum, invoice) => sum + invoiceAmount(invoice),
+        0
+      );
+
+    const recentCustomers = [...customers].sort(
+      (a, b) =>
+        new Date(b.created_at ?? 0).getTime() -
+        new Date(a.created_at ?? 0).getTime()
+    );
+
+    const recentInvoices = [...invoices].sort(
+      (a, b) =>
+        new Date(b.created_at ?? b.issue_date ?? 0).getTime() -
+        new Date(a.created_at ?? a.issue_date ?? 0).getTime()
+    );
+
+    return {
+      customerCount: customers.length,
+      invoiceCount: invoices.length,
+      outstanding,
+      overdueCount: overdueInvoices.length,
+      overdueAmount: overdueInvoices.reduce(
+        (sum, invoice) => sum + invoiceAmount(invoice),
+        0
+      ),
+      monthlyExpenses,
+      monthlySupplierPayments,
+      monthlySales,
+      recentSupplierPayments: [...supplierPayments]
+        .sort(
+          (a, b) =>
+            new Date(b.payment_date ?? b.created_at ?? 0).getTime() -
+            new Date(a.payment_date ?? a.created_at ?? 0).getTime()
+        )
+        .slice(0, 5),
+      recentCustomers: recentCustomers.slice(0, 5),
+      recentInvoices: recentInvoices.slice(0, 6),
+      recentExpenses: [...expenses]
+        .sort(
+          (a, b) =>
+            new Date(
+              b.expense_date ?? b.date ?? b.created_at ?? 0
+            ).getTime() -
+            new Date(
+              a.expense_date ?? a.date ?? a.created_at ?? 0
+            ).getTime()
+        )
+        .slice(0, 5),
+    };
+  }, [customers, invoices, expenses, supplierPayments]);
+
+  const filteredInvoices = stats.recentInvoices.filter((invoice) => {
+    const term = search.trim().toLowerCase();
+    if (!term) return true;
+
+    return [
+      invoiceNumber(invoice),
+      customerName(invoice),
+      invoice.status ?? "",
+    ].some((value) => value.toLowerCase().includes(term));
   });
-  chartMonths.forEach(month => {
-    month.sales = invoices.filter(invoice => invoice.currency === "UGX" && !["draft","void","cancelled"].includes(String(invoice.status).toLowerCase()) && String(invoice.issue_date || "").slice(0, 7) === month.key).reduce((sum, invoice) => sum + Number(invoice.total || 0), 0);
-    month.expenses = expenses.filter(expense => expense.currency === "UGX" && String(expense.expense_date || "").slice(0, 7) === month.key).reduce((sum, expense) => sum + Number(expense.amount || 0), 0);
-  });
-  const chartMax = Math.max(1, ...chartMonths.flatMap(month => [month.sales, month.expenses]));
-  const chartBars = chartMonths.map((month, index) => ({ ...month, x: 42 + index * 54, salesHeight: month.sales / chartMax * 142, expenseHeight: month.expenses / chartMax * 142 }));
-  const otherCurrencyReceivables = Object.entries(outstandingByAge.current).filter(([code]) => code !== "UGX");
 
-  return <main className="inner-page invoice-product-page finance-shell">
-    <aside className="finance-side-rail">
-      <Link className="finance-side-brand" href="/workspace"><span>JOHDEN</span><small>BUSINESS SUITE</small></Link>
-      <div className="finance-side-workspace"><span className="finance-side-mark">J</span><div><b>Johden Business</b><small>Finance workspace</small></div></div>
-      <p className="finance-side-label">WORKSPACE</p>
-      <nav className="finance-side-nav" aria-label="Finance navigation">
-        <a className="selected" href="#overview"><span>▦</span> Overview</a>
-        <Link href="#customers"><span>♙</span> Customers <i>{customers.length}</i></Link>
-        <Link href="/workspace/finance/items"><span>▧</span> Items</Link>
-        <Link href="/workspace/finance/quotes"><span>▧</span> Quotes</Link>
-        <a href="#invoice-list"><span>▤</span> Invoices <i>{invoices.length}</i></a>
-        <Link href="/workspace/finance/receipts"><span>▤</span> Sales Receipts</Link>
-        <Link href="/workspace/finance/recurring"><span>⟳</span> Recurring Invoices</Link>
-        <a href="#invoice-list"><span>⇄</span> Payments Received</a>
-        <Link href="/workspace/finance/credit-notes"><span>▱</span> Credit Notes</Link>
-        <a href="#expense-list"><span>↗</span> Expenses</a>
-        <Link href="/workspace/finance/recurring"><span>⟳</span> Recurring Expenses</Link>
-        <Link href="/workspace/finance/time-tracking"><span>◷</span> Time Tracking</Link>
-        <a href="#overview"><span>▥</span> Reports</a>
-      </nav>
-      <p className="finance-side-label">QUICK ACTIONS</p>
-      <nav className="finance-side-nav">
-        <a href="#create-invoice"><span>＋</span> Create invoice</a>
-        <a href="#add-customer"><span>＋</span> Add customer</a>
-        <a href="#add-expense"><span>＋</span> Add expense</a>
-      </nav>
-      <div className="finance-side-bottom"><span className="finance-side-mark">J</span><div><b>Johden Business</b><small>Billing &amp; accounts</small></div></div>
-      <Link className="finance-side-back" href="/workspace">← Back to workspace</Link>
-      <form action="/api/saas/logout" method="post"><button className="finance-side-signout" type="submit">↪ Sign out</button></form>
-    </aside>
-    <div className="finance-app-main">
-    <header className="finance-topbar">
-      <div className="finance-topbar-search"><span aria-hidden="true">⌕</span><input aria-label="Search customers and invoices" value={globalSearch} onChange={event=>{setGlobalSearch(event.target.value);setInvoiceSearch("");setCustomerSearch("");}} placeholder="Search in customers and invoices" /></div>
-      <div className="finance-topbar-actions"><span className="finance-company-name">JOHDEN BUSINESS CONSULTANCY SERVICES</span><Link href="/workspace" aria-label="Workspace settings" className="finance-topbar-icon">⚙</Link><Link href="#create-invoice" className="finance-topbar-add">＋</Link><span className="finance-profile-mark" aria-label="Johden account">J</span></div>
-    </header>
-    <section className="finance-dashboard-heading">
-      <div><span className="eyebrow dark"><i /> PRIVATE FINANCE WORKSPACE</span><h1>Good afternoon, Johden</h1><p>Your business finances at a glance. Monitor receivables, monthly sales and expenses from one place.</p></div>
-      <Link className="button button-primary" href="#create-invoice">＋ New invoice</Link>
-    </section>
-    <section className="inner-content">
-      <div id="overview" style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:18,flexWrap:"wrap",marginBottom:24}}><div><span className="eyebrow dark"><i/> FINANCE OVERVIEW</span><h2 style={{fontFamily:"Manrope,sans-serif",fontSize:"clamp(28px,3vw,40px)",margin:"10px 0 0"}}>Your business, at a glance.</h2></div><a className="button button-primary" href="#invoice-list">View invoices ↗</a></div>
-      {error && <p role="alert" className="admin-error">{error}</p>}{notice && <p role="status" className="admin-success">{notice}</p>}
-      <section className="finance-receivables-card" aria-labelledby="receivables-title">
-        <div className="finance-panel-heading"><div><h3 id="receivables-title">Total receivables</h3><p>Outstanding issued invoices · UGX view</p></div><a href="#create-invoice" className="finance-new-link">＋ New invoice</a></div>
-        <div className="finance-receivables-total">{money(receivableTotalUGX, "UGX")}</div>
-        <div className="finance-receivables-track" aria-hidden="true">
-          <span style={{width: `${receivableTotalUGX ? (Object.values(outstandingByAge.current).reduce((a,b)=>a+b,0)/Math.max(1,receivableTotalUGX))*100 : 0}%`}} />
-          <span style={{width: `${receivableTotalUGX ? (Object.values(outstandingByAge.days1to15).reduce((a,b)=>a+b,0)/Math.max(1,receivableTotalUGX))*100 : 0}%`}} />
-          <span style={{width: `${receivableTotalUGX ? (Object.values(outstandingByAge.days16to30).reduce((a,b)=>a+b,0)/Math.max(1,receivableTotalUGX))*100 : 0}%`}} />
-          <span style={{width: `${receivableTotalUGX ? (Object.values(outstandingByAge.days31to45).reduce((a,b)=>a+b,0)/Math.max(1,receivableTotalUGX))*100 : 0}%`}} />
-          <span style={{width: `${receivableTotalUGX ? (Object.values(outstandingByAge.over45).reduce((a,b)=>a+b,0)/Math.max(1,receivableTotalUGX))*100 : 0}%`}} />
-        </div>
-        <div className="finance-ageing-grid">
-          <div><small>Current</small><strong>{currencyTotal(outstandingByAge.current)}</strong></div>
-          <div><small>1–15 days</small><strong>{currencyTotal(outstandingByAge.days1to15)}</strong></div>
-          <div><small>16–30 days</small><strong>{currencyTotal(outstandingByAge.days16to30)}</strong></div>
-          <div><small>31–45 days</small><strong>{currencyTotal(outstandingByAge.days31to45)}</strong></div>
-          <div><small>Above 45 days</small><strong>{currencyTotal(outstandingByAge.over45)}</strong></div>
-        </div>
-        {otherCurrencyReceivables.length>0 && <p className="finance-currency-note">Other currencies currently due: {otherCurrencyReceivables.map(([code,amount])=>money(amount,code)).join(" · ")}. Currency balances are kept separate.</p>}
-      </section>
-      <section className="finance-analytics-grid">
-        <article className="finance-analytics-card">
-          <div className="finance-panel-heading"><div><h3>Sales and expenses</h3><p>Last 12 months · UGX only</p></div><span className="finance-period-label">12 MONTHS</span></div>
-          <div className="finance-chart-layout">
-            <div className="finance-chart" role="img" aria-label="Monthly UGX invoice sales and expenses for the last twelve months">
-              <div className="finance-chart-axis"><span>100%</span><span>75%</span><span>50%</span><span>25%</span><span>0</span></div>
-              <svg viewBox="0 0 700 190" preserveAspectRatio="none" aria-hidden="true">
-                {[18,54,90,126,162].map(y=><line key={y} x1="34" x2="690" y1={y} y2={y} stroke="#e9ebef" strokeDasharray="3 4" />)}
-                {chartBars.map((bar,index)=><g key={bar.key}>
-                  <rect x={bar.x} y={162-bar.salesHeight} width="13" height={bar.salesHeight} rx="2" fill="#3687e8"/>
-                  <rect x={bar.x+16} y={162-bar.expenseHeight} width="13" height={bar.expenseHeight} rx="2" fill="#31bd83"/>
-                  {index%2===0 && <text x={bar.x+14} y="183" textAnchor="middle" fontSize="10" fill="#747b87">{bar.label}</text>}
-                </g>)}
-              </svg>
+  const today = new Intl.DateTimeFormat("en-UG", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(new Date());
+
+  return (
+    <div className="min-h-screen bg-slate-50 text-slate-900">
+      <div className="flex min-h-screen">
+        <aside className="hidden h-screen w-64 shrink-0 sticky top-0 flex-col border-r border-slate-200 bg-white text-slate-900 lg:flex">
+          <Link
+            href="/workspace/finance"
+            className="flex items-center gap-3 border-b border-slate-100 px-6 py-5"
+          >
+            <img src="/johden-logo.svg" alt="Johden Business Consultancy Services" className="h-14 w-14 shrink-0 object-contain" />
+            <div className="min-w-0">
+              <p className="truncate text-base font-bold tracking-tight">
+                JOH DEN
+              </p>
+              <p className="mt-0.5 text-xs text-slate-500">
+                Business Finance
+              </p>
             </div>
-            <div className="finance-chart-summary">
-              <div><small>Total sales invoiced</small><strong>{money(chartMonths.reduce((sum,m)=>sum+m.sales,0),"UGX")}</strong></div>
-              <div><small>Payments received</small><strong>{money(paidTotalUGX,"UGX")}</strong></div>
-              <div><small>Total expenses</small><strong>{money(chartMonths.reduce((sum,m)=>sum+m.expenses,0),"UGX")}</strong></div>
+          </Link>
+
+          <div className="min-h-0 flex-1 overflow-y-auto px-4 py-6">
+            {navigation.map((group) => (
+              <div key={group.heading} className="mb-7">
+                <p className="mb-3 px-3 text-[10px] font-bold tracking-[0.18em] text-slate-400">
+                  {group.heading}
+                </p>
+
+                <nav className="space-y-1">
+                  {group.items.map((item) => {
+                    const Icon = item.icon;
+                    const active = item.label === "Dashboard";
+
+                    return (
+                      <Link
+                        key={item.label}
+                        href={item.href}
+                        aria-current={active ? "page" : undefined}
+                        className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
+                          active ? "bg-[#fff0f1] text-[#9f1d35]" : "text-slate-600 hover:bg-[#fff5f5] hover:text-[#9f1d35]"
+                        }`}
+                      >
+                        <Icon
+                          size={18}
+                          className={
+                            active ? "text-[#9f1d35]" : "text-slate-400"
+                          }
+                        />
+                        <span>{item.label}</span>
+                        {active && (
+                          <span className="ml-auto h-1.5 w-1.5 rounded-full bg-[#F3192D]" />
+                        )}
+                      </Link>
+                    );
+                  })}
+                </nav>
+              </div>
+            ))}
+          </div>
+
+          <div className="border-t border-slate-100 p-4">
+            <Link
+              href="/workspace/settings"
+              className="flex items-center gap-3 rounded-xl px-3 py-3 text-[13px] font-medium text-slate-600 hover:bg-[#fff5f5] hover:text-[#9f1d35]"
+            >
+              <Settings size={18} className="text-slate-400" />
+              Settings
+              <ArrowRight size={15} className="ml-auto" />
+            </Link>
+
+            <div className="mt-3 rounded-xl bg-slate-50 p-3">
+              <p className="text-xs font-semibold text-slate-700">
+                Johden Finance
+              </p>
+              <p className="mt-1 text-[11px] leading-4 text-slate-500">
+                Manage your business finances in one place.
+              </p>
             </div>
           </div>
-          <div className="finance-chart-legend"><span><i className="sales-dot"/>Sales invoiced</span><span><i className="expenses-dot"/>Expenses</span></div>
-          <p className="finance-data-note">Figures are calculated from records currently loaded in this workspace. Non-UGX values are not converted or combined.</p>
-        </article>
-        <div className="finance-kpi-stack">
-          <article><small>Customers</small><strong>{customers.length}</strong><span>Saved customer records</span></article>
-          <article><small>Draft invoices</small><strong>{draftCount}</strong><span>Awaiting review or issue</span></article>
-          <article><small>Invoices</small><strong>{invoices.length}</strong><span>{formatTotals(invoiceTotalsByCurrency)} total value</span></article>
-          <article><small>Total expenses</small><strong>{formatTotals(expenseTotalsByCurrency)}</strong><span>{expenses.length} expense records across all dates</span></article>
-        </div>
-      </section>
-      <div className="invoice-feature-grid" id="customers">
-        <article className="invoice-feature-card" id="add-customer"><h3>Add a customer</h3><form className="admin-client-form" onSubmit={createCustomer}><label>Customer or company name<input required minLength={2} maxLength={160} value={customerName} onChange={e=>setCustomerName(e.target.value)} /></label><div className="finance-form-two"><label>Email (optional)<input type="email" maxLength={254} value={customerEmail} onChange={e=>setCustomerEmail(e.target.value)} /></label><label>Telephone<input type="tel" maxLength={40} value={customerPhone} onChange={e=>setCustomerPhone(e.target.value)} placeholder="+256..." /></label></div><label>Billing address<textarea rows={2} maxLength={500} value={customerAddress} onChange={e=>setCustomerAddress(e.target.value)} placeholder="Street, city, country" /></label><label>Tax identification number<input maxLength={100} value={customerTaxNumber} onChange={e=>setCustomerTaxNumber(e.target.value)} /></label><button type="submit" disabled={busy}>Save customer</button></form></article>
-        <article className="invoice-feature-card" id="create-invoice"><h3>Create a draft invoice</h3>{customers.length===0 && <p>Add a customer first to create an invoice.</p>}<form className="admin-client-form" onSubmit={createInvoice}><label>Customer<select required value={selectedCustomer} onChange={e=>setSelectedCustomer(e.target.value)}><option value="">Choose customer</option>{customers.map(c=><option key={c.id} value={c.id}>{c.name}</option>)}</select></label><label>Description<input required maxLength={500} value={description} onChange={e=>setDescription(e.target.value)} /></label><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}><label>Quantity<input required type="number" min="0.001" step="0.001" value={quantity} onChange={e=>setQuantity(e.target.value)} /></label><label>Unit price<input required type="number" min="0" step="0.01" value={unitPrice} onChange={e=>setUnitPrice(e.target.value)} /></label></div><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}><label>Tax rate (%)<input type="number" min="0" max="100" step="0.01" value={taxRate} onChange={e=>setTaxRate(e.target.value)} /></label><label>Currency<select value={currency} onChange={e=>setCurrency(e.target.value)}><option>UGX</option><option>USD</option><option>EUR</option><option>GBP</option><option>KES</option><option>TZS</option></select></label></div><label>Due date (optional)<input type="date" value={dueDate} onChange={e=>setDueDate(e.target.value)} /></label><button type="submit" disabled={busy || !customers.length || !selectedCustomer}>Create draft invoice</button></form></article>
+        </aside>
+
+        <main className="min-w-0 flex-1 jbcs-finance-consistent-main">
+          <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/95 backdrop-blur">
+            <div className="flex min-h-[76px] items-center justify-between gap-4 px-4 py-3 sm:px-6 xl:px-10">
+              <div className="flex min-w-0 items-center gap-3">
+                <img src="/johden-logo.svg" alt="Johden logo" className="h-12 w-12 shrink-0 object-contain sm:h-14 sm:w-14" />
+                <div className="min-w-0">
+                  <p className="text-xs font-medium text-slate-500">
+                    Johden Business Consultancy Services
+                  </p>
+                  <h1 className="truncate text-lg font-bold tracking-tight sm:text-xl">
+                    Dashboard
+                  </h1>
+                </div>
+              </div>
+
+              <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+                <button
+                  type="button"
+                  onClick={() => void loadDashboard(true)}
+                  disabled={loading || refreshing}
+                  title="Refresh dashboard"
+                  className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 transition hover:bg-slate-50 disabled:opacity-50"
+                >
+                  <RefreshCw
+                    size={17}
+                    className={
+                      refreshing ? "animate-spin" : ""
+                    }
+                  />
+                </button>
+                <button
+                  type="button"
+                  title="Notifications"
+                  className="relative hidden h-10 w-10 items-center justify-center rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 sm:flex"
+                >
+                  <Bell size={18} />
+                  <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-[#F3192D] ring-2 ring-white" />
+                </button>
+                <div className="flex min-w-0 items-center gap-2 sm:gap-3">
+                  <div className="hidden min-w-0 text-right sm:block">
+                    <p className="max-w-[220px] truncate text-sm font-semibold text-slate-800">
+                      {accountEmail || "Signed-in user"}
+                    </p>
+                    <p className="text-xs text-slate-500">Logged in</p>
+                  </div>
+                  <form action="/api/saas/logout" method="post">
+                    <button
+                      type="submit"
+                      className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-700 transition hover:border-[#F3192D] hover:bg-[#fff5f5] hover:text-[#9f1d35]"
+                    >
+                      <span aria-hidden="true">â†ª</span>
+                      <span>Log Out</span>
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </header>
+
+          <div className="mx-auto max-w-[1600px] space-y-7 p-4 sm:p-6 xl:p-10">
+            <section className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+              <div>
+                <div className="mb-2 flex items-center gap-2 text-sm text-slate-500">
+                  <CalendarDays size={16} />
+                  {today}
+                </div>
+                <h2 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+                  Welcome to your workspace
+                </h2>
+                <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
+                  Keep track of customers, sales, outstanding invoices and
+                  business expenses from one place.
+                </p>
+              </div>
+
+              <div className="flex flex-wrap gap-2">
+                <Link
+                  href="/workspace/finance/customers"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50"
+                >
+                  <Plus size={17} />
+                  Add customer
+                </Link>
+                <Link
+                  href="/workspace/finance/invoices"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#F3192D] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#CF1022]"
+                >
+                  <FilePlus2 size={17} />
+                  Create invoice
+                </Link>
+              </div>
+            </section>
+
+            {error && (
+              <div
+                role="alert"
+                className="flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4"
+              >
+                <XCircle
+                  size={21}
+                  className="mt-0.5 shrink-0 text-amber-700"
+                />
+                <div className="min-w-0 flex-1">
+                  <p className="font-semibold text-amber-900">
+                    Some dashboard information is unavailable
+                  </p>
+                  <p className="mt-1 text-sm leading-6 text-amber-800">
+                    {error}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => void loadDashboard(true)}
+                  className="shrink-0 rounded-lg px-3 py-2 text-sm font-semibold text-amber-900 hover:bg-amber-100"
+                >
+                  Retry
+                </button>
+              </div>
+            )}
+
+            <section className="grid gap-4 sm:grid-cols-2 2xl:grid-cols-5">
+              <MetricCard
+                title="Total customers"
+                value={
+                  loading && customers.length === 0
+                    ? "Ã¢â‚¬â€"
+                    : customers.length.toLocaleString("en-UG")
+                }
+                detail="Customers registered in your workspace"
+                icon={Users}
+                tone="blue"
+              />
+              <MetricCard
+                title="Outstanding invoices"
+                value={
+                  loading && invoices.length === 0
+                    ? "Ã¢â‚¬â€"
+                    : money(stats.outstanding)
+                }
+                detail={`${stats.overdueCount} overdue invoice${stats.overdueCount === 1 ? "" : "s"}`}
+                icon={CircleDollarSign}
+                tone="amber"
+              />
+              <MetricCard
+                title="Sales collected this month"
+                value={
+                  loading && invoices.length === 0
+                    ? "Ã¢â‚¬â€"
+                    : money(stats.monthlySales)
+                }
+                detail="Paid invoices recorded this month"
+                icon={ChartNoAxesCombined}
+                tone="green"
+              />
+              <MetricCard
+                title="Expenses this month"
+                value={
+                  loading && expenses.length === 0
+                    ? "Ã¢â‚¬â€"
+                    : money(stats.monthlyExpenses)
+                }
+                detail="Expense records only; supplier payments are shown separately"
+                icon={Wallet}
+                tone="purple"
+              />
+              <MetricCard
+                title="Supplier payments this month"
+                value={
+                  loading && supplierPayments.length === 0
+                    ? "Ã¢â‚¬â€"
+                    : money(stats.monthlySupplierPayments)
+                }
+                detail="Cash paid to suppliers this month; not added again to expenses"
+                icon={CreditCard}
+                tone="amber"
+              />
+            </section>
+
+            <section className="grid gap-6 xl:grid-cols-[1.65fr_1fr]">
+              <div className="min-w-0 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+                <SectionTitle
+                  title="Recent invoices"
+                  subtitle="A quick view of your latest billing activity"
+                  href="/workspace/finance/invoices"
+                />
+
+                <div className="mt-5">
+                  <div className="mb-4 flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3">
+                    <Search size={17} className="shrink-0 text-slate-400" />
+                    <input
+                      value={search}
+                      onChange={(event) => setSearch(event.target.value)}
+                      placeholder="Search recent invoices..."
+                      aria-label="Search recent invoices"
+                      className="h-10 min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-slate-400"
+                    />
+                  </div>
+
+                  <div className="overflow-x-auto">
+                    <table className="w-full min-w-[540px] text-left">
+                      <thead>
+                        <tr className="border-b border-slate-100 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                          <th className="pb-3 pr-3">Invoice</th>
+                          <th className="pb-3 pr-3">Customer</th>
+                          <th className="pb-3 pr-3">Date</th>
+                          <th className="pb-3 pr-3">Amount</th>
+                          <th className="pb-3">Status</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100">
+                        {loading && invoices.length === 0 ? (
+                          <tr>
+                            <td colSpan={5} className="py-12 text-center">
+                              <LoaderCircle
+                                size={22}
+                                className="mx-auto animate-spin text-[#F3192D]"
+                              />
+                              <p className="mt-2 text-sm text-slate-500">
+                                Loading invoices...
+                              </p>
+                            </td>
+                          </tr>
+                        ) : filteredInvoices.length === 0 ? (
+                          <tr>
+                            <td colSpan={5} className="py-12 text-center">
+                              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-slate-100 text-slate-400">
+                                <FileText size={23} />
+                              </div>
+                              <p className="mt-3 text-sm font-semibold text-slate-700">
+                                No invoices to display
+                              </p>
+                              <p className="mt-1 text-xs text-slate-500">
+                                {search
+                                  ? "Try another search term."
+                                  : "Your recent invoices will appear here."}
+                              </p>
+                            </td>
+                          </tr>
+                        ) : (
+                          filteredInvoices.map((invoice) => (
+                            <tr
+                              key={invoice.id}
+                              className="transition hover:bg-slate-50/80"
+                            >
+                              <td className="py-4 pr-3">
+                                <span className="text-sm font-semibold text-slate-800">
+                                  {invoiceNumber(invoice)}
+                                </span>
+                              </td>
+                              <td className="max-w-[150px] truncate py-4 pr-3 text-sm text-slate-600">
+                                {customerName(invoice)}
+                              </td>
+                              <td className="whitespace-nowrap py-4 pr-3 text-xs text-slate-500">
+                                {dateLabel(
+                                  invoice.issue_date ?? invoice.created_at
+                                )}
+                              </td>
+                              <td className="whitespace-nowrap py-4 pr-3 text-sm font-semibold text-slate-800">
+                                {money(invoiceAmount(invoice), invoice.currency || "UGX")}
+                              </td>
+                              <td className="py-4">
+                                <StatusBadge
+                                  status={
+                                    isOverdue(invoice)
+                                      ? "overdue"
+                                      : invoice.status
+                                  }
+                                />
+                              </td>
+                            </tr>
+                          ))
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <Link
+                  href="/workspace/finance/invoices"
+                  className="mt-4 flex items-center justify-center gap-2 rounded-xl border border-slate-200 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+                >
+                  Open invoice register
+                  <ArrowRight size={16} />
+                </Link>
+              </div>
+
+              <div className="space-y-6">
+                <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+                  <SectionTitle
+                    title="Quick actions"
+                    subtitle="Common tasks for your business"
+                  />
+
+                  <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
+                    {[
+                      {
+                        title: "Create an invoice",
+                        description: "Bill a customer",
+                        icon: FilePlus2,
+                        href: "/workspace/finance/invoices",
+                        tone: "bg-blue-50 text-[#F3192D]",
+                      },
+                      {
+                        title: "Add a customer",
+                        description: "Register a client",
+                        icon: Users,
+                        href: "/workspace/finance/customers",
+                        tone: "bg-emerald-50 text-emerald-700",
+                      },
+                      {
+                        title: "Record an expense",
+                        description: "Track business spending",
+                        icon: Wallet,
+                        href: "/workspace/finance/expenses",
+                        tone: "bg-amber-50 text-amber-700",
+                      },
+                      {
+                        title: "View reports",
+                        description: "Review business performance",
+                        icon: FileBarChart,
+                        href: "/workspace/finance/reports",
+                        tone: "bg-violet-50 text-violet-700",
+                      },
+                    ].map((action) => {
+                      const Icon = action.icon;
+
+                      return (
+                        <Link
+                          key={action.title}
+                          href={action.href}
+                          className="group flex items-center gap-3 rounded-xl border border-slate-100 p-3 transition hover:border-blue-200 hover:bg-blue-50/40"
+                        >
+                          <div
+                            className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${action.tone}`}
+                          >
+                            <Icon size={20} />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="text-sm font-semibold text-slate-800">
+                              {action.title}
+                            </p>
+                            <p className="mt-1 text-xs text-slate-500">
+                              {action.description}
+                            </p>
+                          </div>
+                          <ArrowRight
+                            size={16}
+                            className="shrink-0 text-slate-300 transition group-hover:translate-x-0.5 group-hover:text-[#F3192D]"
+                          />
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div className="overflow-hidden rounded-2xl bg-gradient-to-br from-blue-800 via-blue-700 to-indigo-800 p-5 text-white shadow-sm sm:p-6">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="text-sm font-medium text-blue-100">
+                        Outstanding payments
+                      </p>
+                      <p className="mt-3 text-2xl font-bold tracking-tight sm:text-3xl">
+                        {money(stats.outstanding)}
+                      </p>
+                      <p className="mt-2 text-xs leading-5 text-blue-100">
+                        {stats.overdueCount} overdue invoice
+                        {stats.overdueCount === 1 ? "" : "s"} need
+                        {stats.overdueCount === 1 ? "s" : ""} attention.
+                      </p>
+                    </div>
+                    <div className="rounded-xl bg-white/10 p-3">
+                      <Activity size={22} />
+                    </div>
+                  </div>
+                  <Link
+                    href="/workspace/finance/invoices"
+                    className="mt-5 inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-blue-800 transition hover:bg-blue-50"
+                  >
+                    Review invoices
+                    <ArrowRight size={16} />
+                  </Link>
+                </div>
+              </div>
+            </section>
+
+            <section className="grid gap-6 xl:grid-cols-3">
+              <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+                <SectionTitle
+                  title="Recent customers"
+                  subtitle="Latest customers added to your workspace"
+                  href="/workspace/finance/customers"
+                />
+
+                <div className="mt-5 divide-y divide-slate-100">
+                  {loading && customers.length === 0 ? (
+                    <div className="flex items-center justify-center py-10 text-sm text-slate-500">
+                      <LoaderCircle
+                        size={18}
+                        className="mr-2 animate-spin text-[#F3192D]"
+                      />
+                      Loading customers...
+                    </div>
+                  ) : stats.recentCustomers.length === 0 ? (
+                    <div className="py-10 text-center">
+                      <Users
+                        size={25}
+                        className="mx-auto text-slate-300"
+                      />
+                      <p className="mt-3 text-sm font-semibold text-slate-700">
+                        No customers yet
+                      </p>
+                      <p className="mt-1 text-xs text-slate-500">
+                        Add your first customer to get started.
+                      </p>
+                      <Link
+                        href="/workspace/finance/customers"
+                        className="mt-4 inline-flex items-center gap-2 rounded-xl bg-[#F3192D] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#CF1022]"
+                      >
+                        <Plus size={16} />
+                        Add customer
+                      </Link>
+                    </div>
+                  ) : (
+                    stats.recentCustomers.map((customer) => (
+                      <div
+                        key={customer.id}
+                        className="flex items-center gap-3 py-4"
+                      >
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-50 text-sm font-bold text-[#F3192D]">
+                          {(customer.name?.trim().charAt(0) || "C").toUpperCase()}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-sm font-semibold text-slate-800">
+                            {customer.name || "Unnamed customer"}
+                          </p>
+                          <p className="mt-1 truncate text-xs text-slate-500">
+                            {customer.email || customer.phone || "No contact details"}
+                          </p>
+                        </div>
+                        <p className="shrink-0 text-xs text-slate-400">
+                          {dateLabel(customer.created_at)}
+                        </p>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+
+              <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+                <SectionTitle
+                  title="Recent expenses"
+                  subtitle="Latest recorded business spending"
+                  href="/workspace/finance/expenses"
+                />
+
+                <div className="mt-5 divide-y divide-slate-100">
+                  {loading && expenses.length === 0 ? (
+                    <div className="flex items-center justify-center py-10 text-sm text-slate-500">
+                      <LoaderCircle
+                        size={18}
+                        className="mr-2 animate-spin text-[#F3192D]"
+                      />
+                      Loading expenses...
+                    </div>
+                  ) : stats.recentExpenses.length === 0 ? (
+                    <div className="py-10 text-center">
+                      <Wallet
+                        size={25}
+                        className="mx-auto text-slate-300"
+                      />
+                      <p className="mt-3 text-sm font-semibold text-slate-700">
+                        No expenses recorded
+                      </p>
+                      <p className="mt-1 text-xs text-slate-500">
+                        Recorded expenses will appear here.
+                      </p>
+                      <Link
+                        href="/workspace/finance/expenses"
+                        className="mt-4 inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+                      >
+                        <Plus size={16} />
+                        Record expense
+                      </Link>
+                    </div>
+                  ) : (
+                    stats.recentExpenses.map((expense) => (
+                      <div
+                        key={expense.id}
+                        className="flex items-center gap-3 py-4"
+                      >
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-50 text-amber-700">
+                          <ShoppingBag size={19} />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-sm font-semibold text-slate-800">
+                            {expense.description ||
+                              expense.name ||
+                              expense.category ||
+                              "Business expense"}
+                          </p>
+                          <p className="mt-1 text-xs text-slate-500">
+                            {expense.category || "General"} Ã‚Â·{" "}
+                            {dateLabel(
+                              expense.expense_date ??
+                                expense.date ??
+                                expense.created_at
+                            )}
+                          </p>
+                        </div>
+                        <p className="shrink-0 text-sm font-semibold text-slate-800">
+                          {money(expenseAmount(expense))}
+                        </p>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+
+              <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+                <SectionTitle
+                  title="Recent supplier payments"
+                  subtitle="Latest payments made to suppliers"
+                  href="/workspace/finance/supplier-payments"
+                />
+
+                <div className="mt-5 divide-y divide-slate-100">
+                  {loading && supplierPayments.length === 0 ? (
+                    <div className="flex items-center justify-center py-10 text-sm text-slate-500">
+                      <LoaderCircle
+                        size={18}
+                        className="mr-2 animate-spin text-[#F3192D]"
+                      />
+                      Loading supplier payments...
+                    </div>
+                  ) : stats.recentSupplierPayments.length === 0 ? (
+                    <div className="py-10 text-center">
+                      <CreditCard size={25} className="mx-auto text-slate-300" />
+                      <p className="mt-3 text-sm font-semibold text-slate-700">
+                        No supplier payments recorded
+                      </p>
+                      <p className="mt-1 text-xs text-slate-500">
+                        Payments made to suppliers will appear here.
+                      </p>
+                      <Link
+                        href="/workspace/finance/supplier-payments"
+                        className="mt-4 inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+                      >
+                        <Plus size={16} />
+                        View supplier payments
+                      </Link>
+                    </div>
+                  ) : (
+                    stats.recentSupplierPayments.map((payment) => (
+                      <div
+                        key={payment.id}
+                        className="flex items-center gap-3 py-4"
+                      >
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-50 text-violet-700">
+                          <CreditCard size={19} />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-sm font-semibold text-slate-800">
+                            {payment.supplier_name || "Supplier"}
+                          </p>
+                          <p className="mt-1 truncate text-xs text-slate-500">
+                            {payment.payment_reference || payment.payment_method || "Supplier payment"} Ã‚Â·{" "}
+                            {dateLabel(payment.payment_date ?? payment.created_at)}
+                          </p>
+                          {(payment.expense_description || payment.invoice_number) && (
+                            <p className="mt-1 truncate text-xs text-slate-400">
+                              {payment.expense_description ||
+                                (payment.invoice_number ? `Invoice ${payment.invoice_number}` : "")}
+                            </p>
+                          )}
+                        </div>
+                        <p className="shrink-0 text-sm font-semibold text-slate-800">
+                          {money(supplierPaymentAmount(payment), payment.currency || "UGX")}
+                        </p>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            </section>
+
+            <footer className="flex flex-col justify-between gap-2 border-t border-slate-200 py-5 text-xs text-slate-400 sm:flex-row sm:items-center">
+              <p>Johden Business Consultancy Services Ã‚Â· Finance workspace</p>
+              <p>
+                {lastUpdated
+                  ? `Last refreshed ${lastUpdated.toLocaleTimeString("en-UG", {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}`
+                  : "Dashboard"}
+              </p>
+            </footer>
+          </div>
+
+          <nav className="sticky bottom-0 z-20 grid grid-cols-5 border-t border-slate-200 bg-white px-1 py-2 lg:hidden">
+            {[
+              {
+                label: "Home",
+                href: "/workspace/finance",
+                icon: LayoutDashboard,
+              },
+              {
+                label: "Customers",
+                href: "/workspace/finance/customers",
+                icon: Users,
+              },
+              {
+                label: "Invoices",
+                href: "/workspace/finance/invoices",
+                icon: FileText,
+              },
+              {
+                label: "Expenses",
+                href: "/workspace/finance/expenses",
+                icon: Wallet,
+              },
+              {
+                label: "Reports",
+                href: "/workspace/finance/reports",
+                icon: FileBarChart,
+              },
+            ].map((item) => {
+              const Icon = item.icon;
+
+              return (
+                <Link
+                  key={item.label}
+                  href={item.href}
+                  className={`flex flex-col items-center gap-1 rounded-lg py-2 text-[10px] font-medium ${
+                    item.label === "Home"
+                      ? "text-[#F3192D]"
+                      : "text-slate-500 hover:text-slate-900"
+                  }`}
+                >
+                  <Icon size={19} />
+                  {item.label}
+                </Link>
+              );
+            })}
+          </nav>
+        </main>
       </div>
-      <article className="invoice-feature-card" id="add-expense" style={{marginTop:24}}><h3>Record an expense</h3><form className="admin-client-form" onSubmit={createExpense}><label>Category<input required maxLength={100} value={expenseCategory} onChange={e=>setExpenseCategory(e.target.value)} /></label><label>Description<input required maxLength={500} value={expenseDescription} onChange={e=>setExpenseDescription(e.target.value)} /></label><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}><label>Amount<input required type="number" min="0" step="0.01" value={expenseAmount} onChange={e=>setExpenseAmount(e.target.value)} /></label><label>Currency<select value={expenseCurrency} onChange={e=>setExpenseCurrency(e.target.value)}><option>UGX</option><option>USD</option><option>EUR</option><option>GBP</option><option>KES</option><option>TZS</option></select></label></div><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}><label>Date<input type="date" required value={expenseDate} onChange={e=>setExpenseDate(e.target.value)} /></label><label>Payment method<select value={expenseMethod} onChange={e=>setExpenseMethod(e.target.value)}><option value="other">Other</option><option value="cash">Cash</option><option value="bank_transfer">Bank transfer</option><option value="mobile_money">Mobile money</option><option value="card">Card</option><option value="cheque">Cheque</option></select></label></div><label>Notes (optional)<textarea rows={2} maxLength={2000} value={expenseNotes} onChange={e=>setExpenseNotes(e.target.value)} placeholder="Additional details or receipt reference" /></label><button type="submit" disabled={busy}>Save expense</button></form></article>
-      <article className="invoice-feature-card" style={{marginTop:24}}>
-        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:16,flexWrap:"wrap"}}><div><h3 style={{marginBottom:6}}>Customer directory</h3><p style={{margin:0}}>Find a saved customer and use their record when preparing an invoice.</p></div><span>{customers.length} {customers.length===1?"customer":"customers"}</span></div>
-        <label style={{display:"block",marginTop:16}}>Search customers<input value={customerSearch} onChange={e=>setCustomerSearch(e.target.value)} placeholder="Search by name or email" /></label>
-        {filteredCustomers.length===0 ? <p style={{marginTop:16}}>{customers.length===0?"Your directory is empty. Add your first customer above.":"No customers match that search."}</p> : <div style={{overflowX:"auto",marginTop:12}}><table style={{width:"100%",borderCollapse:"collapse",textAlign:"left"}}><thead><tr><th style={{padding:10}}>Customer</th><th style={{padding:10}}>Email / telephone</th><th style={{padding:10}}>Billing address</th><th style={{padding:10}}>Action</th></tr></thead><tbody>{filteredCustomers.map(customer=><tr key={customer.id}><td style={{padding:10}}><strong>{customer.name}</strong>{customer.tax_number && <small className="finance-table-subline">Tax ID: {customer.tax_number}</small>}</td><td style={{padding:10}}>{customer.email||"—"}<small className="finance-table-subline">{customer.phone||"No telephone"}</small></td><td style={{padding:10}}>{customer.address||"—"}</td><td style={{padding:10}}><button type="button" onClick={()=>{setSelectedCustomer(customer.id);setNotice(customer.name+" selected for the invoice form.");window.scrollTo({top:0,behavior:"smooth"});}}>Use for invoice</button></td></tr>)}</tbody></table></div>}
-      </article>
-      <div id="invoice-list" className="invoice-list-panel" style={{marginTop:32,background:"#fff",border:"1px solid #ece7e6",borderRadius:12,padding:20}}><div className="invoice-list-heading"><div><span className="eyebrow dark"><i/> BILLING REGISTER</span><h2>Invoices</h2><p>Search, review, and print invoices saved in this workspace.</p></div><input aria-label="Search invoices" value={invoiceSearch} onChange={e=>setInvoiceSearch(e.target.value)} placeholder="Search invoice, customer or status" /></div>{filteredInvoices.length===0 ? <p>{invoiceSearch ? "No invoices match your search." : "No invoices yet. Create your first draft above."}</p> : <div style={{overflowX:"auto"}}><table style={{width:"100%",borderCollapse:"collapse",textAlign:"left"}}><thead><tr><th style={{padding:12}}>Invoice</th><th style={{padding:12}}>Date</th><th style={{padding:12}}>Customer</th><th style={{padding:12}}>Total</th><th style={{padding:12}}>Balance</th><th style={{padding:12}}>Status</th><th style={{padding:12}}>Actions</th></tr></thead><tbody>{filteredInvoices.map(i=><tr key={i.id}><td style={{padding:12}}>{i.invoice_number}</td><td style={{padding:12}}>{i.issue_date}</td><td style={{padding:12}}>{i.business_contacts?.name || "Customer"}</td><td style={{padding:12}}>{money(i.total,i.currency)}</td><td style={{padding:12}}><strong>{money(Math.max(0,Number(i.total||0)-Number(i.amount_paid||0)),i.currency)}</strong></td><td style={{padding:12}}><span className={`finance-status-pill finance-status-${String(i.status).toLowerCase().replace(/[^a-z0-9]+/g,"-")}`}>{i.status.replace(/_/g," ")}</span></td><td style={{padding:12,display:"flex",gap:10,flexWrap:"wrap"}}>{i.status === "draft" && <><button type="button" disabled={busy} onClick={() => editDraftInvoice(i)}>Edit draft</button><button type="button" disabled={busy} onClick={() => issueInvoice(i)}>Issue invoice</button></>}{["sent","part_paid","overdue"].includes(i.status) && Number(i.total || 0) > Number(i.amount_paid || 0) && <button type="button" disabled={busy} onClick={() => recordPayment(i)}>Record payment</button>}<Link href={`/workspace/invoices/${i.id}/print`} target="_blank">Print / Save PDF</Link></td></tr>)}</tbody></table></div>}</div>
-      <div id="expense-list" style={{marginTop:32,background:"#fff",border:"1px solid #ece7e6",borderRadius:12,padding:20}}><h2>Expenses</h2>{expenses.length===0 ? <p>No expenses recorded yet.</p> : <div style={{overflowX:"auto"}}><table style={{width:"100%",borderCollapse:"collapse",textAlign:"left"}}><thead><tr><th style={{padding:12}}>Date</th><th style={{padding:12}}>Category</th><th style={{padding:12}}>Description</th><th style={{padding:12}}>Amount</th><th style={{padding:12}}>Method</th></tr></thead><tbody>{expenses.map(e=><tr key={e.id}><td style={{padding:12}}>{e.expense_date}</td><td style={{padding:12}}>{e.category}</td><td style={{padding:12}}>{e.description}</td><td style={{padding:12}}>{money(e.amount,e.currency)}</td><td style={{padding:12}}>{e.payment_method.replace("_"," ")}</td></tr>)}</tbody></table></div>}</div>
-      {dialog && activeInvoice && <div role="presentation" onMouseDown={event=>{if(event.target===event.currentTarget&&!busy){setDialog(null);setActiveInvoice(null);}}} style={{position:"fixed",inset:0,zIndex:1000,background:"rgba(24,20,22,.62)",display:"grid",placeItems:"center",padding:20}}>
-        <section role="dialog" aria-modal="true" aria-labelledby="invoice-dialog-title" style={{width:"min(100%,520px)",maxHeight:"90vh",overflowY:"auto",background:"#fff",borderRadius:18,padding:26,boxShadow:"0 24px 80px rgba(0,0,0,.24)"}}>
-          <div style={{display:"flex",justifyContent:"space-between",alignItems:"start",gap:16}}><div><span className="eyebrow dark"><i/> {dialog==="edit"?"DRAFT INVOICE":"PAYMENT ENTRY"}</span><h2 id="invoice-dialog-title" style={{margin:"8px 0 4px"}}>{dialog==="edit"?"Edit invoice":"Record a payment"}</h2><p style={{margin:0,color:"#6d6870"}}>{activeInvoice.invoice_number} · {activeInvoice.business_contacts?.name || "Customer"}</p></div><button type="button" disabled={busy} aria-label="Close dialog" onClick={()=>{setDialog(null);setActiveInvoice(null);}} style={{border:0,background:"#f4f1f1",borderRadius:10,width:38,height:38,fontSize:20}}>×</button></div>
-          {dialog==="edit" ? <form className="admin-client-form" onSubmit={saveDraftInvoice} style={{marginTop:22,display:"grid",gap:16}}>
-            <label>Due date<input type="date" min={activeInvoice.issue_date} value={editDueDate} onChange={e=>setEditDueDate(e.target.value)} /></label>
-            <label>Invoice notes<textarea rows={4} maxLength={2000} value={editNotes} onChange={e=>setEditNotes(e.target.value)} placeholder="Add payment terms or a note for this invoice" /></label>
-            <p style={{fontSize:13,color:"#777"}}>Only draft invoices can be edited. Leave the due date blank if no due date applies.</p>
-            <div style={{display:"flex",justifyContent:"flex-end",gap:10}}><button type="button" disabled={busy} onClick={()=>{setDialog(null);setActiveInvoice(null);}}>Cancel</button><button className="button button-primary" type="submit" disabled={busy}>{busy?"Saving…":"Save changes"}</button></div>
-          </form> : <form className="admin-client-form" onSubmit={submitPayment} style={{marginTop:22,display:"grid",gap:16}}>
-            <div style={{background:"#fff5f2",padding:14,borderRadius:12}}><small>Outstanding balance</small><strong style={{display:"block",fontSize:22,marginTop:4}}>{money(Math.max(0,Number(activeInvoice.total||0)-Number(activeInvoice.amount_paid||0)),activeInvoice.currency)}</strong></div>
-            <label>Amount received ({activeInvoice.currency})<input type="number" min="0.01" max={Math.max(0,Number(activeInvoice.total||0)-Number(activeInvoice.amount_paid||0))} step="0.01" required value={paymentAmount} onChange={e=>setPaymentAmount(e.target.value)} /></label>
-            <label>Payment method<select required value={paymentMethod} onChange={e=>setPaymentMethod(e.target.value)}><option value="cash">Cash</option><option value="bank_transfer">Bank transfer</option><option value="mobile_money">Mobile money</option><option value="card">Card</option><option value="cheque">Cheque</option><option value="other">Other</option></select></label>
-            <label>Payment date<input type="date" required max={new Date().toISOString().slice(0,10)} value={paymentDate} onChange={e=>setPaymentDate(e.target.value)} /></label>
-            <label>Payment reference (optional)<input maxLength={120} value={paymentReference} onChange={e=>setPaymentReference(e.target.value)} placeholder="Bank or mobile money reference" /></label>
-            <p style={{fontSize:13,color:"#777"}}>This records a payment against the invoice. It does not initiate a bank or mobile-money transfer.</p>
-            <div style={{display:"flex",justifyContent:"flex-end",gap:10}}><button type="button" disabled={busy} onClick={()=>{setDialog(null);setActiveInvoice(null);}}>Cancel</button><button className="button button-primary" type="submit" disabled={busy}>{busy?"Recording…":"Record payment"}</button></div>
-          </form>}
-        </section>
-      </div>}
-      <p style={{marginTop:20,fontSize:13,opacity:.8}}>This is an initial workspace module. Email delivery, payment recording and subscription checkout remain disabled until provider credentials and secure payment webhooks are configured and tested.</p>
-    </section>
     </div>
-  </main>;
+  );
 }
+
+
+
