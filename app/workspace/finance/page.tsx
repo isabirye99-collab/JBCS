@@ -376,6 +376,8 @@ export default function FinanceDashboardPage() {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState("");
   const [accountEmail, setAccountEmail] = useState("");
+  const [planKey, setPlanKey] = useState("basic");
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -412,26 +414,25 @@ export default function FinanceDashboardPage() {
     setError("");
 
     try {
-      const results = await Promise.allSettled([
-        fetch("/api/saas/customers", {
-          cache: "no-store",
-          credentials: "same-origin",
-        }),
-        fetch("/api/saas/invoices", {
-          cache: "no-store",
-          credentials: "same-origin",
-        }),
-        fetch("/api/saas/expenses", {
-          cache: "no-store",
-          credentials: "same-origin",
-        }),
-        fetch("/api/saas/supplier-payments", {
-          cache: "no-store",
-          credentials: "same-origin",
-        }),
-      ]);
+      const planResponse = await fetch("/api/saas/plan", { cache: "no-store", credentials: "same-origin" });
+      const planData = await planResponse.json();
+      if (!planResponse.ok) throw new Error(planData.error || "Could not verify the subscription plan.");
+      const adminAccess = !!planData.plan?.isSuperAdmin;
+      const effectivePlan = planData.plan?.key === "pro" || adminAccess ? "pro" : "basic";
+      setPlanKey(effectivePlan);
+      setIsSuperAdmin(adminAccess);
 
-      const labels = ["customers", "invoices", "expenses", "supplier payments"];
+      const requests = [
+        fetch("/api/saas/customers", { cache: "no-store", credentials: "same-origin" }),
+        fetch("/api/saas/invoices", { cache: "no-store", credentials: "same-origin" }),
+        fetch("/api/saas/expenses", { cache: "no-store", credentials: "same-origin" }),
+      ];
+      const labels = ["customers", "invoices", "expenses"];
+      if (effectivePlan === "pro") {
+        requests.push(fetch("/api/saas/supplier-payments", { cache: "no-store", credentials: "same-origin" }));
+        labels.push("supplier payments");
+      }
+      const results = await Promise.allSettled(requests);
       const data: Record<string, unknown> = {};
       const errors: string[] = [];
 
@@ -883,7 +884,7 @@ export default function FinanceDashboardPage() {
                 icon={Wallet}
                 tone="purple"
               />
-              <MetricCard
+              {(planKey === "pro" || isSuperAdmin) && <MetricCard
                 title="Supplier payments this month"
                 value={
                   loading && supplierPayments.length === 0
@@ -893,7 +894,7 @@ export default function FinanceDashboardPage() {
                 detail="Cash paid to suppliers this month; not added again to expenses"
                 icon={CreditCard}
                 tone="amber"
-              />
+              />}
             </section>
 
             <section className="grid gap-6 xl:grid-cols-[1.65fr_1fr]">
@@ -1236,7 +1237,7 @@ export default function FinanceDashboardPage() {
                 </div>
               </div>
 
-              <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+              {(planKey === "pro" || isSuperAdmin) && <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
                 <SectionTitle
                   title="Recent supplier payments"
                   subtitle="Latest payments made to suppliers"
@@ -1301,6 +1302,7 @@ export default function FinanceDashboardPage() {
                   )}
                 </div>
               </div>
+              </div>}
             </section>
 
             <footer className="flex flex-col justify-between gap-2 border-t border-slate-200 py-5 text-xs text-slate-400 sm:flex-row sm:items-center">
