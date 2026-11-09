@@ -204,6 +204,7 @@ export default function FinanceReportsPage() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState("");
+  const [planLocked, setPlanLocked] = useState(false);
 
   const load = useCallback(async (manual = false) => {
     if (manual) setRefreshing(true);
@@ -212,6 +213,14 @@ export default function FinanceReportsPage() {
     setError("");
 
     try {
+      const planResponse = await fetch("/api/saas/plan", { cache: "no-store" });
+      const planData = await planResponse.json();
+      if (!planResponse.ok) throw new Error(planData.error || "Could not verify your subscription plan.");
+      if (planData.plan?.key === "basic" && !planData.plan?.isSuperAdmin) {
+        setPlanLocked(true);
+        return;
+      }
+      setPlanLocked(false);
       const [invoiceResponse, paymentResponse, expenseResponse, supplierResponse, ownerIncomeResponse] =
         await Promise.all([
           fetch("/api/saas/invoices", { cache: "no-store" }),
@@ -482,6 +491,28 @@ export default function FinanceReportsPage() {
 
   const panel = "rounded-2xl border border-slate-200 bg-white p-5 shadow-sm";
   const maxCashBar = Math.max(1, collected, supplierPaid);
+
+  if (planLocked) {
+    return (
+      <div className="min-h-screen bg-slate-50 px-4 py-10 text-slate-900 sm:px-6">
+        <main className="mx-auto max-w-3xl rounded-3xl border border-slate-200 bg-white p-8 shadow-sm sm:p-10">
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-rose-50 text-[#F3192D]">
+            <FileBarChart size={28} />
+          </div>
+          <p className="mt-6 text-xs font-bold uppercase tracking-[.18em] text-[#F3192D]">JBCS Business Suite</p>
+          <h1 className="mt-2 text-3xl font-bold tracking-tight">Financial reports are part of Pro Accounting</h1>
+          <p className="mt-4 leading-7 text-slate-600">Your Basic plan includes invoicing, sales recording, expense recording and the basic dashboard. Upgrade to the annual Pro Accounting plan to unlock financial reports, full accounting tools, supplier payment analysis and owner income reporting.</p>
+          <div className="mt-6 rounded-2xl bg-slate-50 p-4 text-sm text-slate-700">
+            Your existing invoices, sales and expenses remain available on the Basic plan.
+          </div>
+          <div className="mt-7 flex flex-wrap gap-3">
+            <Link href="/workspace/settings" className="rounded-xl bg-[#F3192D] px-5 py-3 text-sm font-semibold text-white hover:bg-[#c91425]">View workspace settings</Link>
+            <Link href="/workspace/finance" className="rounded-xl border border-slate-200 px-5 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50">Return to dashboard</Link>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
