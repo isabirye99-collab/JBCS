@@ -56,3 +56,65 @@ grant select, insert, update, delete on public.saas_plans to service_role;
 
 comment on table public.saas_plans is 'JBCS SaaS plans. Read and manage through trusted server-side APIs only.';
 comment on column public.workspace_subscriptions.plan_key is 'SaaS plan assigned to the workspace; Basic is the free one-user plan.';
+
+-- New signups start on the free Basic plan; no trial is required to use Basic.
+-- Existing workspaces and their subscription rows are not rewritten.
+create or replace function public.provision_saas_workspace(
+  p_user_id uuid,
+  p_company_name text,
+  p_billing_currency text default 'UGX'
+)
+returns jsonb
+language plpgsql
+security definer
+set search_path to 'public', 'pg_temp'
+as $function$
+declare
+  v_workspace_id uuid;
+  v_slug text;
+  v_name text;
+  v_currency text;
+begin
+  if p_user_id is null then
+    raise exception 'Authenticated user is required';
+  end if;
+
+  v_name := nullif(trim(p_company_name), '');
+  if v_name is null or length(v_name) > 140 then
+    raise exception 'Company name must be between 1 and 140 characters';
+  end if;
+
+  v_currency := upper(coalesce(nullif(trim(p_billing_currency), ''), 'UGX'));
+  if v_currency not in ('UGX', 'USD') then
+    raise exception 'Billing currency must be UGX or USD';
+  end if;
+
+  v_slug := trim(both '-' from left(regexp_replace(lower(v_name), '[^a-z0-9]+', '-', 'g'), 40));
+  if v_slug = '' then v_slug := 'business'; end if;
+  v_slug := v_slug || '-' || replace(gen_random_uuid()::text, '-', '');
+
+  insert into public.business_workspaces(slug, name, workspace_type, base_currency, is_active)
+  values (v_slug, v_name, 'consultancy', 'UGX', true)
+  returning id into v_workspace_id;
+
+  insert into public.workspace_members(workspace_id, user_id, role, is_active)
+  values (v_workspace_id, p_user_id, 'owner', true);
+
+  insert into public.workspace_subscriptions(
+    workspace_id, billing_interval, billing_currency, status,
+    trial_started_at, trial_ends_at, plan_key
+  )
+  values (v_workspace_id, 'annual', v_currency, 'active', now(), now(), 'basic');
+
+  return jsonb_build_object(
+    'workspace_id', v_workspace_id,
+    'workspace_slug', v_slug,
+    'workspace_name', v_name,
+    'plan_key', 'basic',
+    'max_users', 1,
+    'billing_interval', 'annual',
+    'billing_currency', v_currency,
+    'subscription_status', 'active'
+  );
+end;
+$function$;
