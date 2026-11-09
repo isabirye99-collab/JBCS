@@ -145,6 +145,11 @@ const navigation: { heading: string; items: NavItem[] }[] = [
         icon: Wallet,
       },
       {
+        label: "Owner's Income & Commissions",
+        href: "/workspace/finance/owner-income",
+        icon: Wallet,
+      },
+      {
         label: "Reports",
         href: "/workspace/finance/reports",
         icon: FileBarChart,
@@ -1311,7 +1316,7 @@ export default function FinanceDashboardPage() {
             </footer>
           </div>
 
-          <nav className="sticky bottom-0 z-20 grid grid-cols-5 border-t border-slate-200 bg-white px-1 py-2 lg:hidden">
+          <nav className="sticky bottom-0 z-20 grid grid-cols-3 border-t border-slate-200 bg-white px-1 py-2 lg:hidden">
             {[
               {
                 label: "Home",
@@ -1331,6 +1336,11 @@ export default function FinanceDashboardPage() {
               {
                 label: "Expenses",
                 href: "/workspace/finance/expenses",
+                icon: Wallet,
+              },
+              {
+                label: "Owner Income",
+                href: "/workspace/finance/owner-income",
                 icon: Wallet,
               },
               {
