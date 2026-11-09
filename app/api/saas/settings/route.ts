@@ -12,7 +12,7 @@ export async function GET() {
   const response = await fetch(`${ctx.url}/rest/v1/workspace_document_branding?workspace_id=eq.${encodeURIComponent(ctx.workspaceId)}&product_key=eq.billing&select=${fields}&limit=1`, { headers: headers(ctx.serviceKey), cache: "no-store" });
   if (!response.ok) return NextResponse.json({ error: "Could not load business settings." }, { status: 502 });
   const rows = await response.json();
-  return NextResponse.json({ workspace: { id: ctx.workspaceId, name: ctx.workspaceName, role: ctx.role }, settings: Array.isArray(rows) ? rows[0] ?? null : null });
+  return NextResponse.json({ workspace: { id: ctx.workspaceId, name: ctx.workspaceName, role: ctx.role }, plan: { key: ctx.planKey, status: ctx.subscriptionStatus, maxUsers: ctx.maxUsers, isSuperAdmin: ctx.isSuperAdmin }, settings: Array.isArray(rows) ? rows[0] ?? null : null });
 }
 
 export async function PUT(request: NextRequest) {
