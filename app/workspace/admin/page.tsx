@@ -4,6 +4,8 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { Building2, RefreshCw, ShieldCheck, Users, ArrowRight, AlertCircle } from "lucide-react";
 
+type Plan = { plan_key: string; name: string; description: string; price_amount: number | string | null; currency: string; billing_interval: string; max_users: number | null; is_active: boolean };
+
 type Workspace = {
   id: string;
   name: string;
@@ -20,6 +22,13 @@ type Workspace = {
 
 export default function SuperAdminPage() {
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
+  const [plans, setPlans] = useState<Plan[]>([]);
+  const [proPrice, setProPrice] = useState("");
+  const [proCurrency, setProCurrency] = useState("UGX");
+  const [proMaxUsers, setProMaxUsers] = useState("");
+  const [planSaving, setPlanSaving] = useState(false);
+  const [planError, setPlanError] = useState("");
+  const [planNotice, setPlanNotice] = useState("");
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState("");
@@ -32,6 +41,20 @@ export default function SuperAdminPage() {
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Could not load customer workspaces.");
       setWorkspaces(Array.isArray(data.workspaces) ? data.workspaces : []);
+      const planResponse = await fetch("/api/saas/admin/plans", { cache: "no-store" });
+      const planData = await planResponse.json();
+      if (!planResponse.ok) {
+        setPlanError(planData.error || "Plan pricing is not available yet.");
+      } else {
+        const availablePlans = Array.isArray(planData.plans) ? planData.plans : [];
+        setPlans(availablePlans);
+        const pro = availablePlans.find((item: Plan) => item.plan_key === "pro");
+        if (pro) {
+          setProPrice(pro.price_amount == null ? "" : String(pro.price_amount));
+          setProCurrency(pro.currency || "UGX");
+          setProMaxUsers(pro.max_users == null ? "" : String(pro.max_users));
+        }
+      }
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not load customer workspaces.");
     } finally {
@@ -41,6 +64,30 @@ export default function SuperAdminPage() {
   }, []);
 
   useEffect(() => { void load(); }, [load]);
+
+  const saveProPlan = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setPlanSaving(true);
+    setPlanError("");
+    setPlanNotice("");
+    try {
+      const response = await fetch("/api/saas/admin/plans", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ plan_key: "pro", price_amount: proPrice, currency: proCurrency, max_users: proMaxUsers }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Could not save plan settings.");
+      setPlanNotice("Annual Pro Accounting pricing saved.");
+      const refresh = await fetch("/api/saas/admin/plans", { cache: "no-store" });
+      const refreshData = await refresh.json();
+      if (refresh.ok && Array.isArray(refreshData.plans)) setPlans(refreshData.plans);
+    } catch (e) {
+      setPlanError(e instanceof Error ? e.message : "Could not save plan settings.");
+    } finally {
+      setPlanSaving(false);
+    }
+  };
 
   const active = workspaces.filter((w) => w.is_active).length;
   const paid = workspaces.filter((w) => w.planKey === "pro" && w.subscriptionStatus === "active").length;
@@ -69,6 +116,26 @@ export default function SuperAdminPage() {
           <article className="rounded-2xl border border-slate-200 bg-white p-5"><p className="text-sm text-slate-500">Registered workspaces</p><p className="mt-2 text-3xl font-bold">{loading ? "—" : workspaces.length}</p></article>
           <article className="rounded-2xl border border-slate-200 bg-white p-5"><p className="text-sm text-slate-500">Active workspaces</p><p className="mt-2 text-3xl font-bold">{loading ? "—" : active}</p></article>
           <article className="rounded-2xl border border-slate-200 bg-white p-5"><p className="text-sm text-slate-500">Active Pro subscriptions</p><p className="mt-2 text-3xl font-bold">{loading ? "—" : paid}</p></article>
+        </section>
+
+        <section className="mb-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm md:p-6">
+          <div className="mb-5">
+            <p className="text-xs font-bold uppercase tracking-[.16em] text-rose-600">Commercial settings</p>
+            <h2 className="mt-1 text-xl font-bold">Subscription plans</h2>
+            <p className="mt-1 text-sm text-slate-500">Basic stays free with one registered user. Configure the annual Pro price and its user limit here.</p>
+          </div>
+          {planError && <div role="alert" className="mb-4 rounded-xl border border-rose-200 bg-rose-50 p-3 text-sm text-rose-800">{planError}</div>}
+          {planNotice && <div role="status" className="mb-4 rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-800">{planNotice}</div>}
+          <div className="mb-5 grid gap-3 sm:grid-cols-2">
+            <article className="rounded-xl border border-slate-200 bg-slate-50 p-4"><p className="font-bold">Basic</p><p className="mt-1 text-2xl font-bold">Free</p><p className="mt-1 text-sm text-slate-500">Invoicing, quotations, sales, expenses and basic dashboard · 1 user</p></article>
+            <article className="rounded-xl border border-rose-100 bg-rose-50/50 p-4"><p className="font-bold">Pro Accounting</p><p className="mt-1 text-2xl font-bold">{plans.find((p) => p.plan_key === "pro")?.price_amount == null ? "Price not set" : `${proCurrency} ${Number(proPrice).toLocaleString()}`}</p><p className="mt-1 text-sm text-slate-500">Annual billing · full accounting and advanced reports</p></article>
+          </div>
+          <form onSubmit={saveProPlan} className="grid gap-4 sm:grid-cols-3">
+            <label className="block text-sm font-medium text-slate-700">Annual Pro price<input required type="number" min="1" step="0.01" value={proPrice} onChange={(e) => setProPrice(e.target.value)} className="mt-1.5 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5" placeholder="Enter annual price" /></label>
+            <label className="block text-sm font-medium text-slate-700">Currency<select value={proCurrency} onChange={(e) => setProCurrency(e.target.value)} className="mt-1.5 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5"><option value="UGX">UGX</option><option value="USD">USD</option></select></label>
+            <label className="block text-sm font-medium text-slate-700">Maximum users<input type="number" min="2" step="1" value={proMaxUsers} onChange={(e) => setProMaxUsers(e.target.value)} className="mt-1.5 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5" placeholder="Leave blank for no limit" /></label>
+            <div className="sm:col-span-3"><button disabled={planSaving} className="rounded-xl bg-rose-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-rose-700 disabled:opacity-60">{planSaving ? "Saving…" : "Save annual Pro plan"}</button></div>
+          </form>
         </section>
 
         <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
