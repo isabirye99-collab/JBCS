@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { Building2, RefreshCw, ShieldCheck, Users, ArrowRight, AlertCircle } from "lucide-react";
 
@@ -65,7 +65,7 @@ export default function SuperAdminPage() {
 
   useEffect(() => { void load(); }, [load]);
 
-  const saveProPlan = async (event: React.FormEvent<HTMLFormElement>) => {
+  const saveProPlan = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setPlanSaving(true);
     setPlanError("");
