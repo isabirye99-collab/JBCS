@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useCallback,useEffect,useState,type FormEvent } from "react";
 import { ArrowLeft,Building2,Palette,CreditCard,Save,LayoutDashboard,Settings as SettingsIcon } from "lucide-react";
 type FormData = { [key:string]: string };
-type TeamMember = { id:string; email:string; role:string; is_active:boolean; isSelf:boolean; created_at?:string };
+type TeamMember = { id:string; user_id?:string; email:string; role:string; is_active:boolean; isSelf:boolean; created_at?:string };
 const defaults:FormData={company_name:"",legal_name:"",logo_url:"",address:"",phone:"",email:"",website:"",registration_number:"",tax_number:"",primary_color:"#9F1D35",secondary_color:"#F3192D",font_family:"Inter",template_style:"modern",logo_position:"left",footer_text:"",bank_name:"",bank_account_name:"",bank_account_number:"",bank_branch:"",bank_currency:"UGX",bank_swift_code:"",payment_instructions:""};
 const fields = "mt-1.5 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-50";
 export default function WorkspaceSettingsPage(){
