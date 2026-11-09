@@ -16,11 +16,14 @@ export async function GET() {
   if (!url || !serviceKey) return NextResponse.json({ error: "Account services are not configured." }, { status: 503 });
   const headers = { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` };
 
-  const [workspaceResponse, subscriptionResponse, memberResponse] = await Promise.all([
+  const [workspaceResponse, initialSubscriptionResponse, memberResponse] = await Promise.all([
     fetch(`${url}/rest/v1/business_workspaces?select=id,name,slug,is_active,base_currency,created_at&order=created_at.desc&limit=1000`, { headers, cache: "no-store" }),
     fetch(`${url}/rest/v1/workspace_subscriptions?select=workspace_id,plan_key,status,billing_interval,billing_currency,trial_ends_at,current_period_ends_at&limit=2000`, { headers, cache: "no-store" }),
     fetch(`${url}/rest/v1/workspace_members?is_active=eq.true&select=workspace_id&limit=5000`, { headers, cache: "no-store" }),
   ]);
+  const subscriptionResponse = initialSubscriptionResponse.ok
+    ? initialSubscriptionResponse
+    : await fetch(`${url}/rest/v1/workspace_subscriptions?select=workspace_id,status,billing_interval,billing_currency,trial_ends_at,current_period_ends_at&limit=2000`, { headers, cache: "no-store" });
 
   if (!workspaceResponse.ok) return NextResponse.json({ error: "Could not load customer workspaces." }, { status: 502 });
   const workspaces = await workspaceResponse.json();
@@ -35,7 +38,7 @@ export async function GET() {
     const paidValid = subscription?.status === "active" &&
       (!subscription.current_period_ends_at || Date.parse(subscription.current_period_ends_at) > now);
     const trialValid = subscription?.status === "trialing" && Date.parse(subscription.trial_ends_at || "") > now;
-    const planKey = paidValid ? (subscription.plan_key || "basic") : trialValid ? "pro" : "basic";
+    const planKey = paidValid ? (subscription.plan_key || "pro") : trialValid ? "pro" : "basic";
     return {
       ...workspace,
       planKey,
