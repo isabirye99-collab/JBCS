@@ -192,6 +192,7 @@ export default function FinanceReportsPage() {
   const [payments, setPayments] = useState<Row[]>([]);
   const [expenses, setExpenses] = useState<Row[]>([]);
   const [supplierPayments, setSupplierPayments] = useState<Row[]>([]);
+  const [ownerIncomePayments, setOwnerIncomePayments] = useState<Row[]>([]);
 
   const [start, setStart] = useState(() => {
     const date = new Date();
@@ -211,19 +212,21 @@ export default function FinanceReportsPage() {
     setError("");
 
     try {
-      const [invoiceResponse, paymentResponse, expenseResponse, supplierResponse] =
+      const [invoiceResponse, paymentResponse, expenseResponse, supplierResponse, ownerIncomeResponse] =
         await Promise.all([
           fetch("/api/saas/invoices", { cache: "no-store" }),
           fetch("/api/saas/payments", { cache: "no-store" }),
           fetch("/api/saas/expenses", { cache: "no-store" }),
           fetch("/api/saas/supplier-payments", { cache: "no-store" }),
+          fetch("/api/saas/owner-income", { cache: "no-store" }),
         ]);
 
-      const [invoiceData, paymentData, expenseData, supplierData] = await Promise.all([
+      const [invoiceData, paymentData, expenseData, supplierData, ownerIncomeData] = await Promise.all([
         invoiceResponse.json(),
         paymentResponse.json(),
         expenseResponse.json(),
         supplierResponse.json(),
+        ownerIncomeResponse.json(),
       ]);
 
       const failures = [
@@ -232,6 +235,8 @@ export default function FinanceReportsPage() {
         !expenseResponse.ok && (expenseData.error || "Expenses could not be loaded."),
         !supplierResponse.ok &&
           (supplierData.error || "Supplier payments could not be loaded."),
+        !ownerIncomeResponse.ok &&
+          (ownerIncomeData.error || "Owner income and commission payments could not be loaded."),
         supplierData.migration_required &&
           "Supplier payment records could not be loaded. Check the supplier payments database setup.",
       ].filter(Boolean);
@@ -243,6 +248,9 @@ export default function FinanceReportsPage() {
       setExpenses(Array.isArray(expenseData.expenses) ? expenseData.expenses : []);
       setSupplierPayments(
         Array.isArray(supplierData.payments) ? supplierData.payments : []
+      );
+      setOwnerIncomePayments(
+        Array.isArray(ownerIncomeData.payments) ? ownerIncomeData.payments : []
       );
     } catch (e) {
       setError(
@@ -282,6 +290,47 @@ export default function FinanceReportsPage() {
     () => supplierPayments.filter(inRange),
     [supplierPayments, start, end]
   );
+
+  const reportOwnerIncomePayments = useMemo(
+    () => ownerIncomePayments.filter(inRange),
+    [ownerIncomePayments, start, end]
+  );
+
+  const ownerIncomeReceived = reportOwnerIncomePayments.reduce((sum, row) => sum + amount(row), 0);
+  const formatCurrencyTotals = (rows: Row[]) => {
+    const totals = new Map<string, number>();
+    rows.forEach((row) => {
+      const currency = String(row.currency ?? "UGX").toUpperCase();
+      totals.set(currency, (totals.get(currency) ?? 0) + amount(row));
+    });
+    return [...totals.entries()].map(([currency, total]) => money(total, currency)).join(" · ") || money(0);
+  };
+
+  const dailyOwnerIncome = useMemo(() => {
+    const totals = new Map<string, { date: string; currency: string; total: number; count: number }>();
+    reportOwnerIncomePayments.forEach((row) => {
+      const date = dateOf(row);
+      const currency = String(row.currency ?? "UGX").toUpperCase();
+      if (!date) return;
+      const key = `${date}|${currency}`;
+      const current = totals.get(key) ?? { date, currency, total: 0, count: 0 };
+      current.total += amount(row); current.count += 1; totals.set(key, current);
+    });
+    return [...totals.values()].sort((a, b) => b.date.localeCompare(a.date) || a.currency.localeCompare(b.currency));
+  }, [reportOwnerIncomePayments]);
+
+  const monthlyOwnerIncome = useMemo(() => {
+    const totals = new Map<string, { month: string; currency: string; total: number; count: number }>();
+    reportOwnerIncomePayments.forEach((row) => {
+      const date = dateOf(row);
+      const currency = String(row.currency ?? "UGX").toUpperCase();
+      if (!date) return;
+      const month = date.slice(0, 7); const key = `${month}|${currency}`;
+      const current = totals.get(key) ?? { month, currency, total: 0, count: 0 };
+      current.total += amount(row); current.count += 1; totals.set(key, current);
+    });
+    return [...totals.values()].sort((a, b) => b.month.localeCompare(a.month) || a.currency.localeCompare(b.currency));
+  }, [reportOwnerIncomePayments]);
 
   const invoiced = reportInvoices.reduce((sum, row) => sum + amount(row), 0);
   const collected = reportPayments.reduce((sum, row) => sum + amount(row), 0);
@@ -389,6 +438,18 @@ export default function FinanceReportsPage() {
         String(amount(row)),
       ]),
 
+      ...reportOwnerIncomePayments.map((row) => [
+        "Owner Income / Commission Receipt",
+        dateOf(row),
+        String(row.payment_reference ?? row.id ?? ""),
+        String(row.entry_description ?? row.entry_category ?? row.notes ?? "Owner income / commission"),
+        "",
+        "",
+        "received",
+        String(row.currency ?? "UGX"),
+        String(amount(row)),
+      ]),
+
       ...reportSupplierPayments.map((row) => [
         "Supplier Payment",
         dateOf(row),
@@ -437,7 +498,7 @@ export default function FinanceReportsPage() {
                 Financial reports
               </h1>
               <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
-                Review invoices, customer collections, expenses and supplier payments
+                Review invoices, customer collections, owner income received, expenses and supplier payments
                 for your selected reporting period.
               </p>
             </div>
@@ -562,6 +623,14 @@ export default function FinanceReportsPage() {
                   detail={`${reportPayments.length} customer payment record(s)`}
                   icon={TrendingUp}
                   tone="bg-emerald-50 text-emerald-700"
+                />
+
+                <Metric
+                  title="Owner income received"
+                  value={formatCurrencyTotals(reportOwnerIncomePayments)}
+                  detail={`${reportOwnerIncomePayments.length} owner income / commission payment(s)`}
+                  icon={TrendingUp}
+                  tone="bg-sky-50 text-sky-700"
                 />
 
                 <Metric
@@ -696,6 +765,25 @@ export default function FinanceReportsPage() {
                     </div>
                   </div>
                 </article>
+              </section>
+
+              <section className={`${panel} mb-6`}>
+                <div className="mb-4">
+                  <h2 className="text-lg font-bold">Owner income received by day and month</h2>
+                  <p className="mt-1 text-sm text-slate-500">Based on actual recorded payment dates, including partial payments. Only payments within the selected reporting period are included.</p>
+                </div>
+                <div className="grid gap-5 xl:grid-cols-2">
+                  <div className="overflow-x-auto rounded-xl border border-slate-100">
+                    <h3 className="border-b border-slate-100 bg-slate-50 px-4 py-3 text-sm font-semibold">Daily receipts</h3>
+                    <table className="w-full min-w-[390px] text-left text-sm"><thead className="text-xs uppercase text-slate-500"><tr><th className="px-4 py-3">Date</th><th className="px-4 py-3">Currency</th><th className="px-4 py-3">Received</th><th className="px-4 py-3">Payments</th></tr></thead><tbody className="divide-y divide-slate-100">{dailyOwnerIncome.map((row) => <tr key={`${row.date}-${row.currency}`}><td className="px-4 py-3">{labelDate(row.date)}</td><td className="px-4 py-3">{row.currency}</td><td className="px-4 py-3 font-semibold">{money(row.total, row.currency)}</td><td className="px-4 py-3">{row.count}</td></tr>)}</tbody></table>
+                    {!dailyOwnerIncome.length && <p className="p-5 text-sm text-slate-500">No owner income receipts in this period.</p>}
+                  </div>
+                  <div className="overflow-x-auto rounded-xl border border-slate-100">
+                    <h3 className="border-b border-slate-100 bg-slate-50 px-4 py-3 text-sm font-semibold">Month-end receipts</h3>
+                    <table className="w-full min-w-[390px] text-left text-sm"><thead className="text-xs uppercase text-slate-500"><tr><th className="px-4 py-3">Month</th><th className="px-4 py-3">Currency</th><th className="px-4 py-3">Received</th><th className="px-4 py-3">Payments</th></tr></thead><tbody className="divide-y divide-slate-100">{monthlyOwnerIncome.map((row) => <tr key={`${row.month}-${row.currency}`}><td className="px-4 py-3">{row.month}</td><td className="px-4 py-3">{row.currency}</td><td className="px-4 py-3 font-semibold">{money(row.total, row.currency)}</td><td className="px-4 py-3">{row.count}</td></tr>)}</tbody></table>
+                    {!monthlyOwnerIncome.length && <p className="p-5 text-sm text-slate-500">No owner income receipts in this period.</p>}
+                  </div>
+                </div>
               </section>
 
               <section className={`${panel} mb-6`}>
