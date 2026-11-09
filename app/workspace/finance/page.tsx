@@ -739,6 +739,7 @@ export default function FinanceDashboardPage() {
               </div>
 
               <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+                {isSuperAdmin && <Link href="/workspace/admin" className="hidden rounded-xl bg-slate-900 px-3 py-2.5 text-xs font-semibold text-white hover:bg-slate-700 sm:inline-flex">Platform Admin</Link>}
                 <button
                   type="button"
                   onClick={() => void loadDashboard(true)}
