@@ -84,10 +84,15 @@ export async function POST(request: NextRequest) {
 
     const memberships = await getWorkspaceForUser(String(auth.user.id));
 
-    if (memberships?.length === 1) {
-      const workspaceId = memberships[0].workspace_id;
+    // Give the JBCS account its expected finance workspace when it belongs
+    // to more than one workspace. Keep single-workspace accounts automatic,
+    // and do not guess for accounts with multiple non-JBCS workspaces.
+    const preferredWorkspace =
+      memberships?.find((item: any) => item.business_workspaces?.slug === "jbcs") ??
+      (memberships?.length === 1 ? memberships[0] : null);
 
-      response.cookies.set("johden_selected_workspace", workspaceId, {
+    if (preferredWorkspace?.workspace_id) {
+      response.cookies.set("johden_selected_workspace", preferredWorkspace.workspace_id, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
