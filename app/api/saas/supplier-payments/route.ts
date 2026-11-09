@@ -1,6 +1,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { getSaasContext } from "@/lib/saas-context";
+import { hasSaasFeature, saasFeatureError } from "@/lib/saas-entitlements";
 
 export const dynamic = "force-dynamic";
 
