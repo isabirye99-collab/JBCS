@@ -667,7 +667,7 @@ export default function FinanceDashboardPage() {
                 </p>
 
                 <nav className="space-y-1">
-                  {group.items.map((item) => {
+                  {group.items.filter((item) => isSuperAdmin || planKey === "pro" || !["Owner's Income & Commissions", "Reports"].includes(item.label)).map((item) => {
                     const Icon = item.icon;
                     const active = item.label === "Dashboard";
 
