@@ -395,6 +395,10 @@ export default function FinanceDashboardPage() {
         if (active && typeof data?.email === "string") {
           setAccountEmail(data.email);
         }
+        if (active && data?.isSuperAdmin === true) {
+          setIsSuperAdmin(true);
+          setPlanKey("pro");
+        }
       })
       .catch(() => {
         // Keep the dashboard usable if account details cannot be loaded.
