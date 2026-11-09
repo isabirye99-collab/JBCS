@@ -17,7 +17,7 @@ export async function GET() {
   }
 
   return NextResponse.json(
-    { email: session.user.email },
+    { email: session.user.email, isSuperAdmin: Boolean(process.env.JBCS_ADMIN_EMAIL?.trim()) && session.user.email.trim().toLowerCase() === process.env.JBCS_ADMIN_EMAIL?.trim().toLowerCase() },
     { headers: { "Cache-Control": "no-store" } }
   );
 }
