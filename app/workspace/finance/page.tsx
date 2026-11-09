@@ -298,7 +298,7 @@ function StatusBadge({ status }: { status?: string | null }) {
 }
 
 function AnimatedMetricValue({ value }: { value: string }) {
-  const numericPart = value.match(/-?[\\d,]+(?:\\.\\d+)?/);
+  const numericPart = value.match(/-?[\d,]+(?:\.\d+)?/);
   const target = numericPart ? Number(numericPart[0].replace(/,/g, "")) : null;
   const [current, setCurrent] = useState(0);
 
