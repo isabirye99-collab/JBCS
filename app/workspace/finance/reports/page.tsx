@@ -15,6 +15,7 @@ import {
   FileText,
   LayoutDashboard,
   Package,
+  PieChart,
   Receipt,
   RefreshCw,
   Settings,
@@ -185,6 +186,60 @@ function Metric({
       <p className="mt-3 text-xs text-slate-500">{detail}</p>
     </article>
   );
+}
+
+
+const REPORT_CHART_COLORS = ["#9f1d35", "#f97316", "#0f766e", "#6366f1", "#0891b2", "#a855f7"];
+
+function AnimatedDonut({ data, total }: { data: [string, number][]; total: number }) {
+  const visible = data.filter(([, value]) => value > 0).slice(0, 6);
+  if (!visible.length || total <= 0) {
+    return <div className="flex min-h-52 items-center justify-center rounded-xl bg-slate-50 text-sm text-slate-500">No category data for this period.</div>;
+  }
+  let offset = 0;
+  const segments = visible.map(([name, value], index) => {
+    const percentage = (value / total) * 100;
+    const segment = { name, value, percentage, offset, color: REPORT_CHART_COLORS[index % REPORT_CHART_COLORS.length] };
+    offset += percentage;
+    return segment;
+  });
+  return <div className="grid items-center gap-5 sm:grid-cols-[minmax(150px,.8fr)_1fr]">
+    <div className="report-donut-wrap">
+      <svg viewBox="0 0 42 42" className="report-donut" role="img" aria-label="Expense category distribution">
+        <circle cx="21" cy="21" r="15.915" fill="none" stroke="#f1f5f9" strokeWidth="6" />
+        {segments.map((segment) => <circle key={segment.name} className="report-donut-segment" cx="21" cy="21" r="15.915" fill="none" stroke={segment.color} strokeWidth="6" pathLength="100" strokeDasharray={`${segment.percentage} ${100 - segment.percentage}`} strokeDashoffset={-segment.offset} style={{ animationDelay: `${segments.indexOf(segment) * 120}ms` }} />)}
+        <text x="21" y="20" textAnchor="middle" className="report-donut-total">{segments.length}</text>
+        <text x="21" y="24.5" textAnchor="middle" className="report-donut-caption">categories</text>
+      </svg>
+    </div>
+    <div className="space-y-3">{segments.map((segment) => <div key={segment.name} className="flex items-center gap-3">
+      <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: segment.color }} />
+      <span className="min-w-0 flex-1 truncate text-sm text-slate-600">{segment.name}</span>
+      <span className="text-right text-xs font-semibold tabular-nums text-slate-900">{segment.percentage.toFixed(1)}%</span>
+    </div>)}</div>
+  </div>;
+}
+
+function AnimatedTrendChart({ data }: { data: { month: string; invoiced: number; collected: number; expenses: number }[] }) {
+  const maxValue = Math.max(1, ...data.flatMap((row) => [row.invoiced, row.collected, row.expenses]));
+  if (!data.length) return <div className="flex min-h-64 items-center justify-center rounded-xl bg-slate-50 text-sm text-slate-500">No monthly activity found for this period.</div>;
+  return <div>
+    <div className="mb-4 flex flex-wrap gap-x-5 gap-y-2 text-xs text-slate-600">
+      {[["Invoiced", "#9f1d35"], ["Collected", "#0f766e"], ["Expenses", "#f97316"]].map(([label, color]) => <span key={label} className="inline-flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-sm" style={{ backgroundColor: color }} />{label}</span>)}
+    </div>
+    <div className="report-chart-grid relative grid h-64 grid-cols-6 items-end gap-3 rounded-xl px-2 pb-2 pt-5 sm:gap-5">
+      {data.map((row, index) => <div key={row.month} className="relative z-10 flex h-full min-w-0 flex-col justify-end">
+        <div className="flex min-h-0 flex-1 items-end justify-center gap-1 sm:gap-1.5">
+          {[["invoiced", "#9f1d35"], ["collected", "#0f766e"], ["expenses", "#f97316"]].map(([key, color], seriesIndex) => {
+            const value = row[key as "invoiced" | "collected" | "expenses"];
+            return <div key={key} className="report-animated-bar w-full max-w-5 rounded-t-md" title={`${key}: ${money(value)}`} style={{ height: `${Math.max(value > 0 ? 3 : 0, value / maxValue * 100)}%`, backgroundColor: color, animationDelay: `${index * 90 + seriesIndex * 70}ms` }} />;
+          })}
+        </div>
+        <span className="mt-2 truncate text-center text-[10px] font-medium text-slate-500">{row.month}</span>
+      </div>)}
+    </div>
+    <p className="mt-3 text-xs text-slate-400">Bars animate on load. Hover over a bar to inspect its recorded value.</p>
+  </div>;
 }
 
 export default function FinanceReportsPage() {
@@ -380,6 +435,22 @@ export default function FinanceReportsPage() {
       .sort((a, b) => b[1] - a[1])
       .slice(0, 6);
   }, [reportExpenses]);
+
+  const monthlyFinancialTrend = useMemo(() => {
+    const totals = new Map<string, { month: string; invoiced: number; collected: number; expenses: number }>();
+    const addRows = (rows: Row[], field: "invoiced" | "collected" | "expenses") => rows.forEach((row) => {
+      const date = dateOf(row);
+      if (!date) return;
+      const month = date.slice(0, 7);
+      const current = totals.get(month) ?? { month, invoiced: 0, collected: 0, expenses: 0 };
+      current[field] += amount(row);
+      totals.set(month, current);
+    });
+    addRows(reportInvoices, "invoiced");
+    addRows(reportPayments, "collected");
+    addRows(reportExpenses, "expenses");
+    return [...totals.values()].sort((a, b) => a.month.localeCompare(b.month)).slice(-6).map((row) => ({ ...row, month: new Date(row.month + "-01T00:00:00").toLocaleDateString("en-UG", { month: "short", year: "2-digit" }) }));
+  }, [reportInvoices, reportPayments, reportExpenses]);
 
   const recentInvoices = useMemo(
     () =>
@@ -687,6 +758,42 @@ export default function FinanceReportsPage() {
                   icon={Activity}
                   tone="bg-violet-50 text-violet-700"
                 />
+              </section>
+
+              <section className={`${panel} mb-6 report-chart-panel`}>
+                <div className="mb-5 flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-[.16em] text-[#9f1d35]">Visual analytics</p>
+                    <h2 className="mt-1 text-xl font-bold tracking-tight text-slate-900">Financial performance</h2>
+                    <p className="mt-1 text-sm text-slate-500">Compare invoiced sales, customer collections and recorded expenses over the selected period.</p>
+                  </div>
+                  <span className="rounded-xl border border-rose-100 bg-rose-50 p-3 text-[#9f1d35]"><ChartNoAxesCombined size={21} /></span>
+                </div>
+                <AnimatedTrendChart data={monthlyFinancialTrend} />
+              </section>
+
+              <section className="mb-6 grid gap-5 xl:grid-cols-2">
+                <article className={panel}>
+                  <div className="mb-5 flex items-start justify-between gap-3">
+                    <div><h2 className="text-lg font-bold">Expense mix</h2><p className="mt-1 text-sm text-slate-500">Pie chart of recorded expenses by category.</p></div>
+                    <span className="rounded-xl bg-amber-50 p-2.5 text-amber-700"><PieChart size={20} /></span>
+                  </div>
+                  <AnimatedDonut data={categories} total={spent} />
+                  <p className="mt-4 text-xs text-slate-400">Category percentages use recorded expense totals in the selected period. Supplier payments remain separate to avoid double-counting.</p>
+                </article>
+                <article className={panel}>
+                  <div className="mb-5 flex items-start justify-between gap-3">
+                    <div><h2 className="text-lg font-bold">Cash movement</h2><p className="mt-1 text-sm text-slate-500">Customer collections compared with supplier payments.</p></div>
+                    <span className="rounded-xl bg-emerald-50 p-2.5 text-emerald-700"><Activity size={20} /></span>
+                  </div>
+                  <div className="space-y-5 pt-2">
+                    {[{ label: "Customer collections", value: collected, color: "#0f766e" }, { label: "Supplier payments", value: supplierPaid, color: "#f97316" }].map((item, index) => <div key={item.label}>
+                      <div className="mb-2 flex items-center justify-between gap-3 text-sm"><span className="text-slate-600">{item.label}</span><strong className="tabular-nums">{money(item.value)}</strong></div>
+                      <div className="h-3 overflow-hidden rounded-full bg-slate-100"><div className="report-animated-bar h-full rounded-full" style={{ width: `${Math.min(100, item.value / Math.max(1, collected, supplierPaid) * 100)}%`, backgroundColor: item.color, animationDelay: `${index * 160}ms` }} /></div>
+                    </div>)}
+                    <div className="rounded-xl bg-slate-50 p-4"><p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Net customer-to-supplier movement</p><p className={`mt-2 text-2xl font-bold ${collected - supplierPaid >= 0 ? "text-emerald-700" : "text-rose-700"}`}>{money(collected - supplierPaid)}</p><p className="mt-2 text-xs leading-5 text-slate-500">Collections minus supplier payments only; other cash movements are not included.</p></div>
+                  </div>
+                </article>
               </section>
 
               <section className="mb-6 grid gap-5 xl:grid-cols-[1.2fr_.8fr]">
