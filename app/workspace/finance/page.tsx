@@ -1242,71 +1242,56 @@ export default function FinanceDashboardPage() {
                 </div>
               </div>
 
-              {(planKey === "pro" || isSuperAdmin) && <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-                <SectionTitle
-                  title="Recent supplier payments"
-                  subtitle="Latest payments made to suppliers"
-                  href="/workspace/finance/supplier-payments"
-                />
-
-                <div className="mt-5 divide-y divide-slate-100">
-                  {loading && supplierPayments.length === 0 ? (
-                    <div className="flex items-center justify-center py-10 text-sm text-slate-500">
-                      <LoaderCircle
-                        size={18}
-                        className="mr-2 animate-spin text-[#F3192D]"
-                      />
-                      Loading supplier payments...
-                    </div>
-                  ) : stats.recentSupplierPayments.length === 0 ? (
-                    <div className="py-10 text-center">
-                      <CreditCard size={25} className="mx-auto text-slate-300" />
-                      <p className="mt-3 text-sm font-semibold text-slate-700">
-                        No supplier payments recorded
-                      </p>
-                      <p className="mt-1 text-xs text-slate-500">
-                        Payments made to suppliers will appear here.
-                      </p>
-                      <Link
-                        href="/workspace/finance/supplier-payments"
-                        className="mt-4 inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
-                      >
-                        <Plus size={16} />
-                        View supplier payments
-                      </Link>
-                    </div>
-                  ) : (
-                    stats.recentSupplierPayments.map((payment) => (
-                      <div
-                        key={payment.id}
-                        className="flex items-center gap-3 py-4"
-                      >
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-50 text-violet-700">
-                          <CreditCard size={19} />
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <p className="truncate text-sm font-semibold text-slate-800">
-                            {payment.supplier_name || "Supplier"}
-                          </p>
-                          <p className="mt-1 truncate text-xs text-slate-500">
-                            {payment.payment_reference || payment.payment_method || "Supplier payment"} Ã‚Â·{" "}
-                            {dateLabel(payment.payment_date ?? payment.created_at)}
-                          </p>
-                          {(payment.expense_description || payment.invoice_number) && (
-                            <p className="mt-1 truncate text-xs text-slate-400">
-                              {payment.expense_description ||
-                                (payment.invoice_number ? `Invoice ${payment.invoice_number}` : "")}
-                            </p>
-                          )}
-                        </div>
-                        <p className="shrink-0 text-sm font-semibold text-slate-800">
-                          {money(supplierPaymentAmount(payment), payment.currency || "UGX")}
-                        </p>
+              {(planKey === "pro" || isSuperAdmin) ? (
+                <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+                  <SectionTitle
+                    title="Recent supplier payments"
+                    subtitle="Latest payments made to suppliers"
+                    href="/workspace/finance/supplier-payments"
+                  />
+                  <div className="mt-5 divide-y divide-slate-100">
+                    {loading && supplierPayments.length === 0 ? (
+                      <div className="flex items-center justify-center py-10 text-sm text-slate-500">
+                        <LoaderCircle size={18} className="mr-2 animate-spin text-[#F3192D]" />
+                        Loading supplier payments...
                       </div>
-                    ))
-                  )}
+                    ) : stats.recentSupplierPayments.length === 0 ? (
+                      <div className="py-10 text-center">
+                        <CreditCard size={25} className="mx-auto text-slate-300" />
+                        <p className="mt-3 text-sm font-semibold text-slate-700">No supplier payments recorded</p>
+                        <p className="mt-1 text-xs text-slate-500">Payments made to suppliers will appear here.</p>
+                        <Link href="/workspace/finance/supplier-payments" className="mt-4 inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50">
+                          <Plus size={16} />
+                          View supplier payments
+                        </Link>
+                      </div>
+                    ) : (
+                      stats.recentSupplierPayments.map((payment) => (
+                        <div key={payment.id} className="flex items-center gap-3 py-4">
+                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-50 text-violet-700">
+                            <CreditCard size={19} />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="truncate text-sm font-semibold text-slate-800">{payment.supplier_name || "Supplier"}</p>
+                            <p className="mt-1 truncate text-xs text-slate-500">
+                              {payment.payment_reference || payment.payment_method || "Supplier payment"} ·{" "}
+                              {dateLabel(payment.payment_date ?? payment.created_at)}
+                            </p>
+                            {(payment.expense_description || payment.invoice_number) && (
+                              <p className="mt-1 truncate text-xs text-slate-400">
+                                {payment.expense_description || (payment.invoice_number ? `Invoice ${payment.invoice_number}` : "")}
+                              </p>
+                            )}
+                          </div>
+                          <p className="shrink-0 text-sm font-semibold text-slate-800">
+                            {money(supplierPaymentAmount(payment), payment.currency || "UGX")}
+                          </p>
+                        </div>
+                      ))
+                    )}
+                  </div>
                 </div>
-              </div>}
+              ) : null}
             </section>
 
             <footer className="flex flex-col justify-between gap-2 border-t border-slate-200 py-5 text-xs text-slate-400 sm:flex-row sm:items-center">
