@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSaasContext } from "@/lib/saas-context";
+import { hasSaasFeature, saasFeatureError } from "@/lib/saas-entitlements";
 
 export const dynamic = "force-dynamic";
 const methods = ["cash", "bank_transfer", "mobile_money", "card", "cheque", "other"];
@@ -10,6 +11,7 @@ const headers = (ctx: { serviceKey: string }) => ({ apikey: ctx.serviceKey, Auth
 export async function GET() {
   const ctx = await getSaasContext();
   if ("error" in ctx) return NextResponse.json({ error: ctx.error }, { status: ctx.status });
+  if (!hasSaasFeature(ctx, "full_accounting")) return NextResponse.json({ error: saasFeatureError("full_accounting") }, { status: 403 });
   const response = await fetch(`${ctx.url}/rest/v1/owner_income_entries?workspace_id=eq.${encodeURIComponent(ctx.workspaceId)}&select=id,entry_type,recipient,category,payer,description,earned_date,expected_payment_date,amount,amount_received,currency,payment_method,payment_reference,status,notes,created_at&order=earned_date.desc&limit=500`, { headers: headers(ctx), cache: "no-store" });
   if (!response.ok) return NextResponse.json({ error: "Unable to load owner income records." }, { status: 502 });
   const entries = await response.json();
@@ -21,6 +23,7 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   const ctx = await getSaasContext();
   if ("error" in ctx) return NextResponse.json({ error: ctx.error }, { status: ctx.status });
+  if (!hasSaasFeature(ctx, "full_accounting")) return NextResponse.json({ error: saasFeatureError("full_accounting") }, { status: 403 });
   let body: Record<string, unknown>;
   try { body = await request.json(); } catch { return NextResponse.json({ error: "Enter valid details." }, { status: 400 }); }
   const base = `${ctx.url}/rest/v1`;
