@@ -115,11 +115,11 @@ export async function getSaasContext() {
        Date.parse(s.current_period_ends_at) > now))
   );
   const storedPlanKey = subscriptions.find((s: any) => s?.plan_key)?.plan_key ?? "basic";
-  // An unexpired trial keeps the existing full-access trial behaviour. When a
-  // paid period expires, access safely falls back to Basic without deleting data.
-  const planKey = isSuperAdmin ? "pro" : validPaid ? storedPlanKey : validTrial ? (storedPlanKey === "basic" ? "pro" : storedPlanKey) : "basic";
+  // Keep the customer's assigned plan separate from Super Admin's access override.
+  // Expired paid periods fall back to Basic without deleting customer data.
+  const planKey = validPaid ? storedPlanKey : validTrial ? (storedPlanKey === "basic" ? "pro" : storedPlanKey) : "basic";
 
-  let planFeatures: Record<string, boolean> =
+  let assignedPlanFeatures: Record<string, boolean> =
     planKey === "pro" ? PRO_FEATURES : BASIC_FEATURES;
   let maxUsers: number | null = planKey === "basic" ? 1 : null;
   try {
@@ -131,7 +131,7 @@ export async function getSaasContext() {
       const planRows = await planResponse.json();
       if (Array.isArray(planRows) && planRows[0]) {
         if (planRows[0].features && typeof planRows[0].features === "object") {
-          planFeatures = planRows[0].features;
+          assignedPlanFeatures = planRows[0].features;
         }
         maxUsers = typeof planRows[0].max_users === "number" ? planRows[0].max_users : null;
       }
@@ -139,6 +139,7 @@ export async function getSaasContext() {
   } catch {
     // Keep conservative built-in entitlements if the plan catalogue is not yet deployed.
   }
+  const planFeatures: Record<string, boolean> = isSuperAdmin ? PRO_FEATURES : assignedPlanFeatures;
 
   // Keep existing trial-write override strictly local and never use it as a production bypass.
   const allowLocalTrialWrites =
