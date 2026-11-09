@@ -789,7 +789,7 @@ export default function FinanceReportsPage() {
                   <div className="space-y-5 pt-2">
                     {[{ label: "Customer collections", value: collected, color: "#0f766e" }, { label: "Supplier payments", value: supplierPaid, color: "#f97316" }].map((item, index) => <div key={item.label}>
                       <div className="mb-2 flex items-center justify-between gap-3 text-sm"><span className="text-slate-600">{item.label}</span><strong className="tabular-nums">{money(item.value)}</strong></div>
-                      <div className="h-3 overflow-hidden rounded-full bg-slate-100"><div className="report-animated-bar h-full rounded-full" style={{ width: `${Math.min(100, item.value / Math.max(1, collected, supplierPaid) * 100)}%`, backgroundColor: item.color, animationDelay: `${index * 160}ms` }} /></div>
+                      <div className="h-3 overflow-hidden rounded-full bg-slate-100"><div className="report-animated-fill h-full rounded-full" style={{ width: `${Math.min(100, item.value / Math.max(1, collected, supplierPaid) * 100)}%`, backgroundColor: item.color, animationDelay: `${index * 160}ms` }} /></div>
                     </div>)}
                     <div className="rounded-xl bg-slate-50 p-4"><p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Net customer-to-supplier movement</p><p className={`mt-2 text-2xl font-bold ${collected - supplierPaid >= 0 ? "text-emerald-700" : "text-rose-700"}`}>{money(collected - supplierPaid)}</p><p className="mt-2 text-xs leading-5 text-slate-500">Collections minus supplier payments only; other cash movements are not included.</p></div>
                   </div>
