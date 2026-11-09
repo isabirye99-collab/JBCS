@@ -205,10 +205,10 @@ function customerName(invoice: Invoice): string {
 }
 
 function dateLabel(value?: string | null): string {
-  if (!value) return "Ã¢â‚¬â€";
+  if (!value) return "—";
 
   const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "Ã¢â‚¬â€";
+  if (Number.isNaN(date.getTime())) return "—";
 
   return new Intl.DateTimeFormat("en-UG", {
     day: "2-digit",
@@ -778,7 +778,7 @@ export default function FinanceDashboardPage() {
           <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/95 backdrop-blur">
             <div className="flex min-h-[76px] items-center justify-between gap-4 px-4 py-3 sm:px-6 xl:px-10">
               <div className="flex min-w-0 items-center gap-3">
-                <img src="/johden-logo.svg" alt="Johden logo" className="h-12 w-12 shrink-0 object-contain sm:h-14 sm:w-14" />
+                
                 <div className="min-w-0">
                   <p className="text-xs font-medium text-slate-500">
                     Johden Business Consultancy Services
@@ -790,7 +790,7 @@ export default function FinanceDashboardPage() {
               </div>
 
               <div className="flex shrink-0 items-center gap-2 sm:gap-3">
-                {isSuperAdmin && <Link href="/workspace/admin" className="hidden rounded-xl bg-slate-900 px-3 py-2.5 text-xs font-semibold text-white hover:bg-slate-700 sm:inline-flex">Platform Admin</Link>}
+                {isSuperAdmin && <Link href="/workspace/admin" className="hidden rounded-xl border border-rose-200 bg-rose-50 px-3 py-2.5 text-xs font-semibold text-[#9f1d35] hover:bg-rose-100 sm:inline-flex">Platform Admin</Link>}
                 <button
                   type="button"
                   onClick={() => void loadDashboard(true)}
@@ -825,7 +825,7 @@ export default function FinanceDashboardPage() {
                       type="submit"
                       className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-700 transition hover:border-[#F3192D] hover:bg-[#fff5f5] hover:text-[#9f1d35]"
                     >
-                      <span aria-hidden="true">â†ª</span>
+                      <span aria-hidden="true">↪</span>
                       <span>Log Out</span>
                     </button>
                   </form>
@@ -900,7 +900,7 @@ export default function FinanceDashboardPage() {
                 title="Total customers"
                 value={
                   loading && customers.length === 0
-                    ? "Ã¢â‚¬â€"
+                    ? "—"
                     : customers.length.toLocaleString("en-UG")
                 }
                 detail="Customers registered in your workspace"
@@ -911,7 +911,7 @@ export default function FinanceDashboardPage() {
                 title="Outstanding invoices"
                 value={
                   loading && invoices.length === 0
-                    ? "Ã¢â‚¬â€"
+                    ? "—"
                     : money(stats.outstanding)
                 }
                 detail={`${stats.overdueCount} overdue invoice${stats.overdueCount === 1 ? "" : "s"}`}
@@ -922,7 +922,7 @@ export default function FinanceDashboardPage() {
                 title="Sales collected this month"
                 value={
                   loading && invoices.length === 0
-                    ? "Ã¢â‚¬â€"
+                    ? "—"
                     : money(stats.monthlySales)
                 }
                 detail="Paid invoices recorded this month"
@@ -933,7 +933,7 @@ export default function FinanceDashboardPage() {
                 title="Expenses this month"
                 value={
                   loading && expenses.length === 0
-                    ? "Ã¢â‚¬â€"
+                    ? "—"
                     : money(stats.monthlyExpenses)
                 }
                 detail="Expense records only; supplier payments are shown separately"
@@ -944,7 +944,7 @@ export default function FinanceDashboardPage() {
                 title="Supplier payments this month"
                 value={
                   loading && supplierPayments.length === 0
-                    ? "Ã¢â‚¬â€"
+                    ? "—"
                     : money(stats.monthlySupplierPayments)
                 }
                 detail="Cash paid to suppliers this month; not added again to expenses"
@@ -996,32 +996,32 @@ export default function FinanceDashboardPage() {
                 </div>
               </div>
 
-              <div className="dashboard-insight-panel relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#74162a] via-[#9f1d35] to-[#c21f3a] p-6 text-white shadow-lg shadow-rose-950/10">
-                <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full border border-white/10" />
-                <div className="pointer-events-none absolute -right-2 -top-2 h-24 w-24 rounded-full border border-white/10" />
+              <div className="dashboard-insight-panel relative overflow-hidden rounded-2xl border border-rose-100 bg-white p-6 text-slate-900 shadow-sm">
+                <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full border border-rose-100" />
+                <div className="pointer-events-none absolute -right-2 -top-2 h-24 w-24 rounded-full border border-rose-100" />
                 <div className="relative">
                   <div className="flex items-center justify-between gap-3">
-                    <span className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider text-white/90"><ChartNoAxesCombined size={14} /> Snapshot</span>
-                    <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/15"><Activity size={18} /></span>
+                    <span className="inline-flex items-center gap-2 rounded-full bg-rose-50 px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider text-[#9f1d35]"><ChartNoAxesCombined size={14} /> Snapshot</span>
+                    <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-rose-50"><Activity size={18} /></span>
                   </div>
                   <h3 className="mt-5 text-xl font-bold tracking-tight">Your business at a glance</h3>
-                  <p className="mt-2 text-sm leading-6 text-white/75">A live snapshot of the financial activity recorded in your workspace.</p>
+                  <p className="mt-2 text-sm leading-6 text-slate-600">A live snapshot of the financial activity recorded in your workspace.</p>
                   <div className="mt-6 grid grid-cols-2 gap-3">
-                    <div className="rounded-xl border border-white/15 bg-white/10 p-4 backdrop-blur-sm">
-                      <p className="text-xs text-white/70">Invoices created</p>
+                    <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 ">
+                      <p className="text-xs text-slate-500">Invoices created</p>
                       <p className="mt-2 text-2xl font-bold"><AnimatedMetricValue value={stats.invoiceCount.toLocaleString("en-UG")} /></p>
                     </div>
-                    <div className="rounded-xl border border-white/15 bg-white/10 p-4 backdrop-blur-sm">
-                      <p className="text-xs text-white/70">Overdue invoices</p>
+                    <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 ">
+                      <p className="text-xs text-slate-500">Overdue invoices</p>
                       <p className="mt-2 text-2xl font-bold"><AnimatedMetricValue value={stats.overdueCount.toLocaleString("en-UG")} /></p>
                     </div>
                   </div>
-                  <div className="mt-5 flex items-center justify-between gap-3 border-t border-white/15 pt-4">
+                  <div className="mt-5 flex items-center justify-between gap-3 border-t border-slate-200 pt-4">
                     <div>
-                      <p className="text-xs text-white/70">Outstanding balance</p>
-                      <p className="mt-1 text-lg font-bold"><AnimatedMetricValue value={money(stats.outstanding)} /></p>
+                      <p className="text-xs text-slate-500">Outstanding balance</p>
+                      <p className="mt-1 text-lg font-bold text-[#9f1d35]"><AnimatedMetricValue value={money(stats.outstanding)} /></p>
                     </div>
-                    <Link href="/workspace/finance/invoices" className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-white px-3 py-2.5 text-xs font-bold text-[#86172e] transition hover:bg-rose-50">
+                    <Link href="/workspace/finance/invoices" className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-[#9f1d35] px-3 py-2.5 text-xs font-bold text-white transition hover:bg-[#74162a]">
                       Review invoices <ArrowRight size={14} />
                     </Link>
                   </div>
@@ -1221,7 +1221,7 @@ export default function FinanceDashboardPage() {
                         {stats.overdueCount === 1 ? "s" : ""} attention.
                       </p>
                     </div>
-                    <div className="rounded-xl bg-white/10 p-3">
+                    <div className="rounded-xl bg-slate-50 p-3">
                       <Activity size={22} />
                     </div>
                   </div>
@@ -1352,7 +1352,7 @@ export default function FinanceDashboardPage() {
                               "Business expense"}
                           </p>
                           <p className="mt-1 text-xs text-slate-500">
-                            {expense.category || "General"} Ã‚Â·{" "}
+                            {expense.category || "General"} ·{" "}
                             {dateLabel(
                               expense.expense_date ??
                                 expense.date ??
@@ -1422,7 +1422,7 @@ export default function FinanceDashboardPage() {
             </section>
 
             <footer className="flex flex-col justify-between gap-2 border-t border-slate-200 py-5 text-xs text-slate-400 sm:flex-row sm:items-center">
-              <p>Johden Business Consultancy Services Ã‚Â· Finance workspace</p>
+              <p>Johden Business Consultancy Services · Finance workspace</p>
               <p>
                 {lastUpdated
                   ? `Last refreshed ${lastUpdated.toLocaleTimeString("en-UG", {
