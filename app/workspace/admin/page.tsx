@@ -106,7 +106,7 @@ export default function SuperAdminPage() {
           </div>
           <div className="flex flex-wrap gap-2">
             <button onClick={() => void load(true)} disabled={refreshing} className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold hover:bg-slate-100 disabled:opacity-60"><RefreshCw size={16} className={refreshing ? "animate-spin" : ""} />Refresh</button>
-            <Link href="/workspace/finance" className="rounded-xl bg-rose-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-rose-700">Current workspace</Link>
+            <Link href="/workspace/finance" className="rounded-xl bg-rose-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-rose-700">Current workspace</Link><form action="/api/saas/logout" method="post"><button type="submit" className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 hover:border-rose-200 hover:bg-rose-50 hover:text-rose-700">Log out</button></form>
           </div>
         </header>
 
