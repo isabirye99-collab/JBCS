@@ -2,8 +2,8 @@
 
 import "../finance.css";
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
-import { ArrowLeft, CalendarDays, FileBarChart, FilePlus2, FileText, LayoutDashboard, Package, Receipt, CreditCard, Settings, UsersRound, Wallet, X, Plus, CircleDollarSign } from "lucide-react";
+import { useCallback, useEffect, useMemo, useState, type FormEvent, type ReactNode } from "react";
+import { ArrowLeft, FileBarChart, FilePlus2, FileText, LayoutDashboard, Package, Receipt, CreditCard, Settings, UsersRound, Wallet, X, Plus, CircleDollarSign } from "lucide-react";
 
 type Entry = {
   id: string; entry_type: "owner_income" | "commission"; recipient: "owner" | "business";
@@ -160,5 +160,5 @@ export default function OwnerIncomePage() {
   </div>;
 }
 const inputClass = "mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-50";
-function Field({ label, children, wide = false }: { label: string; children: React.ReactNode; wide?: boolean }) { return <label className={`block text-sm font-medium text-slate-700 ${wide ? "sm:col-span-2" : ""}`}>{label}{children}</label>; }
+function Field({ label, children, wide = false }: { label: string; children: ReactNode; wide?: boolean }) { return <label className={`block text-sm font-medium text-slate-700 ${wide ? "sm:col-span-2" : ""}`}>{label}{children}</label>; }
 function Summary({ title, value, detail }: { title: string; value: string; detail: string }) { return <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{title}</p><p className="mt-3 break-words text-xl font-bold tracking-tight">{value}</p><p className="mt-1 text-xs text-slate-500">{detail}</p></div>; }
