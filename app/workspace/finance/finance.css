@@ -24,8 +24,8 @@
 .invoice-product-page .invoice-feature-card .admin-client-form{display:grid;gap:13px}
 .invoice-product-page .admin-client-form label,.invoice-product-page label{display:grid;gap:6px;font-size:12px;font-weight:700;color:#494249;min-width:0}
 .invoice-product-page .admin-client-form input,.invoice-product-page .admin-client-form select,.invoice-product-page input,.invoice-product-page select{width:100%;min-width:0;min-height:42px;padding:10px 12px;border:1px solid #e3dcdf;border-radius:7px;background:#fff;color:#292429;outline:none}
-.invoice-product-page input:focus,.invoice-product-page select:focus{border-color:#f3192d;box-shadow:0 0 0 3px #f3192d12}
-.invoice-product-page .admin-client-form button,.invoice-product-page table button{border:0;border-radius:7px;background:#f3192d;color:#fff;padding:11px 14px;font-size:12px;font-weight:800;cursor:pointer}
+.invoice-product-page input:focus,.invoice-product-page select:focus{border-color:#9f1d35;box-shadow:0 0 0 3px #9f1d3512}
+.invoice-product-page .admin-client-form button,.invoice-product-page table button{border:0;border-radius:7px;background:#9f1d35;color:#fff;padding:11px 14px;font-size:12px;font-weight:800;cursor:pointer}
 .invoice-product-page button:disabled{opacity:.55;cursor:not-allowed}
 .invoice-product-page .invoice-list-panel,.invoice-product-page #expense-list{border:1px solid #eae6e8!important;border-radius:12px!important;padding:clamp(15px,2.5vw,26px)!important;box-shadow:0 5px 22px #30232806}
 .invoice-product-page .invoice-list-heading{display:flex;justify-content:space-between;align-items:flex-end;gap:18px;flex-wrap:wrap;margin-bottom:18px}
@@ -36,7 +36,7 @@
 .invoice-product-page table th{background:#faf8f9;color:#827982;font-size:10px;letter-spacing:.07em;text-transform:uppercase;font-weight:800}
 .invoice-product-page table th,.invoice-product-page table td{border-bottom:1px solid #eee9ec;padding:13px 12px!important;font-size:12px;vertical-align:middle}
 .invoice-product-page table tbody tr:hover{background:#fff9f8}
-.invoice-product-page table a{color:#c91024;font-weight:800;white-space:nowrap}
+.invoice-product-page table a{color:#81172b;font-weight:800;white-space:nowrap}
 .invoice-product-page #overview{margin-bottom:22px!important}
 .invoice-product-page #overview h2{font-size:clamp(25px,3vw,34px)!important;letter-spacing:-.04em}
 .invoice-product-page .admin-error,.invoice-product-page .admin-success{padding:12px 15px;border-radius:8px;font-size:12px}
@@ -54,7 +54,7 @@
 .invoice-product-page>.site-header .brand{font-size:13px;font-weight:800;letter-spacing:.04em}
 .invoice-product-page>.site-header .desktop-nav{gap:6px;font-size:12px}
 .invoice-product-page>.site-header .desktop-nav a{padding:9px 12px;border-radius:7px;color:#5d5961}
-.invoice-product-page>.site-header .desktop-nav a:hover,.invoice-product-page>.site-header .desktop-nav a:focus{background:#fff0f1;color:#b9162a}
+.invoice-product-page>.site-header .desktop-nav a:hover,.invoice-product-page>.site-header .desktop-nav a:focus{background:#fff0f1;color:#81172b}
 .invoice-product-page>.site-header .button{padding:9px 13px;border-radius:7px}
 .invoice-product-page>.invoice-product-hero{display:none!important}
 .invoice-product-page>.inner-content{max-width:1600px;margin:0 auto;padding:30px clamp(16px,3vw,42px) 64px}
@@ -72,7 +72,7 @@
 .invoice-product-page .invoice-feature-card .admin-client-form{gap:14px}
 .invoice-product-page .admin-client-form label,.invoice-product-page label{font-size:12px;color:#464149}
 .invoice-product-page input,.invoice-product-page select,.invoice-product-page textarea{border:1px solid #dfe2e7;border-radius:7px;min-height:42px;padding:10px 12px;font-size:12px}
-.invoice-product-page .admin-client-form button,.invoice-product-page table button{border-radius:7px;padding:11px 15px;background:#c9192d;color:#fff}
+.invoice-product-page .admin-client-form button,.invoice-product-page table button{border-radius:7px;padding:11px 15px;background:#9f1d35;color:#fff}
 .invoice-product-page .invoice-list-panel,.invoice-product-page #expense-list{margin-top:22px!important;background:#fff;border:1px solid #e5e7eb!important;border-radius:11px!important;padding:22px!important;box-shadow:0 2px 7px #20283805}
 .invoice-product-page .invoice-list-heading{align-items:center}
 .invoice-product-page .invoice-list-heading h2{font-size:24px;letter-spacing:-.03em;margin:5px 0}
@@ -93,11 +93,11 @@
 /* Accounting-app shell inspired by the original Johden finance design */
 .finance-shell{display:flex!important;align-items:stretch;min-height:100vh;background:#f5f6f8!important}
 .finance-shell>.finance-side-rail{width:244px;flex:0 0 244px;min-height:100vh;background:#292629;color:#fff;padding:22px 15px 18px;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto}
-.finance-side-brand{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:#fff;border-radius:6px;padding:12px 8px;margin:0 3px 22px;color:#c9192d}
+.finance-side-brand{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:#fff;border-radius:6px;padding:12px 8px;margin:0 3px 22px;color:#9f1d35}
 .finance-side-brand span{font:800 20px/1.1 Manrope,Arial,sans-serif;letter-spacing:.07em}
 .finance-side-brand small{font-size:8px;letter-spacing:.16em;color:#625b62}
 .finance-side-workspace{display:flex;align-items:center;gap:10px;padding:11px 9px;background:#3a363a;border:1px solid #4a4549;border-radius:8px}
-.finance-side-mark{width:34px;height:34px;flex:0 0 34px;display:grid;place-items:center;border-radius:8px;background:#c9192d;color:#fff;font-weight:800}
+.finance-side-mark{width:34px;height:34px;flex:0 0 34px;display:grid;place-items:center;border-radius:8px;background:#9f1d35;color:#fff;font-weight:800}
 .finance-side-workspace b,.finance-side-workspace small,.finance-side-bottom b,.finance-side-bottom small{display:block}
 .finance-side-workspace b,.finance-side-bottom b{font-size:11px;color:#fff}
 .finance-side-workspace small,.finance-side-bottom small{font-size:9px;color:#b9b1b7;margin-top:3px}
@@ -107,7 +107,7 @@
 .finance-side-nav a>span{width:19px;text-align:center;font-size:17px}
 .finance-side-nav a i{font-style:normal;margin-left:auto;background:#ffffff20;border-radius:12px;padding:2px 7px;font-size:10px}
 .finance-side-nav a:hover{background:#3a363a;color:#fff}
-.finance-side-nav a.selected{background:#c9192d;color:#fff;box-shadow:0 5px 16px #f3192d35}
+.finance-side-nav a.selected{background:transparent;color:#fff;box-shadow:none}
 .finance-side-bottom{display:flex;align-items:center;gap:10px;border-top:1px solid #484247;padding:17px 5px 12px;margin-top:auto}
 .finance-side-back{font-size:10px;color:#d0c7ce;padding:12px 7px 9px}
 .finance-side-back:hover{color:#fff}
@@ -118,7 +118,7 @@
 .finance-app-main>.inner-content{padding-top:30px}
 .finance-shell .finance-anchor{display:block;position:relative;top:-18px}
 @media(max-width:900px){.finance-shell>.finance-side-rail{width:205px;flex-basis:205px;padding:16px 10px}.finance-side-nav a{padding:10px 8px}.finance-app-main>.inner-content{padding:24px 16px 48px}}
-@media(max-width:650px){.finance-shell{display:block!important}.finance-shell>.finance-side-rail{position:relative;top:auto;width:100%;height:auto;min-height:0;padding:12px;overflow:visible}.finance-side-brand{align-items:flex-start;margin:0 0 12px;padding:9px 12px;width:max-content;min-width:155px}.finance-side-brand span{font-size:16px}.finance-side-workspace,.finance-side-label,.finance-side-bottom,.finance-side-back,.finance-side-rail>form{display:none}.finance-side-label:first-of-type{display:none}.finance-side-nav{display:flex;gap:5px;overflow-x:auto;padding:3px 0 6px}.finance-side-nav a{white-space:nowrap;flex:0 0 auto;padding:9px 11px;background:#3a363a}.finance-side-nav a.selected{background:#c9192d}.finance-side-nav a i{display:none}.finance-side-nav+.finance-side-label{display:none}.finance-side-nav+.finance-side-label+.finance-side-nav{display:none}.finance-app-main>.inner-content{padding:22px 13px 40px}}
+@media(max-width:650px){.finance-shell{display:block!important}.finance-shell>.finance-side-rail{position:relative;top:auto;width:100%;height:auto;min-height:0;padding:12px;overflow:visible}.finance-side-brand{align-items:flex-start;margin:0 0 12px;padding:9px 12px;width:max-content;min-width:155px}.finance-side-brand span{font-size:16px}.finance-side-workspace,.finance-side-label,.finance-side-bottom,.finance-side-back,.finance-side-rail>form{display:none}.finance-side-label:first-of-type{display:none}.finance-side-nav{display:flex;gap:5px;overflow-x:auto;padding:3px 0 6px}.finance-side-nav a{white-space:nowrap;flex:0 0 auto;padding:9px 11px;background:#3a363a}.finance-side-nav a.selected{background:#3a363a}.finance-side-nav a i{display:none}.finance-side-nav+.finance-side-label{display:none}.finance-side-nav+.finance-side-label+.finance-side-nav{display:none}.finance-app-main>.inner-content{padding:22px 13px 40px}}
 
 
 /* Final polish pass: stronger accounting hierarchy, form rhythm and readable registers */
@@ -127,7 +127,7 @@
 .finance-shell .finance-app-main #overview{padding:2px 0 18px;border-bottom:1px solid #e6e8ed}
 .finance-shell .finance-app-main #overview h2{font-weight:800;line-height:1.16}
 .finance-shell .finance-app-main .invoice-feature-card{transition:border-color .16s ease,box-shadow .16s ease}
-.finance-shell .finance-app-main .invoice-feature-card:focus-within{border-color:#e6b4ba;box-shadow:0 0 0 3px #c9192d0b}
+.finance-shell .finance-app-main .invoice-feature-card:focus-within{border-color:#e6b4ba;box-shadow:0 0 0 3px #9f1d350b}
 .finance-shell .finance-app-main .invoice-feature-card form button,
 .finance-shell .finance-app-main table button{min-height:40px;font-weight:700;transition:background .15s ease,transform .15s ease}
 .finance-shell .finance-app-main .invoice-feature-card form button:hover,
@@ -164,7 +164,7 @@
 .finance-topbar-actions{display:flex;align-items:center;gap:13px}
 .finance-company-name{font-size:10px;font-weight:800;letter-spacing:.06em;color:#514b52;white-space:nowrap}
 .finance-topbar-icon{width:34px;height:34px;display:grid;place-items:center;border:1px solid #e8e5e7;border-radius:8px;color:#5b555d}
-.finance-topbar-add{width:36px;height:36px;display:grid;place-items:center;border-radius:8px;background:#f3192d;color:#fff;font-size:23px;line-height:1}
+.finance-topbar-add{width:36px;height:36px;display:grid;place-items:center;border-radius:8px;background:#9f1d35;color:#fff;font-size:23px;line-height:1}
 .finance-profile-mark{width:34px;height:34px;display:grid;place-items:center;border-radius:50%;background:#fff0ed;border:1px solid #f4d0d2;color:#bd172b;font-weight:900}
 .finance-shell .finance-app-main>.inner-content{padding-top:28px}
 .finance-receivables-card,.finance-analytics-card{background:#fff;border:1px solid #e5e7eb;border-radius:12px;box-shadow:0 3px 14px #25232a08;overflow:hidden}
@@ -266,3 +266,136 @@
 .finance-shell .finance-app-main>.inner-content{padding-top:24px}
 @media(max-width:900px){.finance-dashboard-heading{padding:22px 18px}.finance-side-rail .finance-side-nav a{font-size:10px}}
 @media(max-width:650px){.finance-dashboard-heading{align-items:flex-start;flex-direction:column;padding:20px 15px}.finance-dashboard-heading .button{width:100%;justify-content:center}.finance-side-rail .finance-side-nav{max-height:150px;overflow:auto;flex-wrap:wrap;justify-content:flex-start}.finance-side-rail .finance-side-nav a{flex:0 0 auto}}
+
+/* JBCS Expenses + Supplier Payments: uses the established Johden red/charcoal palette. */
+.jbcs-finance-page{min-height:100vh;background:#f5f6f8;color:#29252a;padding:22px clamp(14px,2.6vw,38px) 56px;font-family:inherit}
+.jbcs-finance-top{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:2px 0 22px;font-size:12px;color:#77717a}.jbcs-finance-top a{color:#b7192d;text-decoration:none;font-weight:700}.jbcs-finance-top span{font-size:10px;letter-spacing:.12em;font-weight:800;color:#6d6670}
+.jbcs-finance-heading{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:22px}.jbcs-finance-heading h1{font-size:clamp(28px,3vw,38px);line-height:1.1;letter-spacing:-.045em;margin:5px 0 9px;font-weight:800}.jbcs-finance-heading p:not(.jbcs-eyebrow){font-size:13px;color:#77717a;margin:0;line-height:1.65}.jbcs-eyebrow{font-size:9px;letter-spacing:.13em;font-weight:800;color:#a31a2a;margin:0}.jbcs-secondary-button,.jbcs-primary-button{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;border-radius:7px;padding:11px 15px;font-size:12px;font-weight:800;cursor:pointer}.jbcs-secondary-button{background:#fff;color:#393239;border:1px solid #e1e3e8}.jbcs-primary-button{background:#9f1d35;color:#fff;border:1px solid #9f1d35}.jbcs-primary-button:disabled{opacity:.55;cursor:not-allowed}
+.jbcs-stat-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:18px}.jbcs-stat-grid article{background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:17px 19px;min-width:0}.jbcs-stat-grid article span,.jbcs-stat-grid article small{display:block;font-size:11px;color:#77717a}.jbcs-stat-grid article strong{display:block;font-size:25px;letter-spacing:-.035em;margin:8px 0 5px;overflow-wrap:anywhere}.jbcs-finance-columns{display:grid;grid-template-columns:minmax(280px,.82fr) minmax(0,1.18fr);gap:16px;align-items:start}.jbcs-panel{background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:20px;min-width:0;box-shadow:0 2px 7px #20283805}.jbcs-panel-heading{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:18px}.jbcs-panel-heading h2{font-size:19px;letter-spacing:-.025em;margin:5px 0 0;font-weight:800}.jbcs-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}.jbcs-form-grid label{display:grid;gap:6px;font-size:11px;font-weight:700;color:#4a444b;min-width:0}.jbcs-form-grid input,.jbcs-form-grid select,.jbcs-form-grid textarea,.jbcs-filters input,.jbcs-filters select,.jbcs-search{width:100%;min-width:0;border:1px solid #dfe2e7;border-radius:7px;background:#fff;padding:10px 11px;color:#29252a;font:inherit;font-size:12px;outline:none}.jbcs-form-grid input,.jbcs-form-grid select{min-height:40px}.jbcs-form-grid textarea{resize:vertical}.jbcs-form-grid input:focus,.jbcs-form-grid select:focus,.jbcs-form-grid textarea:focus,.jbcs-filters input:focus,.jbcs-filters select:focus,.jbcs-search:focus{border-color:#9f1d35;box-shadow:0 0 0 3px #9f1d3512}.jbcs-span-2{grid-column:1/-1}.jbcs-help{font-size:10px;font-weight:400;color:#77717a;line-height:1.5}.jbcs-message{border:1px solid #f2c6cc;background:#fff1f2;color:#9f1728;border-radius:7px;padding:10px 12px;font-size:12px;line-height:1.5}.jbcs-message.success{border-color:#cde8d5;background:#effaf2;color:#176c3b}.jbcs-filters{display:grid;grid-template-columns:minmax(0,1fr) 125px;gap:9px;margin-bottom:14px}.jbcs-table-wrap{width:100%;overflow:auto}.jbcs-table{width:100%;min-width:570px;border-collapse:collapse;text-align:left}.jbcs-table th{font-size:9px;text-transform:uppercase;letter-spacing:.06em;color:#77717a;background:#f8f8fa}.jbcs-table th,.jbcs-table td{padding:12px 10px;border-bottom:1px solid #eef0f3;vertical-align:top;font-size:11px}.jbcs-table td strong,.jbcs-table td small{display:block}.jbcs-table td strong{font-size:11px;font-weight:750;line-height:1.5}.jbcs-table td small{font-size:10px;color:#77717a;margin-top:4px;line-height:1.45}.jbcs-table tbody tr:last-child td{border-bottom:0}.jbcs-table tbody tr:hover{background:#fff9f8}.jbcs-amount{white-space:nowrap;font-weight:800}.jbcs-empty{text-align:center;color:#77717a;padding:28px 12px!important}.jbcs-history-panel{margin-top:16px}.jbcs-search{max-width:330px}.jbcs-finance-page button:focus-visible,.jbcs-finance-page a:focus-visible{outline:2px solid #9f1d35;outline-offset:2px}
+@media(max-width:1050px){.jbcs-finance-columns{grid-template-columns:1fr}.jbcs-stat-grid article strong{font-size:22px}}
+@media(max-width:620px){.jbcs-finance-page{padding:16px 12px 38px}.jbcs-finance-top span{font-size:8px}.jbcs-stat-grid{grid-template-columns:1fr;gap:9px}.jbcs-stat-grid article{padding:14px 16px}.jbcs-stat-grid article strong{font-size:22px;margin:5px 0}.jbcs-panel{padding:15px}.jbcs-form-grid{grid-template-columns:1fr}.jbcs-span-2{grid-column:auto}.jbcs-filters{grid-template-columns:1fr}.jbcs-search{max-width:none;width:100%}.jbcs-finance-heading{align-items:flex-start}}
+
+
+
+/* Finance register layout refresh: full-width registers with optional entry panels */
+.jbcs-page-actions{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:10px}
+.jbcs-finance-columns{display:grid;grid-template-columns:minmax(0,1fr);gap:22px}
+.jbcs-register-panel{width:100%;min-width:0}
+.jbcs-entry-panel{width:100%;min-width:0}
+.jbcs-finance-heading{align-items:center}
+.jbcs-page-actions .jbcs-primary-button,.jbcs-page-actions .jbcs-secondary-button{white-space:nowrap}
+@media(max-width:760px){.jbcs-page-actions{justify-content:flex-start}.jbcs-finance-heading{align-items:flex-start;gap:16px}.jbcs-page-actions>*{flex:1 1 auto}}
+
+/* Johden consistent finance sidebar */
+.finance-module-layout { display: flex; min-height: 100vh; }
+.finance-module-sidebar { font-family: Arial, sans-serif; }
+.finance-module-sidebar a,
+.finance-module-sidebar button { transition: background-color .15s ease, color .15s ease; }
+.finance-module-sidebar a:hover,
+.finance-module-sidebar button:hover { background: #fff5f5 !important; color: #9f1d35 !important; }
+.finance-module-sidebar a:focus-visible,
+.finance-module-sidebar button:focus-visible { outline: 2px solid #9f1d35; outline-offset: 2px; }
+@media (max-width: 650px) {
+  .finance-module-layout { display: block !important; }
+  .finance-module-sidebar {
+    position: relative !important;
+    top: auto !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    padding: 12px !important;
+    overflow: visible !important;
+    border-right: 0 !important;
+    border-bottom: 1px solid #e5e7eb !important;
+  }
+  .finance-module-sidebar > a:first-child { width: 100%; min-height: 70px !important; margin-bottom: 10px !important; }
+  .finance-module-sidebar > a:first-child img { width: 180px !important; max-height: 55px !important; }
+  .finance-module-nav {
+    display: flex;
+    gap: 4px;
+    max-height: none !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    padding-bottom: 8px;
+  }
+  .finance-module-nav a { flex: 0 0 auto; }
+  .finance-module-footer { display: flex; gap: 8px; align-items: center; }
+  .finance-module-footer > a,
+  .finance-module-footer > form { flex: 1; min-width: 0; }
+  .finance-module-footer > form { margin-top: 0 !important; }
+}
+
+/* Shared typography and control rhythm for Finance modules.
+   Presentation-only overrides: do not change data, calculations, or behavior. */
+.jbcs-finance-consistent-main,
+.jbcs-finance-consistent-main * {
+  font-family: 'DM Sans', Arial, sans-serif;
+}
+.jbcs-finance-consistent-main {
+  line-height: 1.55;
+  color: #29252a;
+}
+.jbcs-finance-consistent-main h1 {
+  font-size: clamp(1.65rem, 2.4vw, 2.15rem);
+  line-height: 1.2;
+  letter-spacing: -0.035em;
+  font-weight: 800;
+}
+.jbcs-finance-consistent-main h2 {
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+}
+.jbcs-finance-consistent-main h3 {
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+}
+.jbcs-finance-consistent-main input:not([type="checkbox"]):not([type="radio"]),
+.jbcs-finance-consistent-main select,
+.jbcs-finance-consistent-main textarea {
+  font-family: 'DM Sans', Arial, sans-serif;
+  line-height: 1.45;
+}
+.jbcs-finance-consistent-main table {
+  border-collapse: collapse;
+}
+.jbcs-finance-consistent-main th {
+  font-size: 10px;
+  line-height: 1.4;
+  letter-spacing: .045em;
+}
+.jbcs-finance-consistent-main td {
+  line-height: 1.5;
+}
+.finance-owner-income,
+.finance-owner-income * {
+  font-family: 'DM Sans', Arial, sans-serif !important;
+}
+.finance-owner-income input:not([type="checkbox"]):not([type="radio"]),
+.finance-owner-income select,
+.finance-owner-income textarea {
+  min-height: 40px !important;
+  padding: 9px 11px !important;
+  border-radius: 8px !important;
+  font-size: 13px !important;
+  line-height: 1.45 !important;
+}
+.finance-owner-income textarea {
+  min-height: 88px !important;
+}
+.finance-owner-income table th {
+  font-size: 10px !important;
+  line-height: 1.4 !important;
+}
+.finance-owner-income table td {
+  line-height: 1.5 !important;
+}
+@media (max-width: 640px) {
+  .jbcs-finance-consistent-main h1 {
+    font-size: 1.6rem;
+  }
+}
+
+
+/* Owner income: white content canvas, isolated from shared finance grey canvas. */
+.finance-owner-income { background: #fff !important; width: 100%; min-height: 100vh; }
+.finance-owner-income > .owner-income-content { background: #fff !important; min-height: 100vh; }
