@@ -30,7 +30,7 @@ export async function GET() {
 
   const result = (Array.isArray(workspaces) ? workspaces : []).map((workspace: any) => {
     const subscription = Array.isArray(subscriptions)
-      ? subscriptions.filter((s: any) => s.workspace_id === workspace.id).sort((a: any, b: any) => Date.parse(b.current_period_ends_at || b.trial_ends_at || 0) - Date.parse(a.current_period_ends_at || a.trial_ends_at || 0))[0]
+      ? subscriptions.filter((s: any) => s.workspace_id === workspace.id).sort((a: any, b: any) => Date.parse(String(b.current_period_ends_at || b.trial_ends_at || "")) - Date.parse(String(a.current_period_ends_at || a.trial_ends_at || "")))[0]
       : null;
     const paidValid = subscription?.status === "active" &&
       (!subscription.current_period_ends_at || Date.parse(subscription.current_period_ends_at) > now);
