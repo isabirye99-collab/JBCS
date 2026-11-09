@@ -1047,7 +1047,7 @@ export default function FinanceDashboardPage() {
                         href: "/workspace/finance/reports",
                         tone: "bg-violet-50 text-violet-700",
                       },
-                    ].map((action) => {
+                    ].filter((action) => isSuperAdmin || planKey === "pro" || action.title !== "View reports").map((action) => {
                       const Icon = action.icon;
 
                       return (
@@ -1354,7 +1354,7 @@ export default function FinanceDashboardPage() {
                 href: "/workspace/finance/reports",
                 icon: FileBarChart,
               },
-            ].map((item) => {
+            ].filter((item) => isSuperAdmin || planKey === "pro" || !["Owner Income", "Reports"].includes(item.label)).map((item) => {
               const Icon = item.icon;
 
               return (
