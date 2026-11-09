@@ -11,8 +11,10 @@ async function requireSuperAdmin() {
     return { error: "Super Admin access is required.", status: 403 as const };
   }
   const config = supabaseConfig();
-  if (!config.url || !config.serviceKey) return { error: "Account services are not configured.", status: 503 as const };
-  return { ...config, session };
+  const url = config.url;
+  const serviceKey = config.serviceKey;
+  if (!url || !serviceKey) return { error: "Account services are not configured.", status: 503 as const };
+  return { url, serviceKey, session };
 }
 
 export async function GET() {
