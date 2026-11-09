@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
   if (!ctx.isSuperAdmin && !["owner", "admin"].includes(ctx.role)) {
     return NextResponse.json({ error: "Only workspace owners or admins can invite team members." }, { status: 403 });
   }
-  if (ctx.planKey === "basic" && !ctx.isSuperAdmin) {
+  if (ctx.planKey === "basic") {
     return NextResponse.json({ error: "The Basic Plan includes one registered user. Upgrade to Pro Accounting to invite team members." }, { status: 403 });
   }
 
