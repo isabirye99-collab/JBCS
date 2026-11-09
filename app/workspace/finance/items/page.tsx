@@ -146,9 +146,9 @@ export default function ProductsServicesPage() {
     finally { setBusy(false); if (fileRef.current) fileRef.current.value = ""; }
   }
 
-  return <div className="finance-shell">
+  return <div className="finance-shell jbcs-products-redesign">
     <aside className="finance-side-rail">
-      <Link href="/workspace/finance" className="finance-side-brand" style={{ display: "flex", background: "#fff", borderRadius: 9, minHeight: 72, alignItems: "center", justifyContent: "center", padding: 10, marginBottom: 20 }}><img src="/johden-logo.svg" alt="Johden Business Consultancy Services" style={{ display: "block", maxWidth: "100%", width: 190, maxHeight: 58, objectFit: "contain" }} /></Link>
+      <Link href="/workspace/finance" className="finance-side-brand jbcs-product-brand" aria-label="Johden Business Suite home"><span className="jbcs-product-brand-mark"><img src="/johden-logo.svg" alt="" /></span><span className="jbcs-product-brand-copy"><strong>JOHDEN</strong><small>Business Consultancy &amp; Finance</small></span></Link>
       <div className="finance-side-label">FINANCE WORKSPACE</div>
       <nav className="finance-side-nav" aria-label="Finance navigation">{NAV.map((item) => { const Icon = item.icon; const active = item.href === "/workspace/finance/items"; return <Link key={item.href} href={item.href} className={active ? "selected" : ""} aria-current={active ? "page" : undefined}><Icon size={16} strokeWidth={1.9} /><span>{item.label}</span></Link>; })}</nav>
       <div className="finance-side-bottom" style={{ marginTop: "auto", borderTop: "1px solid #484348", padding: "16px 10px 0", color: "#bcb5bb", fontSize: 11, lineHeight: 1.6 }}>Johden Business Suite<br />Finance &amp; Billing</div>
