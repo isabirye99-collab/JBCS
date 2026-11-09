@@ -1,4 +1,3 @@
-
 import { NextRequest, NextResponse } from "next/server";
 import {
   SAAS_SESSION_COOKIE,
@@ -84,10 +83,15 @@ export async function POST(request: NextRequest) {
 
     const memberships = await getWorkspaceForUser(String(auth.user.id));
 
-    if (memberships?.length === 1) {
-      const workspaceId = memberships[0].workspace_id;
+    // If this account belongs to JBCS and another workspace, make JBCS the
+    // initial finance workspace. This also replaces a stale workspace cookie
+    // left by a previous session. Other multi-workspace accounts are not guessed.
+    const preferredWorkspace =
+      memberships?.find((item: any) => item.business_workspaces?.slug === "jbcs") ??
+      (memberships?.length === 1 ? memberships[0] : null);
 
-      response.cookies.set("johden_selected_workspace", workspaceId, {
+    if (preferredWorkspace?.workspace_id) {
+      response.cookies.set("johden_selected_workspace", preferredWorkspace.workspace_id, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
