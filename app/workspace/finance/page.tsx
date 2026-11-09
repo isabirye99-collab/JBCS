@@ -297,6 +297,30 @@ function StatusBadge({ status }: { status?: string | null }) {
   );
 }
 
+function AnimatedMetricValue({ value }: { value: string }) {
+  const numericPart = value.match(/-?[\\d,]+(?:\\.\\d+)?/);
+  const target = numericPart ? Number(numericPart[0].replace(/,/g, "")) : null;
+  const [current, setCurrent] = useState(0);
+
+  useEffect(() => {
+    if (target === null || !Number.isFinite(target)) return;
+    let frame = 0;
+    const startedAt = performance.now();
+    const duration = 1150;
+    const animate = (now: number) => {
+      const progress = Math.min((now - startedAt) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setCurrent(Math.round(target * eased));
+      if (progress < 1) frame = requestAnimationFrame(animate);
+    };
+    frame = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(frame);
+  }, [target]);
+
+  if (!numericPart || target === null || !Number.isFinite(target)) return <>{value}</>;
+  return <>{value.replace(numericPart[0], new Intl.NumberFormat("en-UG").format(current))}</>;
+}
+
 function MetricCard({
   title,
   value,
@@ -311,26 +335,29 @@ function MetricCard({
   tone: "blue" | "green" | "amber" | "purple";
 }) {
   const tones = {
-    blue: "bg-blue-50 text-[#F3192D]",
+    blue: "bg-rose-50 text-[#9f1d35]",
     green: "bg-emerald-50 text-emerald-700",
     amber: "bg-amber-50 text-amber-700",
     purple: "bg-violet-50 text-violet-700",
   };
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+    <div className="dashboard-metric-card group rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm transition duration-300 hover:-translate-y-1 hover:border-rose-200 hover:shadow-lg hover:shadow-rose-950/5">
       <div className="flex items-start justify-between gap-3">
-        <div>
+        <div className="min-w-0">
           <p className="text-sm font-medium text-slate-500">{title}</p>
-          <p className="mt-3 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
-            {value}
+          <p className="mt-3 text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl">
+            <AnimatedMetricValue value={value} />
           </p>
         </div>
-        <div className={`rounded-xl p-3 ${tones[tone]}`}>
+        <div className={`rounded-xl p-3 transition duration-300 group-hover:scale-110 ${tones[tone]}`}>
           <Icon size={21} />
         </div>
       </div>
       <p className="mt-4 text-xs leading-5 text-slate-500">{detail}</p>
+      <div className="dashboard-metric-glow mt-4 h-1 overflow-hidden rounded-full bg-slate-100">
+        <div className={`dashboard-metric-glow-fill h-full rounded-full ${tone === "green" ? "bg-emerald-500" : tone === "amber" ? "bg-amber-500" : tone === "purple" ? "bg-violet-500" : "bg-[#F3192D]"}`} />
+      </div>
     </div>
   );
 }
@@ -626,6 +653,30 @@ export default function FinanceDashboardPage() {
     };
   }, [customers, invoices, expenses, supplierPayments]);
 
+  const monthlyTrend = useMemo(() => {
+    const now = new Date();
+    return Array.from({ length: 6 }, (_, index) => {
+      const monthStartDate = new Date(now.getFullYear(), now.getMonth() - 5 + index, 1);
+      const nextMonthDate = new Date(monthStartDate.getFullYear(), monthStartDate.getMonth() + 1, 1);
+      const inMonth = (value?: string | null) => {
+        if (!value) return false;
+        const date = new Date(value);
+        return !Number.isNaN(date.getTime()) && date >= monthStartDate && date < nextMonthDate;
+      };
+      const sales = invoices
+        .filter((invoice) => isPaid(invoice) && inMonth(invoice.issue_date ?? invoice.created_at))
+        .reduce((sum, invoice) => sum + invoiceAmount(invoice), 0);
+      const costs = expenses
+        .filter((expense) => inMonth(expense.expense_date ?? expense.date ?? expense.created_at))
+        .reduce((sum, expense) => sum + expenseAmount(expense), 0);
+      return {
+        label: new Intl.DateTimeFormat("en-UG", { month: "short" }).format(monthStartDate),
+        sales,
+        expenses: costs,
+      };
+    });
+  }, [invoices, expenses]);
+
   const filteredInvoices = stats.recentInvoices.filter((invoice) => {
     const term = search.trim().toLowerCase();
     if (!term) return true;
@@ -900,6 +951,80 @@ export default function FinanceDashboardPage() {
                 icon={CreditCard}
                 tone="amber"
               />}
+            </section>
+
+            <section className="grid gap-6 xl:grid-cols-[1.5fr_1fr]">
+              <div className="dashboard-chart-panel min-w-0 rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm sm:p-6">
+                <div className="flex flex-wrap items-start justify-between gap-4">
+                  <div>
+                    <div className="mb-2 inline-flex items-center gap-2 rounded-full bg-rose-50 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider text-[#9f1d35]">
+                      <Activity size={13} /> Business pulse
+                    </div>
+                    <SectionTitle title="Performance overview" subtitle="Collected sales compared with recorded expenses" />
+                  </div>
+                  <span className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-500">Last 6 months</span>
+                </div>
+
+                <div className="mt-6 flex flex-wrap items-center gap-4 text-xs font-medium text-slate-600">
+                  <span className="inline-flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-[#9f1d35]" /> Sales collected</span>
+                  <span className="inline-flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-rose-200" /> Expenses recorded</span>
+                </div>
+
+                <div className="dashboard-chart-grid mt-5 grid h-52 grid-cols-6 gap-2 border-b border-slate-100 sm:gap-4">
+                  {monthlyTrend.map((month, index) => {
+                    const maxValue = Math.max(1, ...monthlyTrend.flatMap((item) => [item.sales, item.expenses]));
+                    const salesHeight = month.sales > 0 ? Math.max(5, (month.sales / maxValue) * 100) : 0;
+                    const expensesHeight = month.expenses > 0 ? Math.max(5, (month.expenses / maxValue) * 100) : 0;
+                    return (
+                      <div key={month.label + index} className="flex min-w-0 flex-col items-center justify-end">
+                        <div className="flex h-[calc(100%-28px)] w-full items-end justify-center gap-1 sm:gap-2">
+                          <div className="dashboard-chart-bar w-[42%] max-w-7 rounded-t-md bg-[#9f1d35] shadow-sm shadow-rose-900/10" style={{ height: `${salesHeight}%`, animationDelay: `${index * 90}ms` }} title={`Sales: ${money(month.sales)}`} />
+                          <div className="dashboard-chart-bar w-[42%] max-w-7 rounded-t-md bg-rose-200" style={{ height: `${expensesHeight}%`, animationDelay: `${index * 90 + 60}ms` }} title={`Expenses: ${money(month.expenses)}`} />
+                        </div>
+                        <span className="pb-2 pt-2 text-[10px] font-semibold text-slate-500 sm:text-xs">{month.label}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+                <div className="mt-4 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500">
+                  <span>Figures are based on records available in your workspace.</span>
+                  <Link href="/workspace/finance/reports" className="inline-flex items-center gap-1 font-semibold text-[#9f1d35] hover:text-[#74162a]">
+                    Explore reports <ArrowRight size={14} />
+                  </Link>
+                </div>
+              </div>
+
+              <div className="dashboard-insight-panel relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#74162a] via-[#9f1d35] to-[#c21f3a] p-6 text-white shadow-lg shadow-rose-950/10">
+                <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full border border-white/10" />
+                <div className="pointer-events-none absolute -right-2 -top-2 h-24 w-24 rounded-full border border-white/10" />
+                <div className="relative">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider text-white/90"><ChartNoAxesCombined size={14} /> Snapshot</span>
+                    <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/15"><Activity size={18} /></span>
+                  </div>
+                  <h3 className="mt-5 text-xl font-bold tracking-tight">Your business at a glance</h3>
+                  <p className="mt-2 text-sm leading-6 text-white/75">A live snapshot of the financial activity recorded in your workspace.</p>
+                  <div className="mt-6 grid grid-cols-2 gap-3">
+                    <div className="rounded-xl border border-white/15 bg-white/10 p-4 backdrop-blur-sm">
+                      <p className="text-xs text-white/70">Invoices created</p>
+                      <p className="mt-2 text-2xl font-bold"><AnimatedMetricValue value={stats.invoiceCount.toLocaleString("en-UG")} /></p>
+                    </div>
+                    <div className="rounded-xl border border-white/15 bg-white/10 p-4 backdrop-blur-sm">
+                      <p className="text-xs text-white/70">Overdue invoices</p>
+                      <p className="mt-2 text-2xl font-bold"><AnimatedMetricValue value={stats.overdueCount.toLocaleString("en-UG")} /></p>
+                    </div>
+                  </div>
+                  <div className="mt-5 flex items-center justify-between gap-3 border-t border-white/15 pt-4">
+                    <div>
+                      <p className="text-xs text-white/70">Outstanding balance</p>
+                      <p className="mt-1 text-lg font-bold"><AnimatedMetricValue value={money(stats.outstanding)} /></p>
+                    </div>
+                    <Link href="/workspace/finance/invoices" className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-white px-3 py-2.5 text-xs font-bold text-[#86172e] transition hover:bg-rose-50">
+                      Review invoices <ArrowRight size={14} />
+                    </Link>
+                  </div>
+                </div>
+              </div>
             </section>
 
             <section className="grid gap-6 xl:grid-cols-[1.65fr_1fr]">
