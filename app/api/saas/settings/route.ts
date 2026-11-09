@@ -18,7 +18,7 @@ export async function GET() {
 export async function PUT(request: NextRequest) {
   const ctx = await getSaasContext();
   if ("error" in ctx) return NextResponse.json({ error: ctx.error }, { status: ctx.status });
-  if (!["owner", "admin"].includes(ctx.role)) return NextResponse.json({ error: "Only workspace owners or admins can change business settings." }, { status: 403 });
+  if (!ctx.isSuperAdmin && !["owner", "admin"].includes(ctx.role)) return NextResponse.json({ error: "Only workspace owners or admins can change business settings." }, { status: 403 });
   let body: Record<string, unknown>;
   try { body = await request.json(); } catch { return NextResponse.json({ error: "Enter valid settings." }, { status: 400 }); }
 
