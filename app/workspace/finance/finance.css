@@ -476,3 +476,21 @@
 @keyframes dashboardMetricFill{to{transform:scaleX(1)}}
 @keyframes dashboardPanelEnter{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 @media(prefers-reduced-motion:reduce){.dashboard-metric-card,.dashboard-chart-panel,.dashboard-insight-panel,.dashboard-chart-bar,.dashboard-metric-glow-fill{animation:none!important;transition:none!important;transform:none!important}.dashboard-metric-glow-fill{width:72%}}
+
+
+/* Animated analytics for finance reports */
+.report-chart-panel{animation:reportPanelEnter .55s ease-out both}
+.report-chart-grid{background-image:linear-gradient(to bottom,transparent calc(25% - 1px),#e9edf3 25%,transparent calc(25% + 1px),transparent calc(50% - 1px),#e9edf3 50%,transparent calc(50% + 1px),transparent calc(75% - 1px),#e9edf3 75%,transparent calc(75% + 1px));background-size:100% 100%}
+.report-animated-bar{transform-origin:bottom left;animation:reportBarGrow .9s cubic-bezier(.22,1,.36,1) both;transition:filter .18s ease,opacity .18s ease}
+.report-animated-bar:hover{filter:brightness(1.12);opacity:.86}
+.report-donut-wrap{width:100%;max-width:220px;margin:0 auto}
+.report-donut{width:100%;height:auto;overflow:visible;transform:rotate(-90deg)}
+.report-donut-segment{stroke-dasharray:0 100;animation:reportDonutReveal 1.05s cubic-bezier(.22,1,.36,1) forwards;transition:opacity .2s ease}
+.report-donut-segment:hover{opacity:.78}
+.report-donut-total,.report-donut-caption{fill:#1e293b;font-family:inherit;transform:rotate(90deg);transform-origin:21px 21px}
+.report-donut-total{font-size:7px;font-weight:800}
+.report-donut-caption{fill:#64748b;font-size:2.6px}
+@keyframes reportBarGrow{from{transform:scaleY(0);opacity:.45}to{transform:scaleY(1);opacity:1}}
+@keyframes reportDonutReveal{from{stroke-dasharray:0 100}to{stroke-dasharray:var(--donut-segment, 100) 100}}
+@keyframes reportPanelEnter{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@media(prefers-reduced-motion:reduce){.report-chart-panel,.report-animated-bar,.report-donut-segment{animation:none!important;transition:none!important;transform:none!important}.report-donut-segment{stroke-dasharray:var(--donut-segment,100) 100}}
