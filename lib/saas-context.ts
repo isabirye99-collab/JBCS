@@ -88,9 +88,11 @@ export async function getSaasContext() {
   // Read the assigned plan when the SaaS plan migration is installed. During
   // staged deployments, fall back safely to the pre-migration subscription shape.
   let subscriptions: any[] = [];
+  let legacySubscriptionSchema = false;
   const subscriptionUrl = `${url}/rest/v1/workspace_subscriptions?workspace_id=eq.${encodeURIComponent(workspace.id)}&select=status,trial_ends_at,current_period_ends_at,plan_key&limit=50`;
   let subscriptionResponse = await fetch(subscriptionUrl, { headers, cache: "no-store" });
   if (!subscriptionResponse.ok) {
+    legacySubscriptionSchema = true;
     subscriptionResponse = await fetch(
       `${url}/rest/v1/workspace_subscriptions?workspace_id=eq.${encodeURIComponent(workspace.id)}&select=status,trial_ends_at,current_period_ends_at&limit=50`,
       { headers, cache: "no-store" }
@@ -114,7 +116,8 @@ export async function getSaasContext() {
       (Number.isFinite(Date.parse(s.current_period_ends_at)) &&
        Date.parse(s.current_period_ends_at) > now))
   );
-  const storedPlanKey = subscriptions.find((s: any) => s?.plan_key)?.plan_key ?? "basic";
+  const storedPlanKey = subscriptions.find((s: any) => s?.plan_key)?.plan_key ??
+    (legacySubscriptionSchema && subscriptions.some((s: any) => s?.status === "active") ? "pro" : "basic");
   // Keep the customer's assigned plan separate from Super Admin's access override.
   // Expired paid periods fall back to Basic without deleting customer data.
   const planKey = validPaid ? storedPlanKey : validTrial ? (storedPlanKey === "basic" ? "pro" : storedPlanKey) : "basic";
