@@ -485,12 +485,12 @@
 .report-animated-bar:hover{filter:brightness(1.12);opacity:.86}
 .report-donut-wrap{width:100%;max-width:220px;margin:0 auto}
 .report-donut{width:100%;height:auto;overflow:visible;transform:rotate(-90deg)}
-.report-donut-segment{stroke-dasharray:0 100;animation:reportDonutReveal 1.05s cubic-bezier(.22,1,.36,1) forwards;transition:opacity .2s ease}
+.report-donut-segment{animation:reportDonutFade .85s ease-out both;transition:opacity .2s ease}
 .report-donut-segment:hover{opacity:.78}
 .report-donut-total,.report-donut-caption{fill:#1e293b;font-family:inherit;transform:rotate(90deg);transform-origin:21px 21px}
 .report-donut-total{font-size:7px;font-weight:800}
 .report-donut-caption{fill:#64748b;font-size:2.6px}
 @keyframes reportBarGrow{from{transform:scaleY(0);opacity:.45}to{transform:scaleY(1);opacity:1}}
-@keyframes reportDonutReveal{from{stroke-dasharray:0 100}to{stroke-dasharray:var(--donut-segment, 100) 100}}
+@keyframes reportDonutFade{from{opacity:0}to{opacity:1}}
 @keyframes reportPanelEnter{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-@media(prefers-reduced-motion:reduce){.report-chart-panel,.report-animated-bar,.report-donut-segment{animation:none!important;transition:none!important;transform:none!important}.report-donut-segment{stroke-dasharray:var(--donut-segment,100) 100}}
+@media(prefers-reduced-motion:reduce){.report-chart-panel,.report-animated-bar,.report-donut-segment{animation:none!important;transition:none!important;transform:none!important}.report-donut-segment{animation:none!important;opacity:1}}
