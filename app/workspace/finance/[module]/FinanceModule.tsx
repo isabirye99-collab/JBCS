@@ -100,19 +100,19 @@ export default function FinanceModule({ module }: { module: string }) {
 
   return (
     <div style={{ display: "flex", minHeight: "100vh", background: "#f5f6f8", color: "#29252a", fontFamily: "Arial, sans-serif" }}>
-      <aside style={{ width: 248, flex: "0 0 248px", background: "#292629", color: "#fff", padding: "18px 14px", boxSizing: "border-box", height: "100vh", overflowY: "auto", position: "sticky", top: 0 }}>
+      <aside style={{ width: 248, flex: "0 0 248px", background: "#292629", color: "#fff", padding: "18px 14px", boxSizing: "border-box", height: "100vh", overflowY: "auto", position: "sticky", top: 0, display: "flex", flexDirection: "column" }}>
         <Link href="/workspace/finance" style={{ display: "flex", background: "#fff", borderRadius: 9, minHeight: 76, alignItems: "center", justifyContent: "center", padding: 10, marginBottom: 20 }}>
           <img src="/johden-logo.svg" alt="Johden Business Consultancy Services" style={{ display: "block", maxWidth: "100%", width: 190, maxHeight: 58, objectFit: "contain" }} />
         </Link>
         <div style={{ fontSize: 10, letterSpacing: ".14em", color: "#aaa2a8", fontWeight: 800, padding: "0 12px 10px" }}>FINANCE WORKSPACE</div>
-        <nav aria-label="Finance navigation">
+        <nav aria-label="Finance navigation" style={{ flex: 1 }}>
           {financeNav.map((item) => {
             const active = item.href === (module === "receipts" ? "/workspace/finance/sales-receipts" : `/workspace/finance/${module}`);
             const Icon = item.icon;
             return <Link key={item.href} href={item.href} title={item.label} style={navLinkStyle(active)}><span style={{ width: 18, minWidth: 18, display: "inline-flex", alignItems: "center", justifyContent: "center" }}><Icon size={16} strokeWidth={1.9} /></span><span style={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis" }}>{item.label}</span></Link>;
           })}
         </nav>
-        <div style={{ marginTop: 22, borderTop: "1px solid #484348", padding: "16px 10px 0", color: "#bcb5bb", fontSize: 11, lineHeight: 1.6 }}>Johden Business Suite<br />Finance &amp; Billing</div>
+        <div style={{ marginTop: 14, borderTop: "1px solid #484348", padding: "14px 4px 0" }}><Link href="/workspace/settings" style={navLinkStyle(module === "settings")}><SettingsIcon size={16} />Settings</Link><form action="/api/saas/logout" method="post" style={{ marginTop: 8 }}><button type="submit" style={{ ...navLinkStyle(false), width: "100%", border: "1px solid #4a4549", cursor: "pointer", textAlign: "left" }}><span aria-hidden="true">↪</span>Log out</button></form></div>
       </aside>
 
       <main style={{ flex: 1, minWidth: 0, padding: "30px clamp(16px, 3vw, 40px) 56px" }}>
