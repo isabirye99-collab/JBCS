@@ -494,3 +494,8 @@
 @keyframes reportDonutFade{from{opacity:0}to{opacity:1}}
 @keyframes reportPanelEnter{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 @media(prefers-reduced-motion:reduce){.report-chart-panel,.report-animated-bar,.report-donut-segment{animation:none!important;transition:none!important;transform:none!important}.report-donut-segment{animation:none!important;opacity:1}}
+
+.report-animated-fill{transform-origin:left center;animation:reportFillGrow .95s cubic-bezier(.22,1,.36,1) both;transition:filter .18s ease}
+.report-animated-fill:hover{filter:brightness(1.1)}
+@keyframes reportFillGrow{from{transform:scaleX(0);opacity:.55}to{transform:scaleX(1);opacity:1}}
+@media(prefers-reduced-motion:reduce){.report-animated-fill{animation:none!important;transition:none!important;transform:none!important}}
