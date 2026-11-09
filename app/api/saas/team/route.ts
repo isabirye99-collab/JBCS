@@ -60,10 +60,11 @@ export async function POST(request: NextRequest) {
 
   const base = `${ctx.url}/rest/v1`;
   const h = headers(ctx.serviceKey);
-  const memberResponse = await fetch(`${base}/workspace_members?workspace_id=eq.${encodeURIComponent(ctx.workspaceId)}&is_active=eq.true&select=id,user_id&limit=1000`, { headers: h, cache: "no-store" });
+  const memberResponse = await fetch(`${base}/workspace_members?workspace_id=eq.${encodeURIComponent(ctx.workspaceId)}&select=id,user_id,role,is_active&limit=1000`, { headers: h, cache: "no-store" });
   if (!memberResponse.ok) return NextResponse.json({ error: "Could not verify the workspace user limit." }, { status: 502 });
   const currentMembers = await memberResponse.json();
-  if (ctx.maxUsers !== null && Array.isArray(currentMembers) && currentMembers.length >= ctx.maxUsers) {
+  const activeMemberCount = Array.isArray(currentMembers) ? currentMembers.filter((m: any) => m.is_active).length : 0;
+  if (ctx.maxUsers !== null && activeMemberCount >= ctx.maxUsers) {
     return NextResponse.json({ error: `Your current plan allows ${ctx.maxUsers} active user(s). Upgrade or increase the plan limit before inviting another user.` }, { status: 403 });
   }
 
@@ -89,8 +90,18 @@ export async function POST(request: NextRequest) {
     newlyInvited = true;
   }
 
-  const existing = Array.isArray(currentMembers) && currentMembers.some((m: any) => m.user_id === user.id);
-  if (existing) return NextResponse.json({ error: "This user already belongs to the workspace." }, { status: 409 });
+  const existing = Array.isArray(currentMembers) ? currentMembers.find((m: any) => m.user_id === user.id) : null;
+  if (existing?.is_active) return NextResponse.json({ error: "This user already belongs to the workspace." }, { status: 409 });
+  if (existing && !existing.is_active) {
+    const reactivate = await fetch(`${base}/workspace_members?id=eq.${encodeURIComponent(existing.id)}&workspace_id=eq.${encodeURIComponent(ctx.workspaceId)}`, {
+      method: "PATCH",
+      headers: { ...h, "Content-Type": "application/json", Prefer: "return=representation" },
+      body: JSON.stringify({ is_active: true, role }),
+      cache: "no-store",
+    });
+    if (!reactivate.ok) return NextResponse.json({ error: "Could not reactivate this user's workspace access. Check the plan limit." }, { status: 409 });
+    return NextResponse.json({ success: true, message: "Existing workspace access reactivated." }, { status: 200 });
+  }
 
   const insertResponse = await fetch(`${base}/workspace_members`, {
     method: "POST",
