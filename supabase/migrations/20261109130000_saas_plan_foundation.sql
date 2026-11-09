@@ -37,7 +37,13 @@ on conflict (plan_key) do update set
 alter table public.workspace_subscriptions
   add column if not exists plan_key text not null default 'basic';
 
-do $$
+-- Preserve full access for workspaces that already have a paid or unexpired trial.
+update public.workspace_subscriptions
+set plan_key = 'pro'
+where status = 'active'
+   or (status = 'trialing' and trial_ends_at > now());
+
+do $
 begin
   if not exists (
     select 1 from pg_constraint
