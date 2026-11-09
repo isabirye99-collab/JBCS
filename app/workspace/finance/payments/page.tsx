@@ -1,0 +1,131 @@
+"use client";
+
+
+import "../finance.css";
+import Link from "next/link";
+import { LayoutDashboard, UsersRound, Package, FileText, FilePlus2, Receipt, CreditCard, Search, Plus, RefreshCw, Printer, ArrowUpRight, WalletCards, Wallet, CalendarDays, FileBarChart, Settings } from "lucide-react";
+import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
+
+type Invoice = {
+  id: string; invoice_number?: string | null; issue_date?: string | null; due_date?: string | null;
+  currency?: string | null; total?: number | string | null; amount_paid?: number | string | null; status?: string | null;
+  business_contacts?: { name?: string | null } | null;
+};
+type Payment = {
+  id: string; invoice_id?: string | null; payment_reference?: string | null; payment_date?: string | null;
+  amount?: number | string | null; currency?: string | null; exchange_rate?: number | string | null;
+  method?: string | null; notes?: string | null; created_at?: string | null;
+  invoices?: { id?: string; invoice_number?: string | null; total?: number | string | null; amount_paid?: number | string | null; status?: string | null; business_contacts?: { name?: string | null } | null } | null;
+};
+const BRAND = "#F3192D";
+const navigation = [
+  { label: "Dashboard", href: "/workspace/finance", icon: LayoutDashboard },
+  { label: "Customers", href: "/workspace/finance/customers", icon: UsersRound },
+  { label: "Products & Services", href: "/workspace/finance/items", icon: Package },
+  { label: "Invoices", href: "/workspace/finance/invoices", icon: FileText },
+  { label: "Quotes", href: "/workspace/finance/quotes", icon: FilePlus2 },
+  { label: "Sales Receipts", href: "/workspace/finance/sales-receipts", icon: Receipt },
+  { label: "Payments", href: "/workspace/finance/payments", icon: CreditCard },
+  { label: "Expenses", href: "/workspace/finance/expenses", icon: Wallet },
+  { label: "Supplier Payments", href: "/workspace/finance/supplier-payments", icon: CreditCard },
+  { label: "Owner's Income & Commissions", href: "/workspace/finance/owner-income", icon: Wallet },
+  { label: "Reports", href: "/workspace/finance/reports", icon: FileBarChart },
+  { label: "Settings", href: "/workspace/settings", icon: Settings },
+];
+function money(value: unknown, currency = "UGX") {
+  const amount = Number(value ?? 0);
+  try { return new Intl.NumberFormat("en-UG", { style: "currency", currency, maximumFractionDigits: currency === "UGX" ? 0 : 2 }).format(Number.isFinite(amount) ? amount : 0); }
+  catch { return `${currency} ${Number.isFinite(amount) ? amount.toLocaleString() : "0"}`; }
+}
+function today() { return new Date().toISOString().slice(0, 10); }
+function methodLabel(value?: string | null) { return ({ cash: "Cash", bank_transfer: "Bank transfer", mobile_money: "Mobile money", card: "Card", cheque: "Cheque", other: "Other" } as Record<string, string>)[value || ""] || value || "—"; }
+function balance(invoice: Invoice) { return Math.max(0, Number(invoice.total || 0) - Number(invoice.amount_paid || 0)); }
+export default function PaymentsPage() {
+  const [payments, setPayments] = useState<Payment[]>([]);
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
+  const [search, setSearch] = useState("");
+  const [methodFilter, setMethodFilter] = useState("all");
+  const [showForm, setShowForm] = useState(false);
+  const [invoiceId, setInvoiceId] = useState("");
+  const [amount, setAmount] = useState("");
+  const [paymentDate, setPaymentDate] = useState(today());
+  const [method, setMethod] = useState("mobile_money");
+  const [reference, setReference] = useState("");
+  const [notes, setNotes] = useState("");
+
+  const load = useCallback(async () => {
+    setLoading(true); setError("");
+    try {
+      const [pRes, iRes] = await Promise.all([fetch("/api/saas/payments", { cache: "no-store" }), fetch("/api/saas/invoices", { cache: "no-store" })]);
+      const [pData, iData] = await Promise.all([pRes.json(), iRes.json()]);
+      if (!pRes.ok) throw new Error(pData.error || "Could not load payments.");
+      if (!iRes.ok) throw new Error(iData.error || "Could not load invoices.");
+      setPayments(Array.isArray(pData.payments) ? pData.payments : []);
+      setInvoices(Array.isArray(iData.invoices) ? iData.invoices : []);
+    } catch (e) { setError(e instanceof Error ? e.message : "Unable to load payments."); }
+    finally { setLoading(false); }
+  }, []);
+  useEffect(() => { void load(); }, [load]);
+
+  const selectedInvoice = invoices.find((item) => item.id === invoiceId);
+  const availableInvoices = useMemo(() => invoices.filter((item) => ["sent", "part_paid", "overdue"].includes((item.status || "").toLowerCase()) && balance(item) > 0), [invoices]);
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    return payments.filter((p) => {
+      const ref = (p.payment_reference || "").toLowerCase();
+      const inv = (p.invoices?.invoice_number || "").toLowerCase();
+      const customer = (p.invoices?.business_contacts?.name || "").toLowerCase();
+      return (!q || ref.includes(q) || inv.includes(q) || customer.includes(q) || p.id.toLowerCase().includes(q)) && (methodFilter === "all" || p.method === methodFilter);
+    });
+  }, [payments, search, methodFilter]);
+  const totalReceived = useMemo(() => filtered.reduce((sum, p) => sum + Number(p.amount || 0), 0), [filtered]);
+
+  function chooseInvoice(id: string) {
+    setInvoiceId(id);
+    const invoice = invoices.find((item) => item.id === id);
+    setAmount(invoice ? String(balance(invoice)) : "");
+  }
+  async function recordPayment(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault(); setError(""); setNotice("");
+    if (!selectedInvoice) { setError("Choose an invoice with an outstanding balance."); return; }
+    const numericAmount = Number(amount);
+    if (!Number.isFinite(numericAmount) || numericAmount <= 0 || numericAmount > balance(selectedInvoice)) { setError("Enter an amount greater than zero and no higher than the invoice balance."); return; }
+    if (paymentDate > today()) { setError("Payment date cannot be in the future."); return; }
+    setSaving(true);
+    try {
+      const response = await fetch("/api/saas/payments", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ invoice_id: invoiceId, amount: numericAmount, payment_date: paymentDate, method, payment_reference: reference, notes }) });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Payment could not be recorded.");
+      setNotice(`Payment recorded successfully for invoice ${selectedInvoice.invoice_number || ""}. Open Sales Receipts to view and print the receipt.`.trim());
+      setShowForm(false); setInvoiceId(""); setAmount(""); setPaymentDate(today()); setMethod("mobile_money"); setReference(""); setNotes("");
+      await load();
+    } catch (e) { setError(e instanceof Error ? e.message : "Payment could not be recorded."); }
+    finally { setSaving(false); }
+  }
+  const statusClass = (status?: string | null) => status === "overdue" ? "bg-rose-50 text-rose-700" : status === "part_paid" ? "bg-amber-50 text-amber-800" : status === "paid" ? "bg-emerald-50 text-emerald-700" : "bg-blue-50 text-blue-700";
+
+  return <div className="min-h-screen bg-[#F7F8FA] text-slate-900">
+    <aside className="fixed inset-y-0 left-0 z-30 hidden w-[264px] flex-col border-r border-slate-200 bg-white md:flex">
+      <Link href="/workspace/finance" className="flex min-h-[98px] items-center gap-3 border-b border-slate-100 px-4"><span className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-[#f5dfe2] bg-white"><img src="/johden-logo.svg" alt="Johden logo" className="h-full w-full object-contain" /></span><span><span className="block font-bold tracking-wide">JOHDEN</span><span className="mt-0.5 block text-xs text-slate-500">Business Consultancy &amp; Finance</span></span></Link>
+      <div className="px-4 pb-2 pt-7 text-[10px] font-bold uppercase tracking-[.2em] text-slate-400">Workspace</div><nav className="flex-1 space-y-1 overflow-y-auto px-2 pb-4">{navigation.map((item) => { const Icon = item.icon; const active = item.label === "Payments"; return <Link key={item.label} href={item.href} className={`flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold ${active ? "bg-rose-50 text-slate-900" : "text-slate-700 hover:bg-slate-50 hover:text-[#F3192D]"}`}><Icon size={19} className={active ? "text-[#F3192D]" : "text-slate-700"}/><span className="flex-1">{item.label}</span>{active && <span className="h-1.5 w-1.5 rounded-full bg-[#F3192D]"/>}</Link>; })}</nav><div className="border-t border-slate-100 px-4 py-4 text-xs text-slate-400">Johden Business Suite</div>
+    </aside>
+    <main className="min-w-0 px-4 py-5 sm:px-6 lg:px-8 md:ml-[264px] jbcs-finance-consistent-main"><nav aria-label="Workspace navigation" className="mb-5 flex flex-wrap gap-2 md:hidden">{navigation.map((item) => <Link key={item.label} href={item.href} className={`rounded-lg border px-3 py-2 text-xs font-semibold ${item.label === "Payments" ? "border-rose-200 bg-rose-50 text-[#F3192D]" : "border-slate-200 bg-white text-slate-700"}`}>{item.label}</Link>)}</nav>
+      <div className="mx-auto max-w-[1440px] space-y-6"><div className="flex flex-wrap items-end justify-between gap-4"><div><Link href="/workspace/finance" className="text-sm font-semibold text-slate-500 hover:text-[#F3192D]">← Finance overview</Link><div className="mt-4 flex items-center gap-3"><div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#F3192D] text-white"><WalletCards size={23}/></div><div><p className="text-xs font-bold uppercase tracking-[.18em] text-[#F3192D]">Johden Business Suite</p><h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Payments</h1></div></div><p className="mt-2 max-w-2xl text-sm text-slate-500">Record customer payments, track collections and review outstanding invoice balances.</p></div><div className="flex flex-wrap gap-2"><Link href="/workspace/finance/sales-receipts" className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm hover:text-[#F3192D]">View sales receipts</Link><button onClick={() => { setShowForm((v) => !v); setError(""); setNotice(""); }} className="rounded-xl bg-[#F3192D] px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#CF1022]"><Plus size={16} className="mr-1 inline"/>{showForm ? "Close form" : "Record payment"}</button></div></div>
+      {error && <div role="alert" className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">{error}</div>}{notice && <div role="status" className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">{notice}</div>}
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3"><div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><p className="text-sm font-medium text-slate-500">Payments shown</p><p className="mt-2 text-2xl font-bold">{filtered.length}</p><p className="mt-1 text-xs text-slate-400">Based on current filters</p></div><div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><p className="text-sm font-medium text-slate-500">Amount received (filtered)</p><p className="mt-2 text-2xl font-bold">{money(totalReceived, "UGX")}</p><p className="mt-1 text-xs text-slate-400">Mixed currencies are displayed in their payment rows</p></div><div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><p className="text-sm font-medium text-slate-500">Invoices awaiting payment</p><p className="mt-2 text-2xl font-bold">{availableInvoices.length}</p><p className="mt-1 text-xs text-slate-400">Issued invoices with a balance due</p></div></div>
+      {showForm && <form onSubmit={recordPayment} className="space-y-5 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6"><div className="border-b border-slate-100 pb-4"><h2 className="text-xl font-bold">Record a payment</h2><p className="mt-1 text-sm text-slate-500">Payments are checked against the invoice balance before being saved.</p></div><div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <label className="space-y-1.5 text-sm font-semibold text-slate-700 sm:col-span-2"><span>Invoice *</span><select required value={invoiceId} onChange={(e) => chooseInvoice(e.target.value)} className="w-full rounded-xl border border-slate-200 bg-white px-3 py-3 font-normal outline-none focus:border-[#F3192D]"><option value="">Select outstanding invoice</option>{availableInvoices.map((inv) => <option key={inv.id} value={inv.id}>{inv.invoice_number || "Invoice"} — {inv.business_contacts?.name || "Customer"} — Balance {money(balance(inv), inv.currency || "UGX")}</option>)}</select>{availableInvoices.length === 0 && <span className="block text-xs font-normal text-amber-700">No issued invoices with an outstanding balance are available.</span>}</label>
+        <label className="space-y-1.5 text-sm font-semibold text-slate-700"><span>Payment date *</span><input type="date" required max={today()} value={paymentDate} onChange={(e) => setPaymentDate(e.target.value)} className="w-full rounded-xl border border-slate-200 px-3 py-3 font-normal outline-none focus:border-[#F3192D]"/></label>
+        <label className="space-y-1.5 text-sm font-semibold text-slate-700"><span>Amount received *</span><input type="number" required min="0.01" max={selectedInvoice ? balance(selectedInvoice) : undefined} step="0.01" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="Enter amount" className="w-full rounded-xl border border-slate-200 px-3 py-3 font-normal outline-none focus:border-[#F3192D]"/>{selectedInvoice && <span className="block text-xs font-normal text-slate-500">Balance due: {money(balance(selectedInvoice), selectedInvoice.currency || "UGX")}</span>}</label>
+        <label className="space-y-1.5 text-sm font-semibold text-slate-700"><span>Payment method *</span><select required value={method} onChange={(e) => setMethod(e.target.value)} className="w-full rounded-xl border border-slate-200 bg-white px-3 py-3 font-normal outline-none focus:border-[#F3192D]"><option value="cash">Cash</option><option value="bank_transfer">Bank transfer</option><option value="mobile_money">Mobile money</option><option value="card">Card</option><option value="cheque">Cheque</option><option value="other">Other</option></select></label>
+        <label className="space-y-1.5 text-sm font-semibold text-slate-700"><span>Transaction / reference</span><input maxLength={120} value={reference} onChange={(e) => setReference(e.target.value)} placeholder="Mobile money or bank reference" className="w-full rounded-xl border border-slate-200 px-3 py-3 font-normal outline-none focus:border-[#F3192D]"/></label>
+        <label className="space-y-1.5 text-sm font-semibold text-slate-700 sm:col-span-2 lg:col-span-3"><span>Notes</span><textarea maxLength={1000} rows={2} value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Optional internal notes" className="w-full rounded-xl border border-slate-200 px-3 py-3 font-normal outline-none focus:border-[#F3192D]"/></label>
+      </div><div className="flex flex-wrap justify-end gap-2"><button type="button" onClick={() => setShowForm(false)} className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold">Cancel</button><button disabled={saving || !availableInvoices.length} className="rounded-xl bg-[#F3192D] px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-60">{saving ? "Saving payment…" : "Save payment"}</button></div></form>}
+      <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"><div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 p-4 sm:p-5"><div><h2 className="text-lg font-bold">Payment register</h2><p className="mt-1 text-sm text-slate-500">Recent payments recorded in this workspace.</p></div><button onClick={() => void load()} className="rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-600 hover:text-[#F3192D]"><RefreshCw size={15} className="mr-1 inline"/>Refresh</button></div><div className="flex flex-col gap-3 border-b border-slate-100 p-4 sm:flex-row"><div className="relative flex-1"><Search size={17} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"/><input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search invoice, customer or reference" className="w-full rounded-xl border border-slate-200 py-2.5 pl-9 pr-3 text-sm outline-none focus:border-[#F3192D]"/></div><select value={methodFilter} onChange={(e) => setMethodFilter(e.target.value)} className="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none focus:border-[#F3192D]"><option value="all">All methods</option><option value="cash">Cash</option><option value="bank_transfer">Bank transfer</option><option value="mobile_money">Mobile money</option><option value="card">Card</option><option value="cheque">Cheque</option><option value="other">Other</option></select></div><div className="overflow-x-auto"><table className="w-full min-w-[850px] text-left text-sm"><thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500"><tr><th className="px-4 py-3">Payment date</th><th className="px-4 py-3">Invoice / customer</th><th className="px-4 py-3">Method</th><th className="px-4 py-3">Reference</th><th className="px-4 py-3 text-right">Amount</th><th className="px-4 py-3">Receipt</th></tr></thead><tbody className="divide-y divide-slate-100">{loading ? <tr><td colSpan={6} className="px-4 py-12 text-center text-slate-500">Loading payments…</td></tr> : filtered.length === 0 ? <tr><td colSpan={6} className="px-4 py-12 text-center text-slate-500">No payments match your search. Record a payment or adjust the filters.</td></tr> : filtered.map((p) => <tr key={p.id} className="hover:bg-slate-50/70"><td className="whitespace-nowrap px-4 py-4">{p.payment_date || "—"}</td><td className="px-4 py-4"><span className="block font-semibold">{p.invoices?.invoice_number || "Invoice unavailable"}</span><span className="mt-1 block text-xs text-slate-500">{p.invoices?.business_contacts?.name || "Customer"}</span></td><td className="px-4 py-4">{methodLabel(p.method)}</td><td className="px-4 py-4">{p.payment_reference || "—"}</td><td className="whitespace-nowrap px-4 py-4 text-right font-bold">{money(p.amount, p.currency || "UGX")}</td><td className="px-4 py-4"><Link href={`/workspace/finance/sales-receipts?payment=${encodeURIComponent(p.id)}`} className="inline-flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-2 text-xs font-semibold hover:border-rose-200 hover:text-[#F3192D]"><Printer size={14}/> View receipt <ArrowUpRight size={13}/></Link></td></tr>)}</tbody></table></div><div className="border-t border-slate-100 px-4 py-3 text-xs text-slate-400">Showing up to 500 recent payment records.</div></section>
+      </div></main>
+  </div>;
+}
