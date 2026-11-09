@@ -399,3 +399,64 @@
 /* Owner income: white content canvas, isolated from shared finance grey canvas. */
 .finance-owner-income { background: #fff !important; width: 100%; min-height: 100vh; }
 .finance-owner-income > .owner-income-content { background: #fff !important; min-height: 100vh; }
+
+
+/* Products & Services: align the catalogue with the Payments workspace design. */
+.jbcs-products-redesign{display:block!important;min-height:100vh;background:#f7f8fa!important;color:#0f172a;font-family:'DM Sans',Arial,sans-serif}
+.jbcs-products-redesign>.finance-side-rail{position:fixed!important;inset:0 auto 0 0;width:264px!important;flex:0 0 264px!important;height:100vh!important;min-height:100vh!important;overflow-y:auto;background:#fff!important;color:#0f172a!important;border-right:1px solid #e2e8f0;padding:0 12px 16px!important;z-index:30;box-shadow:1px 0 0 #0f172a03}
+.jbcs-products-redesign .jbcs-product-brand{display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:flex-start!important;gap:11px!important;min-height:98px!important;width:auto!important;margin:0 -12px 0!important;padding:15px 16px!important;border-radius:0!important;border-bottom:1px solid #f1f5f9;background:#fff!important;color:#0f172a!important;text-decoration:none}
+.jbcs-products-redesign .jbcs-product-brand-mark{display:flex!important;align-items:center!important;justify-content:center!important;width:44px!important;height:44px!important;min-width:44px!important;padding:3px!important;overflow:hidden!important;border:1px solid #f5dfe2;border-radius:12px!important;background:#fff!important}
+.jbcs-products-redesign .jbcs-product-brand-mark img{display:block;width:100%!important;height:100%!important;max-height:none!important;max-width:100%!important;object-fit:contain}
+.jbcs-products-redesign .jbcs-product-brand-copy{display:block!important;min-width:0!important;line-height:1.3!important}
+.jbcs-products-redesign .jbcs-product-brand-copy strong{display:block!important;font-size:15px!important;font-weight:800!important;letter-spacing:.06em!important;color:#0f172a!important}
+.jbcs-products-redesign .jbcs-product-brand-copy small{display:block!important;margin-top:3px!important;font-size:10px!important;letter-spacing:0!important;color:#64748b!important;white-space:normal}
+.jbcs-products-redesign .finance-side-label{margin-top:22px!important;padding:0 10px 10px!important;color:#94a3b8!important;font-size:10px!important;font-weight:800!important;letter-spacing:.2em!important}
+.jbcs-products-redesign .finance-side-nav{display:grid!important;gap:4px!important}
+.jbcs-products-redesign .finance-side-nav a{display:flex!important;align-items:center!important;gap:12px!important;min-height:42px!important;padding:10px 12px!important;border-radius:11px!important;background:transparent!important;color:#475569!important;font-size:12px!important;font-weight:650!important;text-decoration:none!important}
+.jbcs-products-redesign .finance-side-nav a svg{flex:0 0 18px;color:#475569}
+.jbcs-products-redesign .finance-side-nav a:hover{background:#f8fafc!important;color:#f3192d!important}
+.jbcs-products-redesign .finance-side-nav a:hover svg{color:#f3192d}
+.jbcs-products-redesign .finance-side-nav a.selected{background:#fff0f1!important;color:#f3192d!important}
+.jbcs-products-redesign .finance-side-nav a.selected svg{color:#f3192d}
+.jbcs-products-redesign .finance-side-bottom{margin-top:auto!important;border-top:1px solid #f1f5f9!important;padding:16px 10px 0!important;color:#94a3b8!important;font-size:11px!important}
+.jbcs-products-redesign>.finance-app-main{margin-left:264px!important;width:calc(100% - 264px)!important;min-width:0!important;background:#f7f8fa!important}
+.jbcs-products-redesign>.finance-app-main>.inner-content{max-width:1440px!important;margin:0 auto!important;padding:24px clamp(16px,2.5vw,36px) 48px!important}
+.jbcs-products-redesign .jbcs-finance-top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:24px;color:#64748b;font-size:10px;font-weight:800;letter-spacing:.13em}
+.jbcs-products-redesign .jbcs-finance-top a{color:#64748b;font-size:12px;font-weight:650;letter-spacing:0;text-decoration:none}
+.jbcs-products-redesign .jbcs-finance-top a:hover{color:#f3192d}
+.jbcs-products-redesign .jbcs-finance-heading{margin-bottom:24px;align-items:flex-end}
+.jbcs-products-redesign .jbcs-finance-heading h1{font-size:clamp(30px,3vw,40px);letter-spacing:-.045em;color:#0f172a}
+.jbcs-products-redesign .jbcs-finance-heading p:not(.jbcs-eyebrow){font-size:13px;color:#64748b}
+.jbcs-products-redesign .jbcs-eyebrow{color:#f3192d;font-size:10px;letter-spacing:.16em}
+.jbcs-products-redesign .jbcs-page-actions{gap:9px}
+.jbcs-products-redesign .jbcs-primary-button,.jbcs-products-redesign .jbcs-secondary-button{min-height:42px;border-radius:11px;padding:11px 15px;font-size:12px;transition:background .15s ease,border-color .15s ease,transform .15s ease}
+.jbcs-products-redesign .jbcs-primary-button{background:#f3192d;border-color:#f3192d;box-shadow:0 2px 4px #f3192d1a}
+.jbcs-products-redesign .jbcs-primary-button:hover:not(:disabled){background:#cf1022;border-color:#cf1022;transform:translateY(-1px)}
+.jbcs-products-redesign .jbcs-secondary-button{background:#fff;border-color:#e2e8f0;color:#334155}
+.jbcs-products-redesign .jbcs-secondary-button:hover:not(:disabled){border-color:#fecdd3;background:#fffafa;color:#f3192d}
+.jbcs-products-redesign .jbcs-stat-grid{gap:16px;margin-bottom:22px}
+.jbcs-products-redesign .jbcs-stat-grid article{position:relative;overflow:hidden;border:1px solid #e2e8f0;border-radius:16px;padding:20px;background:#fff;box-shadow:0 2px 8px #0f172a05}
+.jbcs-products-redesign .jbcs-stat-grid article:before{content:"";position:absolute;inset:0 auto 0 0;width:3px;background:#f3192d}
+.jbcs-products-redesign .jbcs-stat-grid article span{font-size:12px;color:#64748b;font-weight:600}
+.jbcs-products-redesign .jbcs-stat-grid article strong{font-size:30px;color:#0f172a;letter-spacing:-.045em;margin:10px 0 6px}
+.jbcs-products-redesign .jbcs-stat-grid article small{font-size:11px;color:#94a3b8;line-height:1.55}
+.jbcs-products-redesign .jbcs-panel{border:1px solid #e2e8f0;border-radius:16px;padding:22px;background:#fff;box-shadow:0 2px 8px #0f172a05}
+.jbcs-products-redesign .jbcs-panel-heading{padding-bottom:16px;margin-bottom:18px;border-bottom:1px solid #f1f5f9}
+.jbcs-products-redesign .jbcs-panel-heading h2{font-size:19px;letter-spacing:-.035em;color:#0f172a}
+.jbcs-products-redesign .jbcs-form-grid label{font-size:12px;color:#334155}
+.jbcs-products-redesign .jbcs-form-grid input,.jbcs-products-redesign .jbcs-form-grid select,.jbcs-products-redesign .jbcs-form-grid textarea,.jbcs-products-redesign .jbcs-filters input,.jbcs-products-redesign .jbcs-filters select{border-color:#e2e8f0;border-radius:10px;padding:11px 12px;font-size:12px}
+.jbcs-products-redesign .jbcs-form-grid input:focus,.jbcs-products-redesign .jbcs-form-grid select:focus,.jbcs-products-redesign .jbcs-form-grid textarea:focus,.jbcs-products-redesign .jbcs-filters input:focus,.jbcs-products-redesign .jbcs-filters select:focus{border-color:#f3192d;box-shadow:0 0 0 3px #f3192d12}
+.jbcs-products-redesign .jbcs-filters{gap:10px}
+.jbcs-products-redesign .jbcs-table-wrap{border:1px solid #eef2f7;border-radius:12px}
+.jbcs-products-redesign .jbcs-table{min-width:850px}
+.jbcs-products-redesign .jbcs-table th{padding:14px 12px;background:#f8fafc;color:#64748b;font-size:10px;letter-spacing:.08em}
+.jbcs-products-redesign .jbcs-table td{padding:14px 12px;border-bottom:1px solid #f1f5f9;font-size:12px;color:#334155}
+.jbcs-products-redesign .jbcs-table td strong{font-size:12px;color:#0f172a}
+.jbcs-products-redesign .jbcs-table td small{font-size:11px;color:#64748b}
+.jbcs-products-redesign .jbcs-table tbody tr:hover{background:#fffafa}
+.jbcs-products-redesign .jbcs-amount{font-variant-numeric:tabular-nums;color:#0f172a}
+.jbcs-products-redesign .jbcs-message{border-radius:12px;padding:13px 15px}
+.jbcs-products-redesign :focus-visible{outline-color:#f3192d}
+@media(max-width:900px){.jbcs-products-redesign>.finance-side-rail{width:220px!important}.jbcs-products-redesign>.finance-app-main{margin-left:220px!important;width:calc(100% - 220px)!important}.jbcs-products-redesign .jbcs-stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:650px){.jbcs-products-redesign{display:block!important}.jbcs-products-redesign>.finance-side-rail{position:sticky!important;top:0!important;inset:auto!important;width:100%!important;height:auto!important;min-height:0!important;padding:0 10px 8px!important;overflow:visible!important;box-shadow:0 4px 12px #0f172a08}.jbcs-products-redesign .jbcs-product-brand{min-height:68px!important;margin:0 -10px 0!important;padding:10px 13px!important}.jbcs-products-redesign .jbcs-product-brand-mark{width:38px!important;height:38px!important;min-width:38px!important}.jbcs-products-redesign .jbcs-product-brand-copy strong{font-size:13px!important}.jbcs-products-redesign .jbcs-product-brand-copy small{font-size:9px!important}.jbcs-products-redesign .finance-side-label,.jbcs-products-redesign .finance-side-bottom{display:none!important}.jbcs-products-redesign .finance-side-nav{display:flex!important;gap:5px!important;overflow-x:auto!important;padding:7px 0 2px!important;scrollbar-width:thin}.jbcs-products-redesign .finance-side-nav a{flex:0 0 auto!important;min-height:36px!important;padding:8px 10px!important;white-space:nowrap;font-size:11px!important;background:#f8fafc!important}.jbcs-products-redesign .finance-side-nav a.selected{background:#fff0f1!important}.jbcs-products-redesign>.finance-app-main{margin-left:0!important;width:100%!important}.jbcs-products-redesign>.finance-app-main>.inner-content{padding:20px 13px 36px!important}.jbcs-products-redesign .jbcs-finance-heading{align-items:flex-start!important}.jbcs-products-redesign .jbcs-page-actions{width:100%;justify-content:stretch}.jbcs-products-redesign .jbcs-page-actions>*{flex:1 1 auto}.jbcs-products-redesign .jbcs-stat-grid{grid-template-columns:1fr;gap:10px}.jbcs-products-redesign .jbcs-stat-grid article{padding:15px 17px}.jbcs-products-redesign .jbcs-stat-grid article strong{font-size:25px}.jbcs-products-redesign .jbcs-panel{padding:15px}.jbcs-products-redesign .jbcs-table-wrap{border-radius:10px}}
+
