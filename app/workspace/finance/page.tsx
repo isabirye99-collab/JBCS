@@ -977,7 +977,7 @@ export default function FinanceDashboardPage() {
                     const expensesHeight = month.expenses > 0 ? Math.max(5, (month.expenses / maxValue) * 100) : 0;
                     return (
                       <div key={month.label + index} className="flex min-w-0 flex-col items-center justify-end">
-                        <div className="flex h-[calc(100%-28px)] w-full items-end justify-center gap-1 sm:gap-2">
+                        <div className="flex h-[calc(100%_-_28px)] w-full items-end justify-center gap-1 sm:gap-2">
                           <div className="dashboard-chart-bar w-[42%] max-w-7 rounded-t-md bg-[#9f1d35] shadow-sm shadow-rose-900/10" style={{ height: `${salesHeight}%`, animationDelay: `${index * 90}ms` }} title={`Sales: ${money(month.sales)}`} />
                           <div className="dashboard-chart-bar w-[42%] max-w-7 rounded-t-md bg-rose-200" style={{ height: `${expensesHeight}%`, animationDelay: `${index * 90 + 60}ms` }} title={`Expenses: ${money(month.expenses)}`} />
                         </div>
@@ -988,9 +988,11 @@ export default function FinanceDashboardPage() {
                 </div>
                 <div className="mt-4 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500">
                   <span>Figures are based on records available in your workspace.</span>
-                  <Link href="/workspace/finance/reports" className="inline-flex items-center gap-1 font-semibold text-[#9f1d35] hover:text-[#74162a]">
-                    Explore reports <ArrowRight size={14} />
-                  </Link>
+                  {(planKey === "pro" || isSuperAdmin) && (
+                    <Link href="/workspace/finance/reports" className="inline-flex items-center gap-1 font-semibold text-[#9f1d35] hover:text-[#74162a]">
+                      Explore reports <ArrowRight size={14} />
+                    </Link>
+                  )}
                 </div>
               </div>
 
