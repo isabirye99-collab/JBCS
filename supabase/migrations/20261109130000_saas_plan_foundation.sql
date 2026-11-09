@@ -118,3 +118,64 @@ begin
   );
 end;
 $function$;
+
+-- Enforce the Basic plan's single active user at database level.
+create or replace function public.enforce_workspace_member_limit()
+returns trigger
+language plpgsql
+security definer
+set search_path to 'public', 'pg_temp'
+as $function$
+declare
+  v_plan_key text := 'basic';
+  v_status text;
+  v_trial_end timestamptz;
+  v_period_end timestamptz;
+  v_max_users integer;
+  v_active_users bigint;
+begin
+  if new.is_active is distinct from true then
+    return new;
+  end if;
+
+  select s.plan_key, s.status, s.trial_ends_at, s.current_period_ends_at
+    into v_plan_key, v_status, v_trial_end, v_period_end
+  from public.workspace_subscriptions s
+  where s.workspace_id = new.workspace_id
+  order by s.created_at desc
+  limit 1;
+
+  if v_status = 'trialing' and v_trial_end > now() then
+    v_plan_key := 'pro';
+  elsif v_status = 'active' and (v_period_end is null or v_period_end > now()) then
+    v_plan_key := coalesce(v_plan_key, 'basic');
+  else
+    v_plan_key := 'basic';
+  end if;
+
+  select p.max_users into v_max_users
+  from public.saas_plans p
+  where p.plan_key = coalesce(v_plan_key, 'basic') and p.is_active = true
+  limit 1;
+
+  if v_max_users is not null then
+    select count(*) into v_active_users
+    from public.workspace_members m
+    where m.workspace_id = new.workspace_id and m.is_active = true;
+
+    if v_active_users >= v_max_users then
+      raise exception 'This workspace plan allows a maximum of % active user(s). Upgrade the subscription to add more users.', v_max_users
+        using errcode = '23514';
+    end if;
+  end if;
+
+  return new;
+end;
+$function$;
+
+drop trigger if exists enforce_workspace_member_limit_before_insert on public.workspace_members;
+create trigger enforce_workspace_member_limit_before_insert
+before insert or update of is_active, workspace_id on public.workspace_members
+for each row execute function public.enforce_workspace_member_limit();
+
+revoke all on function public.enforce_workspace_member_limit() from public, anon, authenticated;
