@@ -1,11 +1,13 @@
 -- Allow the existing atomic payment function to accept both owner income and commission entries.
 -- Apply through the normal reviewed Supabase migration workflow; do not run ad hoc against production.
-create or replace function public.record_owner_commission_payment(
+drop function if exists public.record_owner_commission_payment(uuid, uuid, date, numeric, character, text, text, text, uuid);
+
+create function public.record_owner_commission_payment(
   p_workspace_id uuid,
   p_entry_id uuid,
   p_payment_date date,
   p_amount numeric,
-  p_currency character,
+  p_currency text,
   p_payment_method text,
   p_payment_reference text,
   p_notes text,
