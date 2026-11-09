@@ -109,7 +109,8 @@ export default function FinanceModule({ module }: { module: string }) {
           {financeNav.map((item) => {
             const active = item.href === (module === "receipts" ? "/workspace/finance/sales-receipts" : `/workspace/finance/${module}`);
             const Icon = item.icon;
-            return <Link key={item.href} href={item.href} title={item.label} style={navLinkStyle(active)}><span style={{ width: 18, minWidth: 18, display: "inline-flex", alignItems: "center", justifyContent: "center" }}><Icon size={16} strokeWidth={1.9} /></span><span style={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis" }}>{item.label}</span></Link>;
+            const group = item.label === "Dashboard" ? "WORKSPACE" : item.label === "Products & Services" ? "SALES" : item.label === "Expenses" ? "FINANCE" : null;
+            return <div key={item.href}>{group && <div style={{ padding: "15px 12px 7px", color: "#aaa2a8", fontSize: 10, letterSpacing: ".14em", fontWeight: 800 }}>{group}</div>}<Link href={item.href} title={item.label} style={navLinkStyle(active)}><span style={{ width: 18, minWidth: 18, display: "inline-flex", alignItems: "center", justifyContent: "center" }}><Icon size={16} strokeWidth={1.9} /></span><span style={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis" }}>{item.label}</span></Link></div>;
           })}
         </nav>
         <div style={{ marginTop: 14, borderTop: "1px solid #484348", padding: "14px 4px 0" }}><Link href="/workspace/settings" style={navLinkStyle(module === "settings")}><SettingsIcon size={16} />Settings</Link><form action="/api/saas/logout" method="post" style={{ marginTop: 8 }}><button type="submit" style={{ ...navLinkStyle(false), width: "100%", border: "1px solid #4a4549", cursor: "pointer", textAlign: "left" }}><span aria-hidden="true">↪</span>Log out</button></form></div>
