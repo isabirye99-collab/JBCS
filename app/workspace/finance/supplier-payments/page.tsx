@@ -175,6 +175,7 @@ export default function SupplierPaymentsPage() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [invoices, setInvoices] = useState<CustomerInvoice[]>([]);
   const [payments, setPayments] = useState<Payment[]>([]);
+  const [selectedPaymentId, setSelectedPaymentId] = useState<string | null>(null);
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
   const [search, setSearch] = useState("");
@@ -252,6 +253,7 @@ export default function SupplierPaymentsPage() {
   );
 
   const total = filtered.reduce((n, p) => n + Number(p.amount || 0), 0);
+  const selectedPayment = filtered.find((p) => p.id === selectedPaymentId) || filtered[0] || null;
 
   function chooseSupplier(id: string) {
     setForm((v) => ({
@@ -635,60 +637,7 @@ export default function SupplierPaymentsPage() {
           </section>
         </div>
 
-        <section className="jbcs-panel jbcs-history-panel jbcs-register-panel">
-          <div className="jbcs-panel-heading">
-            <div>
-              <p className="jbcs-eyebrow">PAYMENT HISTORY</p>
-              <h2>Recent supplier payments</h2>
-            </div>
-            <input
-              className="jbcs-search"
-              placeholder="Search supplier, expense, invoice or reference"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-          </div>
-
-          <div className="jbcs-table-wrap">
-            <table className="jbcs-table">
-              <thead>
-                <tr>
-                  <th>Date / supplier</th>
-                  <th>Supplier bill / expense</th>
-                  <th>Customer invoice / job</th>
-                  <th>Method / reference</th>
-                  <th>Amount</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map((p) => (
-                  <tr key={p.id}>
-                    <td>
-                      <strong>{p.supplier_name || "Supplier"}</strong>
-                      <small>{p.payment_date}</small>
-                    </td>
-                    <td>{p.expense_description || "Not linked to an expense"}</td>
-                    <td>{p.invoice_number || "No customer invoice linked"}</td>
-                    <td>
-                      {p.payment_method.replaceAll("_", " ")}
-                      <small>{p.payment_reference || "—"}</small>
-                    </td>
-                    <td className="jbcs-amount">
-                      {money(Number(p.amount), p.currency)}
-                    </td>
-                  </tr>
-                ))}
-                {!filtered.length && (
-                  <tr>
-                    <td colSpan={5} className="jbcs-empty">
-                      No supplier payments found.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </section>
+        <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"><div className="flex flex-col gap-3 border-b border-slate-200 p-4 sm:flex-row sm:items-center sm:justify-between"><div><h2 className="text-lg font-bold">All Supplier Payments <span className="text-sm font-medium text-slate-400">({filtered.length})</span></h2><p className="mt-1 text-xs text-slate-500">Select a payment to review its supplier, allocation and reference.</p></div><input className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm sm:max-w-sm" placeholder="Search supplier, expense, invoice or reference" value={search} onChange={e=>setSearch(e.target.value)}/></div><div className="grid min-h-[600px] grid-cols-1 lg:grid-cols-[340px_minmax(0,1fr)]"><aside className="border-b border-slate-200 lg:border-b-0 lg:border-r"><div className="flex items-center justify-between border-b border-slate-100 px-4 py-3"><span className="text-xs font-semibold uppercase tracking-wide text-slate-500">Supplier payment register</span><span className="text-xs text-slate-400">{filtered.length} records</span></div><div className="max-h-[700px] overflow-y-auto">{filtered.length===0?<p className="p-6 text-sm text-slate-500">No supplier payments found.</p>:filtered.map(p=><button type="button" key={p.id} onClick={()=>setSelectedPaymentId(p.id)} className={`block w-full border-b border-slate-100 px-4 py-4 text-left ${selectedPayment?.id===p.id?"bg-rose-50/80 ring-1 ring-inset ring-rose-100":"hover:bg-slate-50"}`}><span className="flex items-start justify-between gap-3"><span className="truncate text-sm font-semibold">{p.supplier_name||"Supplier"}</span><span className="whitespace-nowrap text-sm font-bold">{money(Number(p.amount),p.currency)}</span></span><span className="mt-1 block text-xs text-slate-500">{p.payment_date}</span><span className="mt-2 block truncate text-xs text-blue-600">{p.expense_description||p.invoice_number||p.payment_reference||"Standalone supplier payment"}</span></button>)}</div></aside><div className="min-w-0 bg-slate-50/70">{!selectedPayment?<div className="flex min-h-[450px] items-center justify-center p-8 text-sm text-slate-500">Select a supplier payment to view details.</div>:<><div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 bg-white px-5 py-4"><div><p className="text-xs text-slate-500">Selected supplier payment</p><h2 className="mt-0.5 text-xl font-bold">{selectedPayment.supplier_name||"Supplier payment"}</h2><p className="mt-1 text-xs text-slate-500">{selectedPayment.payment_date}</p></div><div className="flex flex-wrap gap-2"><button type="button" onClick={()=>window.print()} className="rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium">PDF / Print</button><button type="button" onClick={()=>{setForm({supplier_contact_id:selectedPayment.supplier_contact_id,expense_id:selectedPayment.expense_id||"",invoice_id:selectedPayment.invoice_id||"",payment_date:selectedPayment.payment_date,amount:String(selectedPayment.amount),currency:selectedPayment.currency,payment_method:selectedPayment.payment_method,payment_reference:selectedPayment.payment_reference||"",notes:selectedPayment.notes||""});setShowForm(true);}} className="rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium">Use details for new payment</button></div></div><div className="m-5 rounded-xl border border-slate-200 bg-white p-6 shadow-sm"><div className="grid gap-6 sm:grid-cols-2"><div><p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Amount paid</p><p className="mt-2 text-2xl font-bold">{money(Number(selectedPayment.amount),selectedPayment.currency)}</p></div><div><p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Payment method</p><p className="mt-2 font-semibold capitalize">{selectedPayment.payment_method.replaceAll("_"," ")}</p></div><div><p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Supplier</p><p className="mt-2 font-semibold">{selectedPayment.supplier_name||"—"}</p></div><div><p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Payment reference</p><p className="mt-2 font-semibold">{selectedPayment.payment_reference||"—"}</p></div><div><p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Supplier bill / expense</p><p className="mt-2 font-semibold">{selectedPayment.expense_description||"Not linked to an expense"}</p></div><div><p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Customer invoice / job</p><p className="mt-2 font-semibold">{selectedPayment.invoice_number||"No customer invoice linked"}</p></div><div className="sm:col-span-2"><p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Notes</p><p className="mt-2 whitespace-pre-wrap text-sm text-slate-700">{selectedPayment.notes||"No notes recorded."}</p></div></div></div></>}</div></div><div className="border-t border-slate-100 px-4 py-3 text-xs text-slate-400">Total shown: {money(total)}. Mixed currencies are not converted.</div></section>
       </main>
     </div>
   );
