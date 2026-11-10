@@ -214,37 +214,21 @@ export async function POST(
       });
     }
 
-    // Daily sequence. Existing invoice numbers are never changed.
-    // Example: I20261106-001, I20261106-002; the next day starts at 001.
+    // New invoices use the requested JBCS I sequence. Existing numbers are preserved.
     const numberResponse = await fetch(
       `${ctx.url}/rest/v1/invoices?workspace_id=eq.${encodeURIComponent(ctx.workspaceId)}&select=invoice_number&limit=5000`,
-      {
-        headers: getHeaders(ctx.serviceKey),
-        cache: "no-store",
-      },
+      { headers: getHeaders(ctx.serviceKey), cache: "no-store" },
     );
-
     if (!numberResponse.ok) {
-      console.error("[Invoices POST] Could not determine next invoice number:", {
-        status: numberResponse.status,
-      });
-      return NextResponse.json(
-        { error: "Unable to generate the next invoice number. Please try again." },
-        { status: 502 },
-      );
+      console.error("[Invoices POST] Could not determine next invoice number:", { status: numberResponse.status });
+      return NextResponse.json({ error: "Unable to generate the next invoice number. Please try again." }, { status: 502 });
     }
-
-    const existingNumbers: Array<{ invoice_number?: string | null }> =
-      await numberResponse.json();
-    const dateKey = issueDate.replace(/-/g, "");
+    const existingNumbers: Array<{ invoice_number?: string | null }> = await numberResponse.json();
     const highestSequence = existingNumbers.reduce((highest, row) => {
-      const number = String(row.invoice_number || "");
-      const datedMatch = number.match(new RegExp(`^(?:I|INV-)${dateKey}-(\\d+)$`, "i"));
-      return datedMatch ? Math.max(highest, Number(datedMatch[1])) : highest;
+      const match = String(row.invoice_number || "").match(/^JBCS\s*I\s*(\d+)$/i);
+      return match ? Math.max(highest, Number(match[1])) : highest;
     }, 0);
-    const sequence = String(highestSequence + 1).padStart(3, "0");
-    const invoiceNumber = `I${dateKey}-${sequence}`;
-
+    const invoiceNumber = `JBCS I ${String(highestSequence + 1).padStart(4, "0")}`;
     const rpc = await fetch(
       `${ctx.url}/rest/v1/rpc/create_workspace_invoice`,
       {
