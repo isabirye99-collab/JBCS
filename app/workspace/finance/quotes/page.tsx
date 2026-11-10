@@ -80,6 +80,14 @@ function today() {
   return new Date().toISOString().slice(0, 10);
 }
 
+function printDocument(documentNumber: string) {
+  const previousTitle = document.title;
+  const safeName = documentNumber.trim().replace(/[^a-zA-Z0-9 -]/g, "").replace(/\s+/g, "-");
+  document.title = safeName || "JBCS-Quotation";
+  window.print();
+  window.setTimeout(() => { document.title = previousTitle; }, 1500);
+}
+
 function makeLine(): QuoteLine {
   return { key: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`, description: "", quantity: "1", unit_price: "0", tax_rate: "0" };
 }
@@ -428,7 +436,7 @@ export default function QuotesPage() {
             <p className="mt-10 border-t border-slate-200 pt-4 text-center text-xs text-slate-400">Thank you for considering Johden Business Consultancy Services.</p>
 
           </div>
-          <div className="flex justify-end gap-3 border-t border-slate-200 px-5 py-4 print:hidden"><button onClick={() => setPrintQuote(null)} className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700">Close</button><button onClick={() => window.print()} className="rounded-xl bg-[#F3192D] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#CF1022]"><Printer size={15} className="mr-2 inline" />Print preview</button></div>
+          <div className="flex justify-end gap-3 border-t border-slate-200 px-5 py-4 print:hidden"><button onClick={() => setPrintQuote(null)} className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700">Close</button><button onClick={() => printDocument(printQuote.quote_number || `JBCS-Q-${printQuote.id.slice(0, 8).toUpperCase()}`)} className="rounded-xl bg-[#F3192D] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#CF1022]"><Printer size={15} className="mr-2 inline" />Print preview</button></div>
         </div>
       </div>}
       <style jsx global>{`
