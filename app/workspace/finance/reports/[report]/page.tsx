@@ -196,7 +196,20 @@ export default function FinanceReportDetailPage() {
         </div>
         <header className="mb-6 flex flex-wrap items-start justify-between gap-4">
           <div><p className="text-xs font-bold uppercase tracking-[.18em] text-[#F3192D]">JOHDEN BUSINESS SUITE / REPORTS</p><h1 className="mt-2 text-3xl font-bold tracking-tight">{report.title}</h1><p className="mt-2 max-w-3xl text-sm text-slate-500">{report.description}</p></div>
-          <div className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-xs text-slate-500"><span className="block font-bold uppercase tracking-wide text-slate-400">Data source</span><span className="mt-1 block font-semibold text-slate-700">{report.source}</span></div>
+          <div className="flex flex-wrap items-end gap-3">
+            <label className="text-xs font-semibold text-slate-500">Report module
+              <select value={report.slug} onChange={event => { if (event.target.value) window.location.assign(`/workspace/finance/reports/${event.target.value}`); }} className="mt-1 block min-w-[220px] rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm font-semibold text-slate-800">
+                <option value="sales">Sales Report</option>
+                <option value="expenses">Expense Report</option>
+                <option value="supplier-payments">Supplier Payments</option>
+                <option value="owner-income">Owner Income &amp; Commissions</option>
+                <option value="customer-statements">Customer Statements</option>
+                <option value="profit-loss">Profit &amp; Loss</option>
+                <option value="balance-sheet">Balance Sheet</option>
+              </select>
+            </label>
+            <div className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-xs text-slate-500"><span className="block font-bold uppercase tracking-wide text-slate-400">Data source</span><span className="mt-1 block font-semibold text-slate-700">{report.source}</span></div>
+          </div>
         </header>
         <section className="mb-5 flex flex-wrap items-end gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
           <label className="text-xs font-semibold text-slate-500">From<input type="date" value={start} onChange={event => setStart(event.target.value)} className="mt-1 block rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-800" /></label>
