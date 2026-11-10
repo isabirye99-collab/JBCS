@@ -90,8 +90,26 @@ export async function POST(request: NextRequest) {
       cache: "no-store",
     });
     if (!response.ok) {
-      const detail = await response.text();
-      return NextResponse.json({ error: detail.includes("exceed") || detail.includes("amount") ? "Payment could not be recorded. Check the outstanding balance." : "Could not record the payment." }, { status: 400 });
+      const raw = await response.text();
+      let detail = raw;
+      try {
+        const parsed = JSON.parse(raw);
+        detail = String(parsed.message || parsed.error || raw);
+      } catch {}
+      const reason = detail.toLowerCase();
+      const message = reason.includes("exceed") || reason.includes("outstanding")
+        ? "Payment exceeds the outstanding balance. Check the amount still due."
+        : reason.includes("currency")
+          ? "Payment currency must match the selected income record."
+          : reason.includes("cancelled")
+            ? "Cancelled income records cannot receive payments."
+            : reason.includes("not found")
+              ? "The income record could not be found in this workspace. Refresh and try again."
+              : reason.includes("payment amount") || reason.includes("greater than zero")
+                ? "Enter a payment amount greater than zero."
+                : "Could not record the payment. Refresh the register and try again; if the problem continues, check the database migration and server logs.";
+      console.error("Owner income payment RPC failed", response.status, detail.slice(0, 300));
+      return NextResponse.json({ error: message }, { status: response.status === 400 ? 400 : 502 });
     }
     return NextResponse.json({ success: true }, { status: 201 });
   }
