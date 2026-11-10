@@ -369,6 +369,11 @@ export default function FinanceReportsPage() {
     [ownerIncomePayments, start, end]
   );
 
+  const reportDirectSalesReceipts = useMemo(
+    () => directSalesReceipts.filter(inRange),
+    [directSalesReceipts, start, end]
+  );
+
   const ownerIncomeReceived = reportOwnerIncomePayments.reduce((sum, row) => sum + amount(row), 0);
 
   // Management P&L uses issued invoice totals and recorded expenses in the selected period.
@@ -386,13 +391,17 @@ export default function FinanceReportsPage() {
       const revenue = Number(row.total ?? row.total_amount ?? row.subtotal ?? 0) || 0;
       ensure(currency).revenue += revenue;
     });
+    reportDirectSalesReceipts.forEach((row) => {
+      const currency = String(row.currency ?? "UGX").toUpperCase();
+      ensure(currency).revenue += Number(row.total ?? 0) || 0;
+    });
     reportExpenses.forEach((row) => {
       const currency = String(row.currency ?? "UGX").toUpperCase();
       ensure(currency).expenses += amount(row);
     });
     return [...totals.values()].map((row) => ({ ...row, operatingResult: row.revenue - row.expenses }))
       .sort((a, b) => a.currency.localeCompare(b.currency));
-  }, [reportInvoices, reportExpenses]);
+  }, [reportInvoices, reportDirectSalesReceipts, reportExpenses]);
 
   const formatCurrencyTotals = (rows: Row[]) => {
     const totals = new Map<string, number>();
@@ -481,9 +490,10 @@ export default function FinanceReportsPage() {
     });
     addRows(reportInvoices, "invoiced");
     addRows(reportPayments, "collected");
+    addRows(reportDirectSalesReceipts, "collected");
     addRows(reportExpenses, "expenses");
     return [...totals.values()].sort((a, b) => a.month.localeCompare(b.month)).slice(-6).map((row) => ({ ...row, month: new Date(row.month + "-01T00:00:00").toLocaleDateString("en-UG", { month: "short", year: "2-digit" }) }));
-  }, [reportInvoices, reportPayments, reportExpenses]);
+  }, [reportInvoices, reportPayments, reportDirectSalesReceipts, reportExpenses]);
 
   const recentInvoices = useMemo(
     () =>
