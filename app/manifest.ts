@@ -13,7 +13,7 @@ export default function manifest(): MetadataRoute.Manifest {
     theme_color: "#b91c1c",
     orientation: "portrait",
     icons: [
-      { src: "/jbcs-icon.svg", sizes: "any", type: "image/svg+xml", purpose: "any maskable" }
+      { src: "/jbcs-icon.svg", sizes: "any", type: "image/svg+xml", purpose: "any" }
     ],
     categories: ["business", "finance", "productivity"]
   };
