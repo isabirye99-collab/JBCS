@@ -464,8 +464,10 @@ export default function FinanceDashboardPage() {
         fetch("/api/saas/customers", { cache: "no-store", credentials: "same-origin" }),
         fetch("/api/saas/invoices", { cache: "no-store", credentials: "same-origin" }),
         fetch("/api/saas/expenses", { cache: "no-store", credentials: "same-origin" }),
+        fetch("/api/saas/payments", { cache: "no-store", credentials: "same-origin" }),
+        fetch("/api/saas/sales-receipts", { cache: "no-store", credentials: "same-origin" }),
       ];
-      const labels = ["customers", "invoices", "expenses"];
+      const labels = ["customers", "invoices", "expenses", "customer payments", "direct sales receipts"];
       if (effectivePlan === "pro") {
         requests.push(fetch("/api/saas/supplier-payments", { cache: "no-store", credentials: "same-origin" }));
         labels.push("supplier payments");
@@ -533,6 +535,8 @@ export default function FinanceDashboardPage() {
       const supplierPaymentPayload = data["supplier payments"] as
         | { payments?: SupplierPayment[]; migration_required?: boolean }
         | undefined;
+      const customerPaymentPayload = data["customer payments"] as { payments?: CustomerPayment[] } | undefined;
+      const directSalesPayload = data["direct sales receipts"] as { receipts?: DirectSalesReceipt[] } | undefined;
 
       setCustomers(
         Array.isArray(customerPayload?.customers)
@@ -554,6 +558,8 @@ export default function FinanceDashboardPage() {
           ? supplierPaymentPayload.payments
           : []
       );
+      setCustomerPayments(Array.isArray(customerPaymentPayload?.payments) ? customerPaymentPayload.payments : []);
+      setDirectSalesReceipts(Array.isArray(directSalesPayload?.receipts) ? directSalesPayload.receipts : []);
       if (supplierPaymentPayload?.migration_required) {
         errors.push("Supplier payment records could not be loaded. Check the supplier payments database setup.");
       }
