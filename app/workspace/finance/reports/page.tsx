@@ -705,7 +705,7 @@ export default function FinanceReportsPage() {
                         setEnd(localDate(now));
                       } else if (period.value === "year") {
                         setStart(`${now.getFullYear()}-01-01`);
-                        setEnd(now.toISOString().slice(0, 10));
+                        setEnd(localDate(now));
                       } else {
                         setStart("");
                         setEnd("");
