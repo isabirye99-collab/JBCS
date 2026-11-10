@@ -3,6 +3,8 @@ import { getSaasContext } from "@/lib/saas-context";
 
 export const dynamic = "force-dynamic";
 
+const isValidCalendarDate = (value: unknown) => { if (typeof value !== "string") return false; const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value); if (!match) return false; const year = Number(match[1]), month = Number(match[2]), day = Number(match[3]); const date = new Date(Date.UTC(year, month - 1, day)); return date.getUTCFullYear() === year && date.getUTCMonth() === month - 1 && date.getUTCDate() === day; };
+
 const todayInUganda = () => {
   const parts = new Intl.DateTimeFormat("en-GB", { timeZone: "Africa/Kampala", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(new Date());
   const part = (type: string) => parts.find((item) => item.type === type)?.value || "";
@@ -36,6 +38,8 @@ export async function PATCH(req: Request) {
   const id = String(body.id || "");
   const contact_id = String(body.contact_id || "");
   const currency = String(body.currency || "UGX").toUpperCase();
+  const validUntil = body.valid_until == null || body.valid_until === "" ? null : String(body.valid_until);
+  if (validUntil && (!isValidCalendarDate(validUntil) || validUntil < todayInUganda())) return NextResponse.json({ error: "Enter a valid quotation expiry date that is today or later." }, { status: 400 });
   const items = Array.isArray(body.items) ? body.items.slice(0, 50) : [];
   if (!/^[0-9a-f-]{36}$/i.test(id) || !/^[0-9a-f-]{36}$/i.test(contact_id) || !/^[A-Z]{3}$/.test(currency) || !items.length) {
     return NextResponse.json({ error: "Select a customer and at least one quotation line." }, { status: 400 });
@@ -86,7 +90,7 @@ export async function PATCH(req: Request) {
   const updateResponse = await fetch(quoteUrl, {
     method: "PATCH", headers: { ...headers, Prefer: "return=representation" },
     body: JSON.stringify({
-      contact_id, currency, valid_until: body.valid_until || null,
+      contact_id, currency, valid_until: validUntil,
       notes: String(body.notes || "").slice(0, 2000) || null,
       subtotal, tax_amount, total: subtotal + tax_amount,
     }), cache: "no-store",
@@ -119,6 +123,8 @@ export async function POST(req: Request) {
 
   const contact_id = String(body.contact_id || "");
   const currency = String(body.currency || "UGX").toUpperCase();
+  const validUntil = body.valid_until == null || body.valid_until === "" ? null : String(body.valid_until);
+  if (validUntil && (!isValidCalendarDate(validUntil) || validUntil < todayInUganda())) return NextResponse.json({ error: "Enter a valid quotation expiry date that is today or later." }, { status: 400 });
   const items = Array.isArray(body.items) ? body.items.slice(0, 50) : [];
   if (!/^[0-9a-f-]{36}$/i.test(contact_id) || !/^[A-Z]{3}$/.test(currency) || !items.length) {
     return NextResponse.json({ error: "Select a customer and at least one line item." }, { status: 400 });
@@ -154,7 +160,7 @@ export async function POST(req: Request) {
     body: JSON.stringify({
       workspace_id: c.workspaceId, created_by: c.session.user.id, contact_id, currency,
       quote_number, issue_date: issueDate, subtotal, tax_amount, total: subtotal + tax_amount,
-      valid_until: body.valid_until || null, notes: String(body.notes || "").slice(0, 2000) || null,
+      valid_until: validUntil, notes: String(body.notes || "").slice(0, 2000) || null,
     }),
     cache: "no-store",
   });
