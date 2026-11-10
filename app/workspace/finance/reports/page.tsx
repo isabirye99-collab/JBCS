@@ -278,21 +278,23 @@ export default function FinanceReportsPage() {
         return;
       }
       setPlanLocked(false);
-      const [invoiceResponse, paymentResponse, expenseResponse, supplierResponse, ownerIncomeResponse] =
+      const [invoiceResponse, paymentResponse, expenseResponse, supplierResponse, ownerIncomeResponse, directSalesResponse] =
         await Promise.all([
           fetch("/api/saas/invoices", { cache: "no-store" }),
           fetch("/api/saas/payments", { cache: "no-store" }),
           fetch("/api/saas/expenses", { cache: "no-store" }),
           fetch("/api/saas/supplier-payments", { cache: "no-store" }),
           fetch("/api/saas/owner-income", { cache: "no-store" }),
+          fetch("/api/saas/sales-receipts", { cache: "no-store" }),
         ]);
 
-      const [invoiceData, paymentData, expenseData, supplierData, ownerIncomeData] = await Promise.all([
+      const [invoiceData, paymentData, expenseData, supplierData, ownerIncomeData, directSalesData] = await Promise.all([
         invoiceResponse.json(),
         paymentResponse.json(),
         expenseResponse.json(),
         supplierResponse.json(),
         ownerIncomeResponse.json(),
+        directSalesResponse.json(),
       ]);
 
       const failures = [
@@ -303,6 +305,8 @@ export default function FinanceReportsPage() {
           (supplierData.error || "Supplier payments could not be loaded."),
         !ownerIncomeResponse.ok &&
           (ownerIncomeData.error || "Owner income and commission payments could not be loaded."),
+        !directSalesResponse.ok &&
+          (directSalesData.error || "Direct sales receipts could not be loaded."),
         supplierData.migration_required &&
           "Supplier payment records could not be loaded. Check the supplier payments database setup.",
       ].filter(Boolean);
@@ -317,6 +321,9 @@ export default function FinanceReportsPage() {
       );
       setOwnerIncomePayments(
         Array.isArray(ownerIncomeData.payments) ? ownerIncomeData.payments : []
+      );
+      setDirectSalesReceipts(
+        Array.isArray(directSalesData.receipts) ? directSalesData.receipts : []
       );
     } catch (e) {
       setError(
