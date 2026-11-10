@@ -48,7 +48,6 @@ export async function POST(req: Request) {
   const subtotal = lines.reduce((sum: number, item: any) => sum + item.quantity * item.unit_price, 0);
   const tax_amount = lines.reduce((sum: number, item: any) => sum + item.quantity * item.unit_price * item.tax_rate / 100, 0);
   const issueDate = new Date().toISOString().slice(0, 10);
-  const dateKey = issueDate.replace(/-/g, "");
   const numberResponse = await fetch(
     `${c.url}/rest/v1/quotes?workspace_id=eq.${encodeURIComponent(c.workspaceId)}&select=quote_number&limit=5000`,
     { headers: { apikey: c.serviceKey, Authorization: `Bearer ${c.serviceKey}` }, cache: "no-store" },
@@ -56,10 +55,10 @@ export async function POST(req: Request) {
   if (!numberResponse.ok) return NextResponse.json({ error: "Unable to generate a quotation number. Please try again." }, { status: 502 });
   const existingNumbers: Array<{ quote_number?: string | null }> = await numberResponse.json();
   const highestSequence = existingNumbers.reduce((highest, row) => {
-    const match = String(row.quote_number || "").match(new RegExp(`^Q${dateKey}-(\\d+)$`, "i"));
+    const match = String(row.quote_number || "").match(/^JBCS\s*Q\s*(\d+)$/i);
     return match ? Math.max(highest, Number(match[1])) : highest;
   }, 0);
-  const quote_number = `Q${dateKey}-${String(highestSequence + 1).padStart(3, "0")}`;
+  const quote_number = `JBCS Q ${String(highestSequence + 1).padStart(4, "0")}`;
   const headerResponse = await fetch(`${c.url}/rest/v1/quotes`, {
     method: "POST",
     headers: { apikey: c.serviceKey, Authorization: `Bearer ${c.serviceKey}`, "Content-Type": "application/json", Prefer: "return=representation" },
