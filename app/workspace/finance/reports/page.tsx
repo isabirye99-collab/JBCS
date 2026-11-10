@@ -507,6 +507,18 @@ export default function FinanceReportsPage() {
         String(amount(row)),
       ]),
 
+      ...reportDirectSalesReceipts.map((row) => [
+        "Direct Sales Receipt",
+        dateOf(row),
+        String(row.receipt_number ?? row.receipt_no ?? row.reference ?? row.id ?? ""),
+        String(row.customer_name ?? row.customer ?? row.description ?? "Direct sale"),
+        "",
+        "",
+        String(row.status ?? "recorded"),
+        String(row.currency ?? "UGX"),
+        String(amount(row)),
+      ]),
+
       ...reportPayments.map((row) => [
         "Customer Payment",
         dateOf(row),
@@ -570,7 +582,7 @@ export default function FinanceReportsPage() {
     anchor.href = url;
     anchor.download = `JBCS-financial-report-${start || "all"}-to-${end || "today"}.csv`;
     anchor.click();
-    URL.revokeObjectURL(url);
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
 
   const panel = "rounded-2xl border border-slate-200 bg-white p-5 shadow-sm";
