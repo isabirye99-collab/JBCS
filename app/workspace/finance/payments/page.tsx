@@ -77,6 +77,7 @@ export default function PaymentsPage() {
     finally { setLoading(false); }
   }, []);
   useEffect(() => { void load(); }, [load]);
+  useEffect(() => { const paymentId = new URLSearchParams(window.location.search).get("payment"); if (paymentId) setSelectedPaymentId(paymentId); }, []);
 
   const selectedInvoice = invoices.find((item) => item.id === invoiceId);
   const availableInvoices = useMemo(() => invoices.filter((item) => ["sent", "part_paid", "overdue"].includes((item.status || "").toLowerCase()) && balance(item) > 0), [invoices]);
