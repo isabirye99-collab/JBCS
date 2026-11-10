@@ -1,4 +1,5 @@
 "use client";
+// Keep the client directive as the first statement in this interactive workspace page.
 
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
