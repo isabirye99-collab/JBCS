@@ -16,7 +16,8 @@ const reportOptions = [
   { slug: "profit-loss", title: "Profit & Loss", description: "Management view of sales and recorded expenses.", source: "Invoices, direct sales receipts and expenses", icon: FileBarChart },
   { slug: "balance-sheet", title: "Balance Sheet", description: "Review available financial position data and reconciliation gaps.", source: "Available finance records; not a reconciled general ledger", icon: FileText },
 ];
-const amountOf = (r: Row) => Number(r.amount_due ?? r.total_amount ?? r.total ?? r.amount ?? r.paid_amount ?? 0) || 0;
+// Invoice amount_due is a balance, not the original revenue total.
+const amountOf = (r: Row) => Number(r.total_amount ?? r.total ?? r.amount ?? r.paid_amount ?? r.amount_due ?? 0) || 0;
 const dateOf = (r: Row) => String(r.issue_date ?? r.payment_date ?? r.expense_date ?? r.sale_date ?? r.earned_date ?? r.date ?? r.created_at ?? "").slice(0,10);
 const textOf = (r: Row, ...keys: string[]) => { for (const key of keys) { const v=r[key]; if (v!==undefined && v!==null && String(v).trim()) return String(v); } return "—"; };
 const money = (n: number, c = "UGX") => `${c} ${Math.round(n).toLocaleString("en-UG")}`;
@@ -80,10 +81,10 @@ export default function FinanceReportDetailPage() {
   const totalDirectSales = periodSalesReceipts.reduce((n,r)=>n+amountOf(r),0);
   const totalExpenses = periodExpenses.reduce((n,r)=>n+amountOf(r),0);
   const totalCollections = periodPayments.reduce((n,r)=>n+amountOf(r),0)+totalDirectSales;
-  const outstanding = periodInvoices.reduce((n,r)=>n+Math.max(0,Number(r.amount_due ?? amountOf(r))-Number(r.amount_paid ?? r.paid_amount ?? 0)),0);
+  const outstanding = periodInvoices.reduce((n,r)=>n+Math.max(0,r.amount_due !== undefined && r.amount_due !== null ? Number(r.amount_due) : amountOf(r)-Number(r.amount_paid ?? r.paid_amount ?? 0)),0);
   const totalSupplierPaid = periodSupplierPayments.reduce((n,r)=>n+amountOf(r),0);
   const totalOwnerReceived = periodOwnerPayments.reduce((n,r)=>n+amountOf(r),0);
-  const statementBalance = customerInvoices.reduce((n,r)=>n+Math.max(0,Number(r.amount_due ?? amountOf(r))-Number(r.amount_paid ?? r.paid_amount ?? 0)),0);
+  const statementBalance = customerInvoices.reduce((n,r)=>n+Math.max(0,r.amount_due !== undefined && r.amount_due !== null ? Number(r.amount_due) : amountOf(r)-Number(r.amount_paid ?? r.paid_amount ?? 0)),0);
   const expenseCategories = useMemo(()=>{const m=new Map<string,number>(); for(const e of periodExpenses){const k=textOf(e,"category","expense_category");m.set(k,(m.get(k)||0)+amountOf(e));}return [...m.entries()].sort((a,b)=>b[1]-a[1]);},[periodExpenses]);
   const rows: Row[] = report.slug==="sales" ? [...periodInvoices.map(r=>({...r,__kind:"Invoice"})),...periodSalesReceipts.map(r=>({...r,__kind:"Sales receipt"}))] :
     report.slug==="expenses" ? periodExpenses :
