@@ -117,6 +117,7 @@ export default function CustomersPage() {
   const [selectedId, setSelectedId] = useState("");
   const [showDirectory, setShowDirectory] = useState(false);
   const [showForm, setShowForm] = useState(false);
+  const [editingCustomerId, setEditingCustomerId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [updatingSupplier, setUpdatingSupplier] = useState(false);
@@ -254,9 +255,10 @@ export default function CustomersPage() {
 
     try {
       const response = await fetch("/api/saas/customers", {
-        method: "POST",
+        method: editingCustomerId ? "PATCH" : "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          ...(editingCustomerId ? { id: editingCustomerId } : {}),
           name,
           email,
           phone,
@@ -281,11 +283,14 @@ export default function CustomersPage() {
       setTaxNumber("");
       setIsSupplier(false);
       setShowForm(false);
+      setEditingCustomerId(null);
 
       setNotice(
-        isSupplier
-          ? "Customer registered successfully and marked as a supplier."
-          : "Customer registered successfully."
+        editingCustomerId
+          ? "Customer details updated successfully."
+          : isSupplier
+            ? "Customer registered successfully and marked as a supplier."
+            : "Customer registered successfully."
       );
 
       if (created?.id) {
@@ -824,6 +829,8 @@ export default function CustomersPage() {
                       </div>
                     </div>
 
+                    <div className="flex justify-end"><button type="button" onClick={() => { setName(selectedCustomer.name || ""); setEmail(selectedCustomer.email || ""); setPhone(selectedCustomer.phone || ""); setAddress(selectedCustomer.address || ""); setTaxNumber(selectedCustomer.tax_number || ""); setIsSupplier(Boolean(selectedCustomer.is_supplier)); setEditingCustomerId(selectedCustomer.id); setShowForm(true); }} className="inline-flex items-center gap-2 rounded-xl bg-[#F3192D] px-4 py-2.5 text-sm font-bold text-white hover:bg-[#CF1022]"><FileText size={16} /> Edit customer</button></div>
+
                     {/* Supplier status for existing customers */}
                     <div className="rounded-xl border border-slate-200 p-4">
                       <div className="flex items-start justify-between gap-3">
@@ -1022,7 +1029,7 @@ export default function CustomersPage() {
                   id="add-customer-title"
                   className="mt-1 text-xl font-extrabold text-slate-900"
                 >
-                  Add a customer
+                  {editingCustomerId ? "Edit customer" : "Add a customer"}
                 </h2>
                 <p className="mt-1 text-sm text-slate-500">
                   Enter the details you have. You can leave optional fields
@@ -1184,7 +1191,7 @@ export default function CustomersPage() {
                   {saving && (
                     <LoaderCircle className="animate-spin" size={16} />
                   )}
-                  {saving ? "Saving customer..." : "Save customer"}
+                  {saving ? (editingCustomerId ? "Updating customer..." : "Saving customer...") : (editingCustomerId ? "Save changes" : "Save customer")}
                 </button>
               </div>
             </form>
