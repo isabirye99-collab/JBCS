@@ -37,7 +37,7 @@ function money(value: unknown, currency = "UGX") {
   try { return new Intl.NumberFormat("en-UG", { style: "currency", currency, maximumFractionDigits: currency === "UGX" ? 0 : 2 }).format(Number.isFinite(amount) ? amount : 0); }
   catch { return `${currency} ${Number.isFinite(amount) ? amount.toLocaleString() : "0"}`; }
 }
-function today() { return new Date().toISOString().slice(0, 10); }
+function today() { const date = new Date(); const year = date.getFullYear(); const month = String(date.getMonth() + 1).padStart(2, "0"); const day = String(date.getDate()).padStart(2, "0"); return `${year}-${month}-${day}`; }
 function methodLabel(value?: string | null) { return ({ cash: "Cash", bank_transfer: "Bank transfer", mobile_money: "Mobile money", card: "Card", cheque: "Cheque", other: "Other" } as Record<string, string>)[value || ""] || value || "—"; }
 function balance(invoice: Invoice) { return Math.max(0, Number(invoice.total || 0) - Number(invoice.amount_paid || 0)); }
 export default function PaymentsPage() {
