@@ -23,6 +23,7 @@ import {
   FilePlus2,
   FileText,
   LayoutDashboard,
+  Landmark,
   LoaderCircle,
   Package,
   Plus,
@@ -150,6 +151,11 @@ const navigation: { heading: string; items: NavItem[] }[] = [
         label: "Owner's Income & Commissions",
         href: "/workspace/finance/owner-income",
         icon: Wallet,
+      },
+      {
+        label: "Loans",
+        href: "/workspace/finance/loans",
+        icon: Landmark,
       },
       {
         label: "Reports",
