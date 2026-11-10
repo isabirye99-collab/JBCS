@@ -109,8 +109,8 @@ export async function POST(request: NextRequest) {
   const reference = clean(body.payment_reference, 150);
   const notes = clean(body.notes, 2000);
 
-  if (!supplierId || !dateOk(paymentDate)) {
-    return NextResponse.json({ error: "Choose a supplier and enter a valid payment date." }, { status: 400 });
+  if (!supplierId || !dateOk(paymentDate) || paymentDate > todayInUganda()) {
+    return NextResponse.json({ error: "Choose a supplier and enter a valid payment date that is not in the future." }, { status: 400 });
   }
   if (!Number.isFinite(amount) || amount <= 0 || amount > 1e12) {
     return NextResponse.json({ error: "Enter a valid payment amount greater than zero." }, { status: 400 });
@@ -190,8 +190,8 @@ export async function PATCH(request: NextRequest) {
   const reference = clean(body.payment_reference, 150);
   const notes = clean(body.notes, 2000);
 
-  if (!paymentId || !supplierId || !dateOk(paymentDate)) {
-    return NextResponse.json({ error: "Choose a payment and supplier, and enter a valid payment date." }, { status: 400 });
+  if (!paymentId || !supplierId || !dateOk(paymentDate) || paymentDate > todayInUganda()) {
+    return NextResponse.json({ error: "Choose a payment and supplier, and enter a valid payment date that is not in the future." }, { status: 400 });
   }
   if (!Number.isFinite(amount) || amount <= 0 || amount > 1e12 || Math.round(amount * 100) !== amount * 100) {
     return NextResponse.json({ error: "Enter a valid payment amount with no more than two decimal places." }, { status: 400 });
