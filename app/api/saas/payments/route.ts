@@ -85,7 +85,7 @@ export async function POST(request: import("next/server").NextRequest) {
   if (!Number.isFinite(amount) || amount <= 0 || amount > 999999999999999) {
     return NextResponse.json({ error: "Enter a valid positive payment amount." }, { status: 400 });
   }
-  if (!validDate(paymentDate) || paymentDate > new Date().toISOString().slice(0, 10)) {
+  if (!validDate(paymentDate) || paymentDate > todayInUganda()) {
     return NextResponse.json({ error: "Payment date must be valid and cannot be in the future." }, { status: 400 });
   }
   if (!["cash", "bank_transfer", "mobile_money", "card", "cheque", "other"].includes(method)) {
