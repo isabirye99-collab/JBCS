@@ -5,7 +5,7 @@ type Template = Record<string, unknown> & { id:string; name:string; frequency:st
 type Contact = {id:string;name:string};
 const style:React.CSSProperties={width:"100%",padding:"10px 12px",border:"1px solid #d8dee8",borderRadius:8,font:"inherit",background:"#fff",color:"#172033"};
 const frequencies=[["weekly","Weekly"],["monthly","Monthly"],["quarterly","Quarterly"],["yearly","Yearly"]];
-const today=()=>{const d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());return d.toISOString().slice(0,10)};
+const today=()=>{const parts=new Intl.DateTimeFormat("en-CA",{timeZone:"Africa/Kampala",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date());const part=(type:string)=>parts.find(item=>item.type===type)?.value||"";return `${part("year")}-${part("month")}-${part("day")}`;};
 export default function RecurringFinance({onNotice}:{onNotice:(message:string)=>void}){
  const [kind,setKind]=useState<"invoices"|"expenses">("invoices");
  const [templates,setTemplates]=useState<Template[]>([]);
