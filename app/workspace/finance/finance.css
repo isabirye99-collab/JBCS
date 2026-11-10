@@ -499,3 +499,115 @@
 .report-animated-fill:hover{filter:brightness(1.1)}
 @keyframes reportFillGrow{from{transform:scaleX(0);opacity:.55}to{transform:scaleX(1);opacity:1}}
 @media(prefers-reduced-motion:reduce){.report-animated-fill{animation:none!important;transition:none!important;transform:none!important}}
+
+
+/* Reference-aligned Finance shell: white navigation rail, Johden red active state,
+   crisp register panels, and compact responsive behaviour. */
+.finance-shell>.finance-side-rail,
+.jbcs-products-redesign>.finance-side-rail{
+  background:#fff!important;
+  color:#111827!important;
+  border-right:1px solid #e2e8f0!important;
+  box-shadow:2px 0 10px #0f172a05!important;
+}
+.finance-shell .finance-side-brand,
+.jbcs-products-redesign .finance-side-brand,
+.jbcs-products-redesign .jbcs-product-brand{
+  background:#fff!important;
+  color:#111827!important;
+  border:0!important;
+  border-bottom:1px solid #e5e7eb!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+}
+.finance-shell .finance-side-brand span,
+.jbcs-products-redesign .finance-side-brand span,
+.jbcs-products-redesign .jbcs-product-brand-copy strong{color:#111827!important}
+.finance-shell .finance-side-brand small,
+.jbcs-products-redesign .finance-side-brand small,
+.jbcs-products-redesign .jbcs-product-brand-copy small{color:#9f1d35!important}
+.finance-shell .finance-side-workspace,
+.jbcs-products-redesign .finance-side-workspace{
+  background:#f8fafc!important;
+  border-color:#e5e7eb!important;
+}
+.finance-shell .finance-side-workspace b,
+.finance-shell .finance-side-bottom b,
+.jbcs-products-redesign .finance-side-workspace b,
+.jbcs-products-redesign .finance-side-bottom b{color:#111827!important}
+.finance-shell .finance-side-workspace small,
+.finance-shell .finance-side-bottom small,
+.jbcs-products-redesign .finance-side-workspace small,
+.jbcs-products-redesign .finance-side-bottom small{color:#64748b!important}
+.finance-shell .finance-side-label,
+.jbcs-products-redesign .finance-side-label{color:#64748b!important}
+.finance-shell .finance-side-nav a,
+.jbcs-products-redesign .finance-side-nav a{
+  color:#1f2937!important;
+  border-radius:9px!important;
+  font-weight:600!important;
+  transition:background .18s ease,color .18s ease,transform .18s ease!important;
+}
+.finance-shell .finance-side-nav a:hover,
+.jbcs-products-redesign .finance-side-nav a:hover{
+  color:#b51227!important;
+  background:#fff1f2!important;
+}
+.finance-shell .finance-side-nav a.selected,
+.jbcs-products-redesign .finance-side-nav a.selected{
+  color:#fff!important;
+  background:#e9162b!important;
+  box-shadow:0 4px 10px #e9162b20!important;
+}
+.finance-shell .finance-side-nav a.selected span,
+.jbcs-products-redesign .finance-side-nav a.selected span{color:#fff!important}
+.finance-shell .finance-side-bottom,
+.jbcs-products-redesign .finance-side-bottom{border-top-color:#e5e7eb!important}
+.finance-shell .finance-side-back,
+.jbcs-products-redesign .finance-side-back{color:#64748b!important}
+.finance-shell .finance-side-back:hover,
+.jbcs-products-redesign .finance-side-back:hover{color:#b51227!important}
+.finance-shell .finance-side-signout,
+.jbcs-products-redesign .finance-side-signout{
+  border-color:#e5e7eb!important;
+  color:#334155!important;
+  background:#fff!important;
+}
+.finance-shell .finance-side-signout:hover,
+.jbcs-products-redesign .finance-side-signout:hover{
+  color:#b51227!important;background:#fff1f2!important;border-color:#fecdd3!important;
+}
+.finance-shell .finance-app-main>.inner-content,
+.jbcs-products-redesign>.finance-app-main>.inner-content{padding-left:clamp(18px,2.1vw,32px)!important;padding-right:clamp(18px,2.1vw,32px)!important}
+.finance-shell .invoice-list-panel,
+.finance-shell #expense-list,
+.jbcs-products-redesign .jbcs-panel,
+.jbcs-products-redesign .invoice-list-panel{
+  border-color:#dfe4eb!important;
+  border-radius:14px!important;
+  box-shadow:0 2px 8px #0f172a06!important;
+}
+.finance-shell .invoice-feature-card,
+.jbcs-products-redesign .invoice-feature-card{
+  border-color:#e2e8f0!important;
+  border-radius:13px!important;
+  box-shadow:0 2px 8px #0f172a05!important;
+}
+.finance-shell .invoice-feature-card:hover,
+.jbcs-products-redesign .invoice-feature-card:hover{
+  border-color:#fecdd3!important;
+  box-shadow:0 8px 22px #9f1d350c!important;
+}
+.finance-shell .finance-side-signout:focus-visible,
+.finance-shell .finance-side-nav a:focus-visible,
+.jbcs-products-redesign .finance-side-nav a:focus-visible{outline:2px solid #f3192d!important;outline-offset:3px}
+@media(max-width:650px){
+  .finance-shell>.finance-side-rail,
+  .jbcs-products-redesign>.finance-side-rail{border-right:0!important;border-bottom:1px solid #e2e8f0!important}
+  .finance-shell .finance-side-nav a,
+  .jbcs-products-redesign .finance-side-nav a{background:#f8fafc!important;color:#334155!important}
+  .finance-shell .finance-side-nav a.selected,
+  .jbcs-products-redesign .finance-side-nav a.selected{background:#e9162b!important;color:#fff!important}
+  .finance-shell .finance-app-main>.inner-content,
+  .jbcs-products-redesign>.finance-app-main>.inner-content{padding-left:13px!important;padding-right:13px!important}
+}
