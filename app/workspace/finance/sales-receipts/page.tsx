@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { LayoutDashboard, UsersRound, Package, FileText, FilePlus2, Receipt, CreditCard, Search, RefreshCw, Printer, ArrowLeft, CheckCircle2, Wallet, FileBarChart, Settings } from "lucide-react";
+import { LayoutDashboard, UsersRound, Package, FileText, FilePlus2, Receipt, CreditCard, Search, RefreshCw, Printer, ArrowLeft, CheckCircle2, Wallet, FileBarChart, Settings, Plus, X } from "lucide-react";
 import { Suspense, useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
 
 type Payment = {
