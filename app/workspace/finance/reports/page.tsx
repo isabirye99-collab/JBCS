@@ -118,13 +118,15 @@ type Row = Record<string, unknown> & {
   status?: string;
 };
 
+// Prefer the original invoice/receipt total. amount_due is a remaining balance,
+// so it must not be used as the revenue total when both fields are present.
 const amount = (r: Row) =>
   Number(
-    r.amount_due ??
-      r.total_amount ??
+    r.total_amount ??
       r.total ??
       r.amount ??
       r.paid_amount ??
+      r.amount_due ??
       0
   ) || 0;
 
