@@ -125,7 +125,7 @@ function ReceiptsContent() {
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Could not record the direct sales receipt.");
       setNotice(`Direct sales receipt ${data.receipt.receipt_number} recorded.`);
-      setDirectFormOpen(false); setDirectCustomerId(""); setDirectDate(new Date().toISOString().slice(0,10)); setDirectCurrency("UGX"); setDirectMethod("cash"); setDirectReference(""); setDirectNotes(""); setDirectLines([{ description: "", quantity: "1", unit_price: "", tax_rate: "0" }]);
+      setDirectFormOpen(false); setDirectCustomerId(""); setDirectDate(today()); setDirectCurrency("UGX"); setDirectMethod("cash"); setDirectReference(""); setDirectNotes(""); setDirectLines([{ description: "", quantity: "1", unit_price: "", tax_rate: "0" }]);
       await load(); if (data.receipt?.id) setSelectedDirectId(data.receipt.id);
     } catch (e) { setError(e instanceof Error ? e.message : "Could not record the direct sales receipt."); }
     finally { setDirectBusy(false); }
