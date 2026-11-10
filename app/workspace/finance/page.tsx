@@ -718,7 +718,7 @@ export default function FinanceDashboardPage() {
   }).format(new Date());
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900">
+    <div className="jbcs-dashboard-page min-h-screen bg-slate-50 text-slate-900">
       <div className="flex min-h-screen">
         <aside className="hidden h-screen w-64 shrink-0 sticky top-0 flex-col border-r border-slate-200 bg-white text-slate-900 lg:flex">
           <Link
@@ -1070,230 +1070,29 @@ export default function FinanceDashboardPage() {
               </div>
             </section>
 
-            <section className="grid gap-6 xl:grid-cols-[1.65fr_1fr]">
-              <div className="min-w-0 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-                <SectionTitle
-                  title="Recent invoices"
-                  subtitle="A quick view of your latest billing activity"
-                  href="/workspace/finance/invoices"
-                />
-
-                <div className="mt-5">
-                  <div className="mb-4 flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3">
-                    <Search size={17} className="shrink-0 text-slate-400" />
-                    <input
-                      value={search}
-                      onChange={(event) => setSearch(event.target.value)}
-                      placeholder="Search recent invoices..."
-                      aria-label="Search recent invoices"
-                      className="h-10 min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-slate-400"
-                    />
-                  </div>
-
-                  <div className="overflow-x-auto">
-                    <table className="w-full min-w-[540px] text-left">
-                      <thead>
-                        <tr className="border-b border-slate-100 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
-                          <th className="pb-3 pr-3">Invoice</th>
-                          <th className="pb-3 pr-3">Customer</th>
-                          <th className="pb-3 pr-3">Date</th>
-                          <th className="pb-3 pr-3">Amount</th>
-                          <th className="pb-3">Status</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-slate-100">
-                        {loading && invoices.length === 0 ? (
-                          <tr>
-                            <td colSpan={5} className="py-12 text-center">
-                              <LoaderCircle
-                                size={22}
-                                className="mx-auto animate-spin text-[#F3192D]"
-                              />
-                              <p className="mt-2 text-sm text-slate-500">
-                                Loading invoices...
-                              </p>
-                            </td>
-                          </tr>
-                        ) : filteredInvoices.length === 0 ? (
-                          <tr>
-                            <td colSpan={5} className="py-12 text-center">
-                              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-slate-100 text-slate-400">
-                                <FileText size={23} />
-                              </div>
-                              <p className="mt-3 text-sm font-semibold text-slate-700">
-                                No invoices to display
-                              </p>
-                              <p className="mt-1 text-xs text-slate-500">
-                                {search
-                                  ? "Try another search term."
-                                  : "Your recent invoices will appear here."}
-                              </p>
-                            </td>
-                          </tr>
-                        ) : (
-                          filteredInvoices.map((invoice) => (
-                            <tr
-                              key={invoice.id}
-                              className="transition hover:bg-slate-50/80"
-                            >
-                              <td className="py-4 pr-3">
-                                <span className="text-sm font-semibold text-slate-800">
-                                  {invoiceNumber(invoice)}
-                                </span>
-                              </td>
-                              <td className="max-w-[150px] truncate py-4 pr-3 text-sm text-slate-600">
-                                {customerName(invoice)}
-                              </td>
-                              <td className="whitespace-nowrap py-4 pr-3 text-xs text-slate-500">
-                                {dateLabel(
-                                  invoice.issue_date ?? invoice.created_at
-                                )}
-                              </td>
-                              <td className="whitespace-nowrap py-4 pr-3 text-sm font-semibold text-slate-800">
-                                {money(invoiceAmount(invoice), invoice.currency || "UGX")}
-                              </td>
-                              <td className="py-4">
-                                <StatusBadge
-                                  status={
-                                    isOverdue(invoice)
-                                      ? "overdue"
-                                      : invoice.status
-                                  }
-                                />
-                              </td>
-                            </tr>
-                          ))
-                        )}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-
-                <Link
-                  href="/workspace/finance/invoices"
-                  className="mt-4 flex items-center justify-center gap-2 rounded-xl border border-slate-200 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
-                >
-                  Open invoice register
-                  <ArrowRight size={16} />
-                </Link>
-              </div>
-
-              <div className="space-y-6">
-                <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-                  <SectionTitle
-                    title="Quick actions"
-                    subtitle="Common tasks for your business"
-                  />
-
-                  <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
-                    {[
-                      {
-                        title: "Create an invoice",
-                        description: "Bill a customer",
-                        icon: FilePlus2,
-                        href: "/workspace/finance/invoices",
-                        tone: "bg-blue-50 text-[#F3192D]",
-                      },
-                      {
-                        title: "Add a customer",
-                        description: "Register a client",
-                        icon: Users,
-                        href: "/workspace/finance/customers",
-                        tone: "bg-emerald-50 text-emerald-700",
-                      },
-                      {
-                        title: "Record an expense",
-                        description: "Track business spending",
-                        icon: Wallet,
-                        href: "/workspace/finance/expenses",
-                        tone: "bg-amber-50 text-amber-700",
-                      },
-                      {
-                        title: "Owner's income & commissions",
-                        description: "Review owner income and commission payments",
-                        icon: Wallet,
-                        href: "/workspace/finance/owner-income",
-                        tone: "bg-rose-50 text-[#F3192D]",
-                      },
-                      {
-                        title: "View reports",
-                        description: "Review business performance",
-                        icon: FileBarChart,
-                        href: "/workspace/finance/reports",
-                        tone: "bg-violet-50 text-violet-700",
-                      },
-                    ].filter((action) => isSuperAdmin || planKey === "pro" || action.title !== "View reports").map((action) => {
-                      const Icon = action.icon;
-
-                      return (
-                        <Link
-                          key={action.title}
-                          href={action.href}
-                          className="group flex items-center gap-3 rounded-xl border border-slate-100 p-3 transition hover:border-blue-200 hover:bg-blue-50/40"
-                        >
-                          <div
-                            className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${action.tone}`}
-                          >
-                            <Icon size={20} />
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <p className="text-sm font-semibold text-slate-800">
-                              {action.title}
-                            </p>
-                            <p className="mt-1 text-xs text-slate-500">
-                              {action.description}
-                            </p>
-                          </div>
-                          <ArrowRight
-                            size={16}
-                            className="shrink-0 text-slate-300 transition group-hover:translate-x-0.5 group-hover:text-[#F3192D]"
-                          />
-                        </Link>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                <div className="overflow-hidden rounded-2xl bg-gradient-to-br from-blue-800 via-blue-700 to-indigo-800 p-5 text-white shadow-sm sm:p-6">
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <p className="text-sm font-medium text-blue-100">
-                        Outstanding payments
-                      </p>
-                      <p className="mt-3 text-2xl font-bold tracking-tight sm:text-3xl">
-                        {money(stats.outstanding)}
-                      </p>
-                      <p className="mt-2 text-xs leading-5 text-blue-100">
-                        {stats.overdueCount} overdue invoice
-                        {stats.overdueCount === 1 ? "" : "s"} need
-                        {stats.overdueCount === 1 ? "s" : ""} attention.
-                      </p>
-                    </div>
-                    <div className="rounded-xl bg-slate-50 p-3">
-                      <Activity size={22} />
-                    </div>
-                  </div>
-                  <Link
-                    href="/workspace/finance/invoices"
-                    className="mt-5 inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-blue-800 transition hover:bg-blue-50"
-                  >
-                    Review invoices
-                    <ArrowRight size={16} />
-                  </Link>
-                </div>
-              </div>
-            </section>
-
-            <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <section className="jbcs-dashboard-actions rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+              <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-[.16em] text-[#F3192D]">Workspace shortcuts</p>
-                  <h2 className="mt-1 text-lg font-bold tracking-tight text-slate-900">What would you like to do?</h2>
-                  <p className="mt-1 text-sm text-slate-500">Open a register to manage records, or use Reports for the bigger financial picture.</p>
+                  <p className="text-[11px] font-bold uppercase tracking-[.16em] text-[#F3192D]">Quick actions</p>
+                  <h2 className="mt-1 text-lg font-bold tracking-tight text-slate-900">Get things done</h2>
+                  <p className="mt-1 text-sm text-slate-500">Shortcuts to your most-used finance tasks.</p>
                 </div>
-                <Link href="/workspace/finance/reports" className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-[#F3192D] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#CF1022]">
-                  Open financial reports <ArrowRight size={16} />
-                </Link>
+                {(planKey === "pro" || isSuperAdmin) && <Link href="/workspace/finance/reports" className="inline-flex items-center gap-2 text-sm font-semibold text-[#9f1d35] hover:underline">Open financial reports <ArrowRight size={15} /></Link>}
+              </div>
+              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                {[
+                  { title: "Create an invoice", description: "Bill a customer", icon: FilePlus2, href: "/workspace/finance/invoices", tone: "bg-rose-50 text-[#F3192D]" },
+                  { title: "Add a customer", description: "Register a client", icon: Users, href: "/workspace/finance/customers", tone: "bg-emerald-50 text-emerald-700" },
+                  { title: "Record an expense", description: "Track business spending", icon: Wallet, href: "/workspace/finance/expenses", tone: "bg-amber-50 text-amber-700" },
+                  { title: "Owner income & commissions", description: "Manage owner records", icon: CircleDollarSign, href: "/workspace/finance/owner-income", tone: "bg-slate-100 text-slate-700" },
+                ].filter((action) => isSuperAdmin || planKey === "pro" || action.title !== "Owner income & commissions").map((action) => {
+                  const Icon = action.icon;
+                  return <Link key={action.title} href={action.href} className="group flex min-w-0 items-center gap-3 rounded-xl border border-slate-200 p-3.5 transition hover:border-rose-200 hover:bg-rose-50/40">
+                    <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${action.tone}`}><Icon size={19} /></span>
+                    <span className="min-w-0"><span className="block text-sm font-semibold text-slate-800">{action.title}</span><span className="mt-0.5 block text-xs text-slate-500">{action.description}</span></span>
+                    <ArrowRight size={15} className="ml-auto shrink-0 text-slate-400 transition group-hover:translate-x-0.5 group-hover:text-[#F3192D]" />
+                  </Link>;
+                })}
               </div>
             </section>
 
