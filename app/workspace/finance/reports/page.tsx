@@ -594,7 +594,7 @@ export default function FinanceReportsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900">
+    <div className="jbcs-reports-page min-h-screen bg-slate-50 text-slate-900">
       <Sidebar />
 
       <main className="min-h-screen px-4 py-5 sm:px-6 md:ml-[264px] md:px-8 md:py-8 jbcs-finance-consistent-main">
