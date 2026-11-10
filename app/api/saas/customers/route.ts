@@ -156,18 +156,23 @@ export async function PATCH(request: NextRequest) {
   const field = (value: unknown, max: number) =>
     typeof value === "string" ? value.trim().slice(0, max) : "";
   const hasSupplierStatus = typeof body.is_supplier === "boolean";
+  const hasName = Object.prototype.hasOwnProperty.call(body, "name");
+  const hasEmail = Object.prototype.hasOwnProperty.call(body, "email");
+  const hasPhone = Object.prototype.hasOwnProperty.call(body, "phone");
+  const hasAddress = Object.prototype.hasOwnProperty.call(body, "address");
+  const hasTaxNumber = Object.prototype.hasOwnProperty.call(body, "tax_number");
+  const hasProfileFields = hasName || hasEmail || hasPhone || hasAddress || hasTaxNumber;
   const name = field(body.name, 160);
   const email = field(body.email, 254).toLowerCase();
   const phone = field(body.phone, 40);
   const address = field(body.address, 500);
   const taxNumber = field(body.tax_number, 100);
-  const hasProfileFields = ["name", "email", "phone", "address", "tax_number"].some((key) => key in body);
 
   if (
     !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id) ||
     (!hasSupplierStatus && !hasProfileFields) ||
-    (hasProfileFields && name.length < 2) ||
-    (email && !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email))
+    (hasName && name.length < 2) ||
+    (hasEmail && email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
   ) {
     return NextResponse.json(
       { error: "Enter a valid customer ID and customer details." },
@@ -183,13 +188,11 @@ export async function PATCH(request: NextRequest) {
 
   const update: Record<string, unknown> = {};
   if (hasSupplierStatus) update.is_supplier = body.is_supplier;
-  if (hasProfileFields) {
-    update.name = name;
-    update.email = email || null;
-    update.phone = phone || null;
-    update.address = address || null;
-    update.tax_number = taxNumber || null;
-  }
+  if (hasName) update.name = name;
+  if (hasEmail) update.email = email || null;
+  if (hasPhone) update.phone = phone || null;
+  if (hasAddress) update.address = address || null;
+  if (hasTaxNumber) update.tax_number = taxNumber || null;
 
   const response = await fetch(url.toString(), {
     method: "PATCH",
