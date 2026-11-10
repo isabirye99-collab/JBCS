@@ -28,7 +28,7 @@ const nav = [
   { label: "Settings", href: "/workspace/settings", icon: Settings },
 ];
 const money = (amount: number, currency: string) => new Intl.NumberFormat("en-UG", { style: "currency", currency: currency || "UGX", maximumFractionDigits: 2 }).format(Number(amount) || 0);
-const today = () => new Date().toISOString().slice(0, 10);
+const today = () => { const date = new Date(); date.setMinutes(date.getMinutes() - date.getTimezoneOffset()); return date.toISOString().slice(0, 10); };
 const emptyEntry = { entry_type: "owner_income", recipient: "owner", category: "Owner salary", payer: "", description: "", earned_date: today(), expected_payment_date: "", amount: "", currency: "UGX", notes: "" };
 
 export default function OwnerIncomePage() {
