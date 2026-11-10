@@ -81,8 +81,8 @@ export async function POST(request: NextRequest) {
     const amount = Number(body.amount);
     const currency = clean(body.currency || "UGX", 3).toUpperCase();
     const paymentMethod = clean(body.payment_method || "other", 30);
-    if (!entryId || !dateOk(paymentDate) || !Number.isFinite(amount) || amount <= 0 || amount > 1e12 || !/^[A-Z]{3}$/.test(currency) || !methods.includes(paymentMethod)) {
-      return NextResponse.json({ error: "Enter a valid payment date, amount, currency and method." }, { status: 400 });
+    if (!entryId || !dateOk(paymentDate) || paymentDate > new Date().toISOString().slice(0, 10) || !Number.isFinite(amount) || amount <= 0 || amount > 1e12 || !/^[A-Z]{3}$/.test(currency) || !methods.includes(paymentMethod)) {
+      return NextResponse.json({ error: "Enter a valid payment date (not in the future), amount, currency and method." }, { status: 400 });
     }
     const response = await fetch(`${base}/rpc/record_owner_commission_payment`, {
       method: "POST", headers: { ...h, "Content-Type": "application/json" },
