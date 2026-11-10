@@ -193,7 +193,8 @@ function Metric({
 const REPORT_CHART_COLORS = ["#9f1d35", "#f97316", "#0f766e", "#6366f1", "#0891b2", "#a855f7"];
 
 function AnimatedDonut({ data, total }: { data: [string, number][]; total: number }) {
-  const visible = data.filter(([, value]) => value > 0).slice(0, 6);
+  const sorted = data.filter(([, value]) => value > 0).sort((a, b) => b[1] - a[1]);
+  const visible: [string, number][] = sorted.length > 6 ? [...sorted.slice(0, 5), ["Other categories", sorted.slice(5).reduce((sum, [, value]) => sum + value, 0)]] : sorted;
   if (!visible.length || total <= 0) {
     return <div className="flex min-h-52 items-center justify-center rounded-xl bg-slate-50 text-sm text-slate-500">No category data for this period.</div>;
   }
@@ -451,9 +452,7 @@ export default function FinanceReportsPage() {
       sums.set(category, (sums.get(category) ?? 0) + amount(row));
     });
 
-    return [...sums.entries()]
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 6);
+    return [...sums.entries()].sort((a, b) => b[1] - a[1]);
   }, [reportExpenses]);
 
   const recentInvoices = useMemo(
