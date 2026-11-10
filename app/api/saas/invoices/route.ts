@@ -12,6 +12,12 @@ const validDate = (value: string) =>
   !Number.isNaN(Date.parse(value)) &&
   new Date(value + "T00:00:00Z").toISOString().slice(0, 10) === value;
 
+const todayInUganda = () => {
+  const parts = new Intl.DateTimeFormat("en-GB", { timeZone: "Africa/Kampala", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(new Date());
+  const part = (type: string) => parts.find((item) => item.type === type)?.value || "";
+  return `${part("year")}-${part("month")}-${part("day")}`;
+};
+
 const str = (value: unknown, max: number) =>
   typeof value === "string" ? value.trim().slice(0, max) : "";
 
@@ -106,7 +112,7 @@ export async function POST(
     const contactId = str(body.contact_id, 64);
     const issueDate =
       str(body.issue_date, 10) ||
-      new Date().toISOString().slice(0, 10);
+      todayInUganda();
     const dueDate = str(body.due_date, 10);
     const currency = str(body.currency || "UGX", 3).toUpperCase();
     const notes = str(body.notes, 2000);
