@@ -672,9 +672,12 @@ export default function FinanceDashboardPage() {
         const date = new Date(value);
         return !Number.isNaN(date.getTime()) && date >= monthStartDate && date < nextMonthDate;
       };
-      const sales = invoices
-        .filter((invoice) => isPaid(invoice) && inMonth(invoice.issue_date ?? invoice.created_at))
-        .reduce((sum, invoice) => sum + invoiceAmount(invoice), 0);
+      const sales = customerPayments
+        .filter((payment) => inMonth(payment.payment_date ?? payment.created_at))
+        .reduce((sum, payment) => sum + asNumber(payment.amount), 0)
+        + directSalesReceipts
+          .filter((receipt) => inMonth(receipt.sale_date ?? receipt.created_at))
+          .reduce((sum, receipt) => sum + asNumber(receipt.total), 0);
       const costs = expenses
         .filter((expense) => inMonth(expense.expense_date ?? expense.date ?? expense.created_at))
         .reduce((sum, expense) => sum + expenseAmount(expense), 0);
@@ -684,7 +687,17 @@ export default function FinanceDashboardPage() {
         expenses: costs,
       };
     });
-  }, [invoices, expenses]);
+  }, [customerPayments, directSalesReceipts, expenses]);
+
+  const invoiceStatusSummary = useMemo(() => {
+    const active = invoices.filter((invoice) => !isCancelled(invoice));
+    const paid = active.filter(isPaid).length;
+    const overdue = active.filter(isOverdue).length;
+    const sent = Math.max(0, active.length - paid - overdue);
+    const total = active.length;
+    const percent = (count: number) => total ? Math.round((count / total) * 100) : 0;
+    return { paid, overdue, sent, total, paidPercent: percent(paid), overduePercent: percent(overdue), sentPercent: percent(sent) };
+  }, [invoices]);
 
   const filteredInvoices = stats.recentInvoices.filter((invoice) => {
     const term = search.trim().toLowerCase();
@@ -1010,34 +1023,48 @@ export default function FinanceDashboardPage() {
                 </div>
               </div>
 
-              <div className="dashboard-insight-panel relative overflow-hidden rounded-2xl border border-rose-100 bg-white p-6 text-slate-900 shadow-sm">
-                <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full border border-rose-100" />
-                <div className="pointer-events-none absolute -right-2 -top-2 h-24 w-24 rounded-full border border-rose-100" />
-                <div className="relative">
-                  <div className="flex items-center justify-between gap-3">
-                    <span className="inline-flex items-center gap-2 rounded-full bg-rose-50 px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider text-[#9f1d35]"><ChartNoAxesCombined size={14} /> Snapshot</span>
-                    <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-rose-50"><Activity size={18} /></span>
+              <div className="dashboard-insight-panel relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <h2 className="text-lg font-bold tracking-tight text-slate-900">Invoice status</h2>
+                    <p className="mt-1 text-sm text-slate-500">Breakdown of active invoices by status</p>
                   </div>
-                  <h3 className="mt-5 text-xl font-bold tracking-tight">Your business at a glance</h3>
-                  <p className="mt-2 text-sm leading-6 text-slate-600">A live snapshot of the financial activity recorded in your workspace.</p>
-                  <div className="mt-6 grid grid-cols-2 gap-3">
-                    <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 ">
-                      <p className="text-xs text-slate-500">Invoices created</p>
-                      <p className="mt-2 text-2xl font-bold"><AnimatedMetricValue value={stats.invoiceCount.toLocaleString("en-UG")} /></p>
-                    </div>
-                    <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 ">
-                      <p className="text-xs text-slate-500">Overdue invoices</p>
-                      <p className="mt-2 text-2xl font-bold"><AnimatedMetricValue value={stats.overdueCount.toLocaleString("en-UG")} /></p>
+                  <Link href="/workspace/finance/invoices" className="text-xs font-semibold text-[#9f1d35] hover:underline">View invoices <ArrowRight size={13} className="inline" /></Link>
+                </div>
+                <div className="mt-5 flex flex-col items-center gap-5 sm:flex-row sm:items-center sm:justify-center">
+                  <div className="relative h-40 w-40 shrink-0 rounded-full" style={{ background: invoiceStatusSummary.total ? `conic-gradient(#059669 0% ${invoiceStatusSummary.paidPercent}%, #f59e0b ${invoiceStatusSummary.paidPercent}% ${invoiceStatusSummary.paidPercent + invoiceStatusSummary.sentPercent}%, #e9162b ${invoiceStatusSummary.paidPercent + invoiceStatusSummary.sentPercent}% 100%)` : "#e2e8f0" }} role="img" aria-label={`${invoiceStatusSummary.total} active invoices: ${invoiceStatusSummary.paid} paid, ${invoiceStatusSummary.sent} outstanding, ${invoiceStatusSummary.overdue} overdue`}>
+                    <div className="absolute inset-[22px] flex flex-col items-center justify-center rounded-full bg-white text-center">
+                      <span className="text-3xl font-bold tracking-tight text-slate-950">{invoiceStatusSummary.total.toLocaleString("en-UG")}</span>
+                      <span className="text-xs font-medium text-slate-500">Invoices</span>
                     </div>
                   </div>
-                  <div className="mt-5 flex items-center justify-between gap-3 border-t border-slate-200 pt-4">
-                    <div>
-                      <p className="text-xs text-slate-500">Outstanding balance</p>
-                      <p className="mt-1 text-lg font-bold text-[#9f1d35]"><AnimatedMetricValue value={money(stats.outstanding)} /></p>
-                    </div>
-                    <Link href="/workspace/finance/invoices" className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-[#9f1d35] px-3 py-2.5 text-xs font-bold text-white transition hover:bg-[#74162a]">
-                      Review invoices <ArrowRight size={14} />
-                    </Link>
+                  <div className="w-full max-w-[220px] space-y-3">
+                    {[
+                      { label: "Paid", count: invoiceStatusSummary.paid, percent: invoiceStatusSummary.paidPercent, color: "bg-emerald-500" },
+                      { label: "Outstanding", count: invoiceStatusSummary.sent, percent: invoiceStatusSummary.sentPercent, color: "bg-amber-500" },
+                      { label: "Overdue", count: invoiceStatusSummary.overdue, percent: invoiceStatusSummary.overduePercent, color: "bg-rose-600" },
+                    ].map((item) => (
+                      <div key={item.label} className="flex items-center justify-between gap-3 border-b border-slate-100 pb-2 last:border-0">
+                        <div className="flex items-center gap-2">
+                          <span className={`h-3 w-3 rounded-sm ${item.color}`} />
+                          <span className="text-sm text-slate-700">{item.label}</span>
+                        </div>
+                        <div className="text-right">
+                          <span className="block text-sm font-bold text-slate-900">{item.percent}%</span>
+                          <span className="text-[11px] text-slate-500">{item.count} invoices</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="mt-5 grid grid-cols-2 gap-3 border-t border-slate-100 pt-4">
+                  <div className="rounded-xl bg-slate-50 p-3">
+                    <p className="text-xs text-slate-500">Outstanding balance</p>
+                    <p className="mt-1 text-base font-bold text-[#9f1d35]">{money(stats.outstanding)}</p>
+                  </div>
+                  <div className="rounded-xl bg-slate-50 p-3">
+                    <p className="text-xs text-slate-500">Overdue amount</p>
+                    <p className="mt-1 text-base font-bold text-slate-900">{money(stats.overdueAmount)}</p>
                   </div>
                 </div>
               </div>
