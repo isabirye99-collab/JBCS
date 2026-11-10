@@ -960,9 +960,10 @@ export default function FinanceDashboardPage() {
                     ? "—"
                     : money(stats.monthlySupplierPayments)
                 }
-                detail="Cash paid to suppliers this month; not added again to expenses"
+                detail="Cash paid to suppliers this month; open the supplier payment register for details"
                 icon={CreditCard}
                 tone="amber"
+                href="/workspace/finance/supplier-payments"
               />}
             </section>
 
