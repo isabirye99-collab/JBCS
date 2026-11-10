@@ -537,6 +537,7 @@ export default function SupplierPaymentsPage() {
                   <input
                     type="date"
                     required
+                    max={today()}
                     value={form.payment_date}
                     onChange={(e) =>
                       setForm((s) => ({ ...s, payment_date: e.target.value }))
