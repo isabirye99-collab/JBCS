@@ -923,15 +923,17 @@ export default function CustomersPage() {
                       {customerInvoices.length ? (
                         <div className="space-y-2">
                           {customerInvoices.slice(0, 4).map((invoice) => {
-                            const balance = Math.max(
-                              0,
-                              Number(invoice.total || 0) -
-                                Number(invoice.amount_paid || 0)
-                            );
+                            const invoiceStatus = String(invoice.status || "draft").toLowerCase();
+                            const isCancelledInvoice = ["void", "cancelled", "canceled"].includes(invoiceStatus);
+                            const balance = isCancelledInvoice
+                              ? 0
+                              : Math.max(
+                                  0,
+                                  Number(invoice.total || 0) -
+                                    Number(invoice.amount_paid || 0)
+                                );
 
-                            const status = String(
-                              invoice.status || "draft"
-                            ).replace(/_/g, " ");
+                            const status = invoiceStatus.replace(/_/g, " ");
 
                             return (
                               <div
