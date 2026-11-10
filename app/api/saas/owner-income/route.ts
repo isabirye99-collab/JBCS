@@ -20,6 +20,52 @@ export async function GET() {
   return NextResponse.json({ entries, payments });
 }
 
+
+export async function PATCH(request: NextRequest) {
+  const ctx = await getSaasContext();
+  if ("error" in ctx) return NextResponse.json({ error: ctx.error }, { status: ctx.status });
+  if (!hasSaasFeature(ctx, "full_accounting")) return NextResponse.json({ error: saasFeatureError("full_accounting") }, { status: 403 });
+  let body: Record<string, unknown>;
+  try { body = await request.json(); } catch { return NextResponse.json({ error: "Enter valid details." }, { status: 400 }); }
+  const id = clean(body.id, 64);
+  const entryType = clean(body.entry_type, 30);
+  const recipient = clean(body.recipient, 30);
+  const category = clean(body.category, 100);
+  const payer = clean(body.payer, 200);
+  const description = clean(body.description, 500);
+  const earnedDate = clean(body.earned_date, 10);
+  const expectedDate = clean(body.expected_payment_date, 10);
+  const amount = Number(body.amount);
+  const currency = clean(body.currency || "UGX", 3).toUpperCase();
+  const notes = clean(body.notes, 2000);
+  if (!id || !["owner_income", "commission"].includes(entryType) || !["owner", "business"].includes(recipient) || !category || !payer || !description || !dateOk(earnedDate) || (expectedDate && !dateOk(expectedDate))) {
+    return NextResponse.json({ error: "Complete the required fields and use valid dates." }, { status: 400 });
+  }
+  if (!Number.isFinite(amount) || amount <= 0 || amount > 1e12 || !/^[A-Z]{3}$/.test(currency)) {
+    return NextResponse.json({ error: "Enter a valid amount and three-letter currency." }, { status: 400 });
+  }
+  const base = `${ctx.url}/rest/v1`;
+  const h = headers(ctx);
+  const existingResponse = await fetch(`${base}/owner_income_entries?id=eq.${encodeURIComponent(id)}&workspace_id=eq.${encodeURIComponent(ctx.workspaceId)}&select=id,amount_received,currency,status&limit=1`, { headers: h, cache: "no-store" });
+  if (!existingResponse.ok) return NextResponse.json({ error: "Unable to verify the existing record." }, { status: 502 });
+  const existingRows = await existingResponse.json();
+  const existing = Array.isArray(existingRows) ? existingRows[0] : null;
+  if (!existing) return NextResponse.json({ error: "Record not found in this workspace." }, { status: 404 });
+  const received = Number(existing.amount_received || 0);
+  if (amount < received) return NextResponse.json({ error: "The amount cannot be lower than payments already received." }, { status: 400 });
+  if (received > 0 && currency !== String(existing.currency || "UGX").trim()) return NextResponse.json({ error: "Currency cannot be changed after payments have been recorded." }, { status: 400 });
+  const status = existing.status === "cancelled" ? "cancelled" : received >= amount ? "paid" : received > 0 ? "partially_paid" : "pending";
+  const response = await fetch(`${base}/owner_income_entries?id=eq.${encodeURIComponent(id)}&workspace_id=eq.${encodeURIComponent(ctx.workspaceId)}`, {
+    method: "PATCH",
+    headers: { ...h, "Content-Type": "application/json", Prefer: "return=representation" },
+    body: JSON.stringify({ entry_type: entryType, recipient, category, payer, description, earned_date: earnedDate, expected_payment_date: expectedDate || null, amount, currency, notes: notes || null, status, updated_at: new Date().toISOString() }),
+    cache: "no-store",
+  });
+  if (!response.ok) return NextResponse.json({ error: "Could not update the owner income record." }, { status: 502 });
+  const rows = await response.json();
+  return NextResponse.json({ entry: Array.isArray(rows) ? rows[0] : null }, { status: 200 });
+}
+
 export async function POST(request: NextRequest) {
   const ctx = await getSaasContext();
   if ("error" in ctx) return NextResponse.json({ error: ctx.error }, { status: ctx.status });
