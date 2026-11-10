@@ -1,5 +1,4 @@
- "use
-  const selectedQuote = filteredQuotes.find((quote) => quote.id === selectedQuoteId) || filteredQuotes[0] || null; client";
+"use client";
 
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
@@ -183,6 +182,7 @@ export default function QuotesPage() {
       return matchesSearch && matchesStatus;
     });
   }, [quotes, search, statusFilter]);
+  const selectedQuote = filteredQuotes.find((quote) => quote.id === selectedQuoteId) || filteredQuotes[0] || null;
 
   function updateLine(key: string, patch: Partial<QuoteLine>) {
     setLines((current) => current.map((line) => line.key === key ? { ...line, ...patch } : line));
