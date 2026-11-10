@@ -249,6 +249,17 @@ export default function CustomersPage() {
   async function createCustomer(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
+    const normalizedName = name.trim();
+    const normalizedEmail = email.trim().toLowerCase();
+    if (normalizedName.length < 2) {
+      setError("Enter a customer or company name with at least two characters.");
+      return;
+    }
+    if (normalizedEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
+      setError("Enter a valid email address or leave the email field blank.");
+      return;
+    }
+
     setSaving(true);
     setError("");
     setNotice("");
@@ -259,11 +270,11 @@ export default function CustomersPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...(editingCustomerId ? { id: editingCustomerId } : {}),
-          name,
-          email,
-          phone,
-          address,
-          tax_number: taxNumber,
+          name: normalizedName,
+          email: normalizedEmail || null,
+          phone: phone.trim() || null,
+          address: address.trim() || null,
+          tax_number: taxNumber.trim() || null,
           is_supplier: isSupplier,
         }),
       });
