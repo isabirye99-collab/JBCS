@@ -144,6 +144,9 @@ const dateOf = (r: Row, fallback = "") =>
 const money = (value: number, currency = "UGX") =>
   `${currency} ${Math.round(value).toLocaleString("en-UG")}`;
 
+const localDate = (date: Date) =>
+  `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+
 const labelDate = (value: string) => {
   if (!value) return "—";
   const date = new Date(`${value.slice(0, 10)}T00:00:00`);
@@ -235,10 +238,10 @@ export default function FinanceReportsPage() {
   const [start, setStart] = useState(() => {
     const date = new Date();
     date.setDate(1);
-    return date.toISOString().slice(0, 10);
+    return localDate(date);
   });
 
-  const [end, setEnd] = useState(() => new Date().toISOString().slice(0, 10));
+  const [end, setEnd] = useState(() => localDate(new Date()));
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState("");
@@ -697,11 +700,9 @@ export default function FinanceReportsPage() {
 
                       if (period.value === "month") {
                         setStart(
-                          new Date(now.getFullYear(), now.getMonth(), 1)
-                            .toISOString()
-                            .slice(0, 10)
+                          localDate(new Date(now.getFullYear(), now.getMonth(), 1))
                         );
-                        setEnd(now.toISOString().slice(0, 10));
+                        setEnd(localDate(now));
                       } else if (period.value === "year") {
                         setStart(`${now.getFullYear()}-01-01`);
                         setEnd(now.toISOString().slice(0, 10));
