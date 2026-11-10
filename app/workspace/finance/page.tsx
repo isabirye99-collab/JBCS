@@ -1001,7 +1001,7 @@ export default function FinanceDashboardPage() {
                   })}
                 </div>
                 <div className="mt-4 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500">
-                  <span>Figures are based on records available in your workspace.</span>
+                  <span>Data sources: customer payments + direct sales receipts for sales collected; expense records for expenses.</span><span className="flex flex-wrap gap-3 font-semibold"><Link href="/workspace/finance/payments" className="text-[#9f1d35] hover:underline">Payments</Link><Link href="/workspace/finance/sales-receipts" className="text-[#9f1d35] hover:underline">Sales receipts</Link><Link href="/workspace/finance/expenses" className="text-[#9f1d35] hover:underline">Expenses</Link></span>
                   {(planKey === "pro" || isSuperAdmin) && (
                     <Link href="/workspace/finance/reports" className="inline-flex items-center gap-1 font-semibold text-[#9f1d35] hover:text-[#74162a]">
                       Explore reports <ArrowRight size={14} />
