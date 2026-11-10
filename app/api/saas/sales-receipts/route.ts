@@ -22,6 +22,45 @@ export async function GET() {
   return NextResponse.json({ receipts: await response.json() });
 }
 
+export async function PATCH(request: NextRequest) {
+  const ctx = await getSaasContext();
+  if ("error" in ctx) return NextResponse.json({ error: ctx.error }, { status: ctx.status });
+  let body: Record<string, unknown>;
+  try { body = await request.json(); } catch { return NextResponse.json({ error: "Enter valid receipt details." }, { status: 400 }); }
+  const clean = (v: unknown, max: number) => typeof v === "string" ? v.trim().slice(0, max) : "";
+  const id = clean(body.id, 64);
+  const contactId = clean(body.contact_id, 64);
+  const saleDate = clean(body.sale_date, 10);
+  const paymentMethod = clean(body.payment_method, 30);
+  const paymentReference = clean(body.payment_reference, 120);
+  const notes = clean(body.notes, 2000);
+  if (!UUID.test(id)) return NextResponse.json({ error: "Choose a valid sales receipt." }, { status: 400 });
+  if (contactId && !UUID.test(contactId)) return NextResponse.json({ error: "Choose a valid customer or leave the customer blank." }, { status: 400 });
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(saleDate) || Number.isNaN(Date.parse(saleDate)) || new Date(saleDate + "T00:00:00Z").toISOString().slice(0, 10) !== saleDate) return NextResponse.json({ error: "Enter a valid sale date." }, { status: 400 });
+  if (!METHODS.includes(paymentMethod)) return NextResponse.json({ error: "Choose a supported payment method." }, { status: 400 });
+  const h = { ...headers(ctx.serviceKey), "Content-Type": "application/json", Prefer: "return=representation" };
+  if (contactId) {
+    const customerResponse = await fetch(`${ctx.url}/rest/v1/business_contacts?id=eq.${encodeURIComponent(contactId)}&workspace_id=eq.${encodeURIComponent(ctx.workspaceId)}&select=id&limit=1`, { headers: headers(ctx.serviceKey), cache: "no-store" });
+    if (!customerResponse.ok) return NextResponse.json({ error: "Unable to verify the selected customer." }, { status: 502 });
+    const customers = await customerResponse.json();
+    if (!Array.isArray(customers) || !customers.length) return NextResponse.json({ error: "Choose a customer belonging to this workspace." }, { status: 400 });
+  }
+  const response = await fetch(`${ctx.url}/rest/v1/sales_receipts?id=eq.${encodeURIComponent(id)}&workspace_id=eq.${encodeURIComponent(ctx.workspaceId)}`, {
+    method: "PATCH", headers: h,
+    // Receipt amounts, currency and line items are immutable here to preserve issued financial records.
+    body: JSON.stringify({ contact_id: contactId || null, sale_date: saleDate, payment_method: paymentMethod, payment_reference: paymentReference || null, notes: notes || null }),
+    cache: "no-store",
+  });
+  if (!response.ok) {
+    const detail = await response.text().catch(() => "");
+    console.error("Direct sales receipt metadata update failed", response.status, detail.slice(0, 250));
+    return NextResponse.json({ error: "Receipt details could not be updated." }, { status: 502 });
+  }
+  const rows = await response.json();
+  if (!Array.isArray(rows) || !rows.length) return NextResponse.json({ error: "Receipt was not found in this workspace." }, { status: 404 });
+  return NextResponse.json({ receipt: rows[0] });
+}
+
 export async function POST(request: NextRequest) {
   const ctx = await getSaasContext();
   if ("error" in ctx) return NextResponse.json({ error: ctx.error }, { status: ctx.status });
