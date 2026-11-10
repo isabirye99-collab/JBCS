@@ -16,8 +16,8 @@ create table if not exists public.sales_receipts (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
   constraint sales_receipts_workspace_receipt_number_unique unique (workspace_id, receipt_number),
-  constraint sales_receipts_contact_workspace_fk foreign key (contact_id, workspace_id)
-    references public.business_contacts(id, workspace_id) on delete set null
+  constraint sales_receipts_contact_fk foreign key (contact_id)
+    references public.business_contacts(id) on delete set null
 );
 create table if not exists public.sales_receipt_items (
   id uuid primary key default gen_random_uuid(),
