@@ -39,7 +39,7 @@ export async function PATCH(req: Request) {
   const contact_id = String(body.contact_id || "");
   const currency = String(body.currency || "UGX").toUpperCase();
   const validUntil = body.valid_until == null || body.valid_until === "" ? null : String(body.valid_until);
-  if (validUntil && (!isValidCalendarDate(validUntil) || validUntil < todayInUganda())) return NextResponse.json({ error: "Enter a valid quotation expiry date that is today or later." }, { status: 400 });
+  if (validUntil && !isValidCalendarDate(validUntil)) return NextResponse.json({ error: "Enter a valid quotation expiry date." }, { status: 400 });
   const items = Array.isArray(body.items) ? body.items.slice(0, 50) : [];
   if (!/^[0-9a-f-]{36}$/i.test(id) || !/^[0-9a-f-]{36}$/i.test(contact_id) || !/^[A-Z]{3}$/.test(currency) || !items.length) {
     return NextResponse.json({ error: "Select a customer and at least one quotation line." }, { status: 400 });
