@@ -608,16 +608,12 @@ export default function FinanceDashboardPage() {
       )
       .reduce((sum, payment) => sum + supplierPaymentAmount(payment), 0);
 
-    const monthlySales = invoices
-      .filter(
-        (invoice) =>
-          isPaid(invoice) &&
-          isThisMonth(invoice.issue_date ?? invoice.created_at)
-      )
-      .reduce(
-        (sum, invoice) => sum + invoiceAmount(invoice),
-        0
-      );
+    const monthlySales = customerPayments
+      .filter((payment) => isThisMonth(payment.payment_date ?? payment.created_at))
+      .reduce((sum, payment) => sum + asNumber(payment.amount), 0)
+      + directSalesReceipts
+        .filter((receipt) => isThisMonth(receipt.sale_date ?? receipt.created_at))
+        .reduce((sum, receipt) => sum + asNumber(receipt.total), 0);
 
     const recentCustomers = [...customers].sort(
       (a, b) =>
@@ -664,7 +660,7 @@ export default function FinanceDashboardPage() {
         )
         .slice(0, 5),
     };
-  }, [customers, invoices, expenses, supplierPayments]);
+  }, [customers, invoices, expenses, supplierPayments, customerPayments, directSalesReceipts]);
 
   const monthlyTrend = useMemo(() => {
     const now = new Date();
@@ -940,7 +936,7 @@ export default function FinanceDashboardPage() {
                     ? "—"
                     : money(stats.monthlySales)
                 }
-                detail="Paid invoices recorded this month"
+                detail="Invoice payments and direct sales receipts recorded this month"
                 icon={ChartNoAxesCombined}
                 tone="green"
                 href="/workspace/finance/payments"
