@@ -152,30 +152,44 @@ export async function PATCH(request: NextRequest) {
     );
   }
 
-  const id =
-    typeof body.id === "string" ? body.id.trim() : "";
+  const id = typeof body.id === "string" ? body.id.trim() : "";
+  const field = (value: unknown, max: number) =>
+    typeof value === "string" ? value.trim().slice(0, max) : "";
+  const hasSupplierStatus = typeof body.is_supplier === "boolean";
+  const name = field(body.name, 160);
+  const email = field(body.email, 254).toLowerCase();
+  const phone = field(body.phone, 40);
+  const address = field(body.address, 500);
+  const taxNumber = field(body.tax_number, 100);
+  const hasProfileFields = ["name", "email", "phone", "address", "tax_number"].some((key) => key in body);
 
   if (
     !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id) ||
-    typeof body.is_supplier !== "boolean"
+    (!hasSupplierStatus && !hasProfileFields) ||
+    (hasProfileFields && name.length < 2) ||
+    (email && !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email))
   ) {
     return NextResponse.json(
-      { error: "A valid customer and supplier status are required." },
+      { error: "Enter a valid customer ID and customer details." },
       { status: 400 }
     );
   }
 
-  const url = new URL(
-    `${ctx.url}/rest/v1/business_contacts`
-  );
-
+  const url = new URL(`${ctx.url}/rest/v1/business_contacts`);
   url.searchParams.set("id", `eq.${id}`);
   url.searchParams.set("workspace_id", `eq.${ctx.workspaceId}`);
   url.searchParams.set("contact_type", "eq.client");
-  url.searchParams.set(
-    "select",
-    "id,name,email,phone,address,tax_number,created_at,is_supplier"
-  );
+  url.searchParams.set("select", "id,name,email,phone,address,tax_number,created_at,is_supplier");
+
+  const update: Record<string, unknown> = {};
+  if (hasSupplierStatus) update.is_supplier = body.is_supplier;
+  if (hasProfileFields) {
+    update.name = name;
+    update.email = email || null;
+    update.phone = phone || null;
+    update.address = address || null;
+    update.tax_number = taxNumber || null;
+  }
 
   const response = await fetch(url.toString(), {
     method: "PATCH",
@@ -185,9 +199,7 @@ export async function PATCH(request: NextRequest) {
       "Content-Type": "application/json",
       Prefer: "return=representation",
     },
-    body: JSON.stringify({
-      is_supplier: body.is_supplier,
-    }),
+    body: JSON.stringify(update),
     cache: "no-store",
   });
 
