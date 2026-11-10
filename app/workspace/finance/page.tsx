@@ -1175,6 +1175,13 @@ export default function FinanceDashboardPage() {
                         tone: "bg-amber-50 text-amber-700",
                       },
                       {
+                        title: "Owner's income & commissions",
+                        description: "Review owner income and commission payments",
+                        icon: Wallet,
+                        href: "/workspace/finance/owner-income",
+                        tone: "bg-rose-50 text-[#F3192D]",
+                      },
+                      {
                         title: "View reports",
                         description: "Review business performance",
                         icon: FileBarChart,
