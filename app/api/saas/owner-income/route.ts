@@ -7,6 +7,11 @@ const methods = ["cash", "bank_transfer", "mobile_money", "card", "cheque", "oth
 const clean = (v: unknown, max = 500) => typeof v === "string" ? v.trim().slice(0, max) : "";
 const dateOk = (v: string) => /^\d{4}-\d{2}-\d{2}$/.test(v) && !Number.isNaN(Date.parse(v)) && new Date(v + "T00:00:00Z").toISOString().slice(0, 10) === v;
 const headers = (ctx: { serviceKey: string }) => ({ apikey: ctx.serviceKey, Authorization: `Bearer ${ctx.serviceKey}` });
+const todayInUganda = () => {
+  const parts = new Intl.DateTimeFormat("en-GB", { timeZone: "Africa/Kampala", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(new Date());
+  const part = (type: string) => parts.find((item) => item.type === type)?.value || "";
+  return `${part("year")}-${part("month")}-${part("day")}`;
+};
 
 export async function GET() {
   const ctx = await getSaasContext();
@@ -38,7 +43,7 @@ export async function PATCH(request: NextRequest) {
   const amount = Number(body.amount);
   const currency = clean(body.currency || "UGX", 3).toUpperCase();
   const notes = clean(body.notes, 2000);
-  if (!id || !["owner_income", "commission"].includes(entryType) || !["owner", "business"].includes(recipient) || !category || !payer || !description || !dateOk(earnedDate) || (expectedDate && !dateOk(expectedDate))) {
+  if (!id || !["owner_income", "commission"].includes(entryType) || !["owner", "business"].includes(recipient) || !category || !payer || !description || !dateOk(earnedDate) || (expectedDate && (!dateOk(expectedDate) || expectedDate < earnedDate))) {
     return NextResponse.json({ error: "Complete the required fields and use valid dates." }, { status: 400 });
   }
   if (!Number.isFinite(amount) || amount <= 0 || amount > 1e12 || !/^[A-Z]{3}$/.test(currency)) {
@@ -77,7 +82,7 @@ export async function POST(request: NextRequest) {
   const h = headers(ctx);
   if (body.action === "record_payment") {
     const entryId = clean(body.entry_id, 64);
-    const paymentDate = clean(body.payment_date, 10) || new Date().toISOString().slice(0, 10);
+    const paymentDate = clean(body.payment_date, 10) || todayInUganda();
     const amount = Number(body.amount);
     const currency = clean(body.currency || "UGX", 3).toUpperCase();
     const paymentMethod = clean(body.payment_method || "other", 30);
