@@ -133,6 +133,7 @@ const dateOf = (r: Row, fallback = "") =>
     r.issue_date ??
       r.payment_date ??
       r.expense_date ??
+      r.sale_date ??
       r.date ??
       r.created_at ??
       fallback
@@ -248,6 +249,7 @@ export default function FinanceReportsPage() {
   const [expenses, setExpenses] = useState<Row[]>([]);
   const [supplierPayments, setSupplierPayments] = useState<Row[]>([]);
   const [ownerIncomePayments, setOwnerIncomePayments] = useState<Row[]>([]);
+  const [directSalesReceipts, setDirectSalesReceipts] = useState<Row[]>([]);
 
   const [start, setStart] = useState(() => {
     const date = new Date();
