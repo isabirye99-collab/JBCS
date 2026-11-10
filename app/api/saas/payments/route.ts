@@ -3,6 +3,12 @@ import { getSaasContext } from "@/lib/saas-context";
 
 export const dynamic = "force-dynamic";
 
+const todayInUganda = () => {
+  const parts = new Intl.DateTimeFormat("en-GB", { timeZone: "Africa/Kampala", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(new Date());
+  const part = (type: string) => parts.find((item) => item.type === type)?.value || "";
+  return `${part("year")}-${part("month")}-${part("day")}`;
+};
+
 export async function GET() {
   const ctx = await getSaasContext();
   if ("error" in ctx) return NextResponse.json({ error: ctx.error }, { status: ctx.status });
@@ -34,7 +40,7 @@ export async function PATCH(request: import("next/server").NextRequest) {
   const validUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
   const validDate = (value: string) => /^\d{4}-\d{2}-\d{2}$/.test(value) && !Number.isNaN(Date.parse(value)) && new Date(value + "T00:00:00Z").toISOString().slice(0, 10) === value;
   if (!validUuid.test(id)) return NextResponse.json({ error: "Select a valid payment record." }, { status: 400 });
-  if (!validDate(paymentDate) || paymentDate > new Date().toISOString().slice(0, 10)) return NextResponse.json({ error: "Payment date must be valid and cannot be in the future." }, { status: 400 });
+  if (!validDate(paymentDate) || paymentDate > todayInUganda()) return NextResponse.json({ error: "Payment date must be valid and cannot be in the future." }, { status: 400 });
   if (!["cash", "bank_transfer", "mobile_money", "card", "cheque", "other"].includes(method)) return NextResponse.json({ error: "Choose a supported payment method." }, { status: 400 });
 
   // Only metadata is editable here. Amount and invoice linkage remain immutable to protect reconciled balances.
@@ -67,7 +73,7 @@ export async function POST(request: import("next/server").NextRequest) {
   const id = str(body.invoice_id, 64);
   const amount = Number(body.amount);
   const method = str(body.method, 30);
-  const paymentDate = str(body.payment_date, 10) || new Date().toISOString().slice(0, 10);
+  const paymentDate = str(body.payment_date, 10) || todayInUganda();
   const reference = str(body.payment_reference, 120);
   const notes = str(body.notes, 1000);
   const validUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
