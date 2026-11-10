@@ -327,12 +327,14 @@ function MetricCard({
   detail,
   icon: Icon,
   tone,
+  href,
 }: {
   title: string;
   value: string;
   detail: string;
   icon: typeof Users;
   tone: "blue" | "green" | "amber" | "purple";
+  href?: string;
 }) {
   const tones = {
     blue: "bg-rose-50 text-[#9f1d35]",
@@ -341,7 +343,7 @@ function MetricCard({
     purple: "bg-violet-50 text-violet-700",
   };
 
-  return (
+  const card = (
     <div className="dashboard-metric-card group rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm transition duration-300 hover:-translate-y-1 hover:border-rose-200 hover:shadow-lg hover:shadow-rose-950/5">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
@@ -360,6 +362,7 @@ function MetricCard({
       </div>
     </div>
   );
+  return href ? <Link href={href} aria-label={`Open ${title}`} className="block h-full rounded-2xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F3192D]">{card}</Link> : card;
 }
 
 function SectionTitle({
@@ -906,6 +909,7 @@ export default function FinanceDashboardPage() {
                 detail="Customers registered in your workspace"
                 icon={Users}
                 tone="blue"
+                href="/workspace/finance/customers"
               />
               <MetricCard
                 title="Outstanding invoices"
@@ -917,6 +921,7 @@ export default function FinanceDashboardPage() {
                 detail={`${stats.overdueCount} overdue invoice${stats.overdueCount === 1 ? "" : "s"}`}
                 icon={CircleDollarSign}
                 tone="amber"
+                href="/workspace/finance/invoices"
               />
               <MetricCard
                 title="Sales collected this month"
@@ -928,6 +933,7 @@ export default function FinanceDashboardPage() {
                 detail="Paid invoices recorded this month"
                 icon={ChartNoAxesCombined}
                 tone="green"
+                href="/workspace/finance/payments"
               />
               <MetricCard
                 title="Expenses this month"
@@ -939,6 +945,7 @@ export default function FinanceDashboardPage() {
                 detail="Expense records only; supplier payments are shown separately"
                 icon={Wallet}
                 tone="purple"
+                href="/workspace/finance/expenses"
               />
               {(planKey === "pro" || isSuperAdmin) && <MetricCard
                 title="Supplier payments this month"
