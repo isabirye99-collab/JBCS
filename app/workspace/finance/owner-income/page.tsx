@@ -99,7 +99,7 @@ export default function OwnerIncomePage() {
       const response = await fetch("/api/saas/owner-income", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...paymentForm, action: "record_payment", entry_id: selected.id }) });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Could not record payment.");
-      setModal(null); setSelected(null); await load();
+      setModal(null); setSelected(null); await load(); setMessage("Payment recorded successfully. The outstanding balance has been updated.");
     } catch (error) { setMessage(error instanceof Error ? error.message : "Could not record payment."); }
     finally { setSaving(false); }
   }
@@ -154,7 +154,7 @@ export default function OwnerIncomePage() {
         {selected && <div className="rounded-xl bg-slate-50 p-4 text-sm sm:col-span-2"><div className="font-semibold">{selected.category} — {selected.payer}</div><div className="mt-1 text-slate-500">Outstanding: {money(Math.max(0,Number(selected.amount)-Number(selected.amount_received)),selected.currency)}</div></div>}
         <Field label="Payment date"><input required type="date" value={paymentForm.payment_date} onChange={e=>setPaymentForm({...paymentForm,payment_date:e.target.value})} className={inputClass}/></Field>
         <Field label="Amount received"><input required type="number" min="0.01" step="0.01" max={selected?Math.max(0,Number(selected.amount)-Number(selected.amount_received)):undefined} value={paymentForm.amount} onChange={e=>setPaymentForm({...paymentForm,amount:e.target.value})} className={inputClass}/></Field>
-        <Field label="Currency"><select value={paymentForm.currency} onChange={e=>setPaymentForm({...paymentForm,currency:e.target.value})} className={inputClass}><option>UGX</option><option>USD</option><option>KES</option><option>TZS</option><option>RWF</option></select></Field>
+        <Field label="Payment currency"><input value={paymentForm.currency} readOnly aria-readonly="true" className={inputClass+" bg-slate-100 text-slate-600"} /><span className="mt-1 block text-xs text-slate-500">Must match the currency of the selected income record.</span></Field>
         <Field label="Payment method"><select value={paymentForm.payment_method} onChange={e=>setPaymentForm({...paymentForm,payment_method:e.target.value})} className={inputClass}>{["cash","bank_transfer","mobile_money","card","cheque","other"].map(m=><option key={m} value={m}>{m.replace("_"," ")}</option>)}</select></Field>
         <Field label="Transaction reference"><input value={paymentForm.payment_reference} onChange={e=>setPaymentForm({...paymentForm,payment_reference:e.target.value})} className={inputClass}/></Field>
         <Field label="Notes"><input value={paymentForm.notes} onChange={e=>setPaymentForm({...paymentForm,notes:e.target.value})} className={inputClass}/></Field>
