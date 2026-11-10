@@ -13,6 +13,12 @@ const dateOk = (v: string) =>
   !Number.isNaN(Date.parse(v)) &&
   new Date(v + "T00:00:00Z").toISOString().slice(0, 10) === v;
 
+const todayInUganda = () => {
+  const parts = new Intl.DateTimeFormat("en-GB", { timeZone: "Africa/Kampala", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(new Date());
+  const part = (type: string) => parts.find((item) => item.type === type)?.value || "";
+  return `${part("year")}-${part("month")}-${part("day")}`;
+};
+
 const methods = [
   "cash",
   "bank_transfer",
@@ -96,7 +102,7 @@ export async function POST(request: NextRequest) {
   const supplierId = clean(body.supplier_contact_id, 64);
   const expenseId = clean(body.expense_id, 64);
   const invoiceId = clean(body.invoice_id, 64);
-  const paymentDate = clean(body.payment_date, 10) || new Date().toISOString().slice(0, 10);
+  const paymentDate = clean(body.payment_date, 10) || todayInUganda();
   const amount = Number(body.amount);
   const currency = clean(body.currency || "UGX", 3).toUpperCase();
   const method = clean(body.payment_method || "other", 30);
