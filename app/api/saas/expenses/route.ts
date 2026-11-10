@@ -19,14 +19,26 @@ export async function GET() {
 export async function POST(request: NextRequest) {
  const ctx = await getSaasContext(); if ("error" in ctx) return NextResponse.json({ error: ctx.error }, { status: ctx.status });
  let body: Record<string, unknown>; try { body = await request.json(); } catch { return NextResponse.json({ error: "Enter valid expense details." }, { status: 400 }); }
+ const requestedId = clean(body.id, 64);
+ if (requestedId && !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(requestedId)) return NextResponse.json({ error: "Invalid expense identifier." }, { status: 400 });
  const category = clean(body.category,100), description = clean(body.description,500), expenseDate = clean(body.expense_date,10) || todayInUganda(), currency = clean(body.currency || "UGX",3).toUpperCase(), amount = Number(body.amount), paymentMethod = clean(body.payment_method || "other",30), notes = clean(body.notes,2000), supplierId = clean(body.supplier_contact_id,64);
  if (!category || !description || !dateOk(expenseDate)) return NextResponse.json({ error: "Enter a category, description and valid date." }, { status: 400 });
  if (!Number.isFinite(amount) || amount <= 0 || amount > 1e12) return NextResponse.json({ error: "Enter a valid expense amount greater than zero." }, { status: 400 });
  if (!/^[A-Z]{3}$/.test(currency)) return NextResponse.json({ error: "Use a valid three-letter currency." }, { status: 400 });
  if (!methods.includes(paymentMethod)) return NextResponse.json({ error: "Choose a valid payment method." }, { status: 400 });
  const h = headers(ctx); const base = `${ctx.url}/rest/v1`;
+ // A stable client-generated UUID makes queued offline POST retries idempotent.
+ if (requestedId) {
+   const priorResponse = await fetch(`${base}/expenses?id=eq.${encodeURIComponent(requestedId)}&select=id,workspace_id&limit=1`, { headers: h, cache: "no-store" });
+   if (!priorResponse.ok) return NextResponse.json({ error: "Unable to verify this expense before saving." }, { status: 502 });
+   const prior = await priorResponse.json() as Array<{ id: string; workspace_id: string }>;
+   if (prior.length) {
+     if (prior[0].workspace_id !== ctx.workspaceId) return NextResponse.json({ error: "This expense identifier is already in use." }, { status: 409 });
+     return NextResponse.json({ expense: prior[0], already_saved: true }, { status: 200 });
+   }
+ }
  if (supplierId) { const sr = await fetch(`${base}/business_contacts?id=eq.${encodeURIComponent(supplierId)}&workspace_id=eq.${encodeURIComponent(ctx.workspaceId)}&contact_type=eq.supplier&select=id&limit=1`, { headers: h, cache: "no-store" }); if (!sr.ok) return NextResponse.json({ error: "Unable to verify the selected supplier." }, { status: 502 }); const s = await sr.json(); if (!Array.isArray(s) || !s.length) return NextResponse.json({ error: "Choose a supplier belonging to this workspace." }, { status: 400 }); }
- const response = await fetch(`${base}/expenses`, { method:"POST", headers:{ ...h, "Content-Type":"application/json", Prefer:"return=representation" }, body:JSON.stringify({ workspace_id:ctx.workspaceId, expense_date:expenseDate, category, description, supplier_contact_id:supplierId || null, amount, currency, payment_method:paymentMethod, notes:notes || null, recorded_by:ctx.session.user.id }), cache:"no-store" });
+ const response = await fetch(`${base}/expenses`, { method:"POST", headers:{ ...h, "Content-Type":"application/json", Prefer:"return=representation" }, body:JSON.stringify({ ...(requestedId ? { id: requestedId } : {}), workspace_id:ctx.workspaceId, expense_date:expenseDate, category, description, supplier_contact_id:supplierId || null, amount, currency, payment_method:paymentMethod, notes:notes || null, recorded_by:ctx.session.user.id }), cache:"no-store" });
  if (!response.ok) return NextResponse.json({ error: "Could not save the expense." }, { status: 502 }); const rows = await response.json(); return NextResponse.json({ expense:Array.isArray(rows)?rows[0]:null }, { status:201 });
 }
 
