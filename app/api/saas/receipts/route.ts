@@ -3,6 +3,12 @@ import { getSaasContext } from "@/lib/saas-context";
 
 export const dynamic = "force-dynamic";
 
+const todayInUganda = () => {
+  const parts = new Intl.DateTimeFormat("en-GB", { timeZone: "Africa/Kampala", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(new Date());
+  const part = (type: string) => parts.find((item) => item.type === type)?.value || "";
+  return `${part("year")}-${part("month")}-${part("day")}`;
+};
+
 export async function GET() {
   const c = await getSaasContext();
   if ("error" in c) return NextResponse.json({ error: c.error }, { status: c.status });
@@ -50,7 +56,7 @@ export async function POST(req: NextRequest) {
   };
 
   const receiptDate = typeof b.receipt_date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(b.receipt_date)
-    ? b.receipt_date : new Date().toISOString().slice(0, 10);
+    ? b.receipt_date : todayInUganda();
   const dateKey = receiptDate.replace(/-/g, "");
   const numberResponse = await fetch(
     `${c.url}/rest/v1/sales_receipts?workspace_id=eq.${encodeURIComponent(c.workspaceId)}&select=receipt_number&limit=5000`,
