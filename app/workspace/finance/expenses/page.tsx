@@ -52,7 +52,43 @@ export default function ExpensesPage() {
   const visible = useMemo(() => expenses.filter(x => { const q = search.toLowerCase(); const matches = `${x.category} ${x.description} ${x.supplier_name || ""} ${x.payment_method || ""}`.toLowerCase().includes(q); const now = new Date(); const d = new Date(`${x.expense_date}T00:00:00`); const dateMatch = period === "all" || (period === "month" && d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()) || (period === "year" && d.getFullYear() === now.getFullYear()); return matches && dateMatch; }), [expenses, search, period]);
   const selectedExpense = visible.find((expense) => expense.id === selectedExpenseId) || visible[0] || null;
   const total = visible.reduce((sum, x) => sum + Number(x.amount || 0), 0);
-  async function save(e: FormEvent) { e.preventDefault(); setBusy(true); setMessage(""); try { const r = await fetch("/api/saas/expenses", { method: editingExpenseId ? "PATCH" : "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...form, ...(editingExpenseId ? { id: editingExpenseId } : {}), amount: Number(form.amount), supplier_contact_id: form.supplier_contact_id || null }) }); const d = await r.json(); if (!r.ok) throw new Error(d.error || (editingExpenseId ? "Could not update expense." : "Could not save expense.")); setMessage(editingExpenseId ? "Expense updated successfully." : "Expense saved successfully."); setForm(s => ({ ...s, category: "", description: "", supplier_contact_id: "", amount: "", notes: "" })); setEditingExpenseId(null); setShowForm(false); await load(); } catch (e) { setMessage(e instanceof Error ? e.message : "Could not save expense."); } finally { setBusy(false); } }
+  async function save(e: FormEvent) {
+    e.preventDefault();
+    setMessage("");
+    const amountValue = Number(form.amount);
+    if (!form.expense_date) { setMessage("Choose the expense date."); return; }
+    if (!form.category.trim()) { setMessage("Enter an expense category."); return; }
+    if (!form.description.trim()) { setMessage("Enter a description for this expense."); return; }
+    if (!Number.isFinite(amountValue) || amountValue <= 0) { setMessage("Expense amount must be a valid amount greater than zero."); return; }
+    if (!form.currency.trim()) { setMessage("Choose the expense currency."); return; }
+    setBusy(true);
+    try {
+      const r = await fetch("/api/saas/expenses", {
+        method: editingExpenseId ? "PATCH" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...form,
+          category: form.category.trim(),
+          description: form.description.trim(),
+          ...(editingExpenseId ? { id: editingExpenseId } : {}),
+          amount: amountValue,
+          currency: form.currency.trim().toUpperCase(),
+          supplier_contact_id: form.supplier_contact_id || null,
+        }),
+      });
+      const d = await r.json();
+      if (!r.ok) throw new Error(d.error || (editingExpenseId ? "Could not update expense." : "Could not save expense."));
+      setMessage(editingExpenseId ? "Expense updated successfully." : "Expense saved successfully.");
+      setForm(s => ({ ...s, category: "", description: "", supplier_contact_id: "", amount: "", notes: "" }));
+      setEditingExpenseId(null);
+      setShowForm(false);
+      await load();
+    } catch (e) {
+      setMessage(e instanceof Error ? e.message : "Could not save expense.");
+    } finally {
+      setBusy(false);
+    }
+  }
   function editExpense(x: Expense) { setEditingExpenseId(x.id); setForm({ expense_date: x.expense_date, category: x.category || "", description: x.description || "", supplier_contact_id: x.supplier_contact_id || "", amount: String(x.amount ?? ""), currency: x.currency || "UGX", payment_method: x.payment_method || "bank_transfer", notes: x.notes || "" }); setMessage(""); setShowForm(true); }
   async function deleteExpense(x: Expense) { if (!window.confirm("Delete this expense record? Linked supplier payment history will be protected.")) return; setMessage(""); try { const r = await fetch("/api/saas/expenses?id=" + encodeURIComponent(x.id), { method: "DELETE" }); const d = await r.json(); if (!r.ok) throw new Error(d.error || "Could not delete expense."); setMessage("Expense deleted."); await load(); } catch (e) { setMessage(e instanceof Error ? e.message : "Could not delete expense."); } }
   async function makeRecurring(e: FormEvent) {
