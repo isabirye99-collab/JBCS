@@ -189,7 +189,7 @@ export default function SupplierPaymentsPage() {
     supplier_contact_id: "",
     expense_id: "",
     invoice_id: "",
-    payment_date: new Date().toISOString().slice(0, 10),
+    payment_date: today(),
     amount: "",
     currency: "UGX",
     payment_method: "bank_transfer",
@@ -386,7 +386,7 @@ export default function SupplierPaymentsPage() {
                   setEditingPaymentId(null);
                 } else {
                   setEditingPaymentId(null);
-                  setForm({ supplier_contact_id: "", expense_id: "", invoice_id: "", payment_date: new Date().toISOString().slice(0, 10), amount: "", currency: "UGX", payment_method: "bank_transfer", payment_reference: "", notes: "" });
+                  setForm({ supplier_contact_id: "", expense_id: "", invoice_id: "", payment_date: today(), amount: "", currency: "UGX", payment_method: "bank_transfer", payment_reference: "", notes: "" });
                   setShowForm(true);
                 }
               }}
