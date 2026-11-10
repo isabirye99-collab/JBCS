@@ -221,28 +221,6 @@ function AnimatedDonut({ data, total }: { data: [string, number][]; total: numbe
   </div>;
 }
 
-function AnimatedTrendChart({ data }: { data: { month: string; invoiced: number; collected: number; expenses: number }[] }) {
-  const maxValue = Math.max(1, ...data.flatMap((row) => [row.invoiced, row.collected, row.expenses]));
-  if (!data.length) return <div className="flex min-h-64 items-center justify-center rounded-xl bg-slate-50 text-sm text-slate-500">No monthly activity found for this period.</div>;
-  return <div>
-    <div className="mb-4 flex flex-wrap gap-x-5 gap-y-2 text-xs text-slate-600">
-      {[["Invoiced", "#9f1d35"], ["Collected", "#0f766e"], ["Expenses", "#f97316"]].map(([label, color]) => <span key={label} className="inline-flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-sm" style={{ backgroundColor: color }} />{label}</span>)}
-    </div>
-    <div className="report-chart-grid relative grid h-64 grid-cols-6 items-end gap-3 rounded-xl px-2 pb-2 pt-5 sm:gap-5">
-      {data.map((row, index) => <div key={row.month} className="relative z-10 flex h-full min-w-0 flex-col justify-end">
-        <div className="flex min-h-0 flex-1 items-end justify-center gap-1 sm:gap-1.5">
-          {[["invoiced", "#9f1d35"], ["collected", "#0f766e"], ["expenses", "#f97316"]].map(([key, color], seriesIndex) => {
-            const value = row[key as "invoiced" | "collected" | "expenses"];
-            return <div key={key} className="report-animated-bar w-full max-w-5 rounded-t-md" title={`${key}: ${money(value)}`} style={{ height: `${Math.max(value > 0 ? 3 : 0, value / maxValue * 100)}%`, backgroundColor: color, animationDelay: `${index * 90 + seriesIndex * 70}ms` }} />;
-          })}
-        </div>
-        <span className="mt-2 truncate text-center text-[10px] font-medium text-slate-500">{row.month}</span>
-      </div>)}
-    </div>
-    <p className="mt-3 text-xs text-slate-400">Bars animate on load. Hover over a bar to inspect its recorded value.</p>
-  </div>;
-}
-
 export default function FinanceReportsPage() {
   const [invoices, setInvoices] = useState<Row[]>([]);
   const [payments, setPayments] = useState<Row[]>([]);
@@ -478,23 +456,6 @@ export default function FinanceReportsPage() {
       .slice(0, 6);
   }, [reportExpenses]);
 
-  const monthlyFinancialTrend = useMemo(() => {
-    const totals = new Map<string, { month: string; invoiced: number; collected: number; expenses: number }>();
-    const addRows = (rows: Row[], field: "invoiced" | "collected" | "expenses") => rows.forEach((row) => {
-      const date = dateOf(row);
-      if (!date) return;
-      const month = date.slice(0, 7);
-      const current = totals.get(month) ?? { month, invoiced: 0, collected: 0, expenses: 0 };
-      current[field] += amount(row);
-      totals.set(month, current);
-    });
-    addRows(reportInvoices, "invoiced");
-    addRows(reportPayments, "collected");
-    addRows(reportDirectSalesReceipts, "collected");
-    addRows(reportExpenses, "expenses");
-    return [...totals.values()].sort((a, b) => a.month.localeCompare(b.month)).slice(-6).map((row) => ({ ...row, month: new Date(row.month + "-01T00:00:00").toLocaleDateString("en-UG", { month: "short", year: "2-digit" }) }));
-  }, [reportInvoices, reportPayments, reportDirectSalesReceipts, reportExpenses]);
-
   const recentInvoices = useMemo(
     () =>
       [...reportInvoices]
@@ -604,7 +565,6 @@ export default function FinanceReportsPage() {
   }
 
   const panel = "rounded-2xl border border-slate-200 bg-white p-5 shadow-sm";
-  const maxCashBar = Math.max(1, collected, supplierPaid);
 
   if (planLocked) {
     return (
