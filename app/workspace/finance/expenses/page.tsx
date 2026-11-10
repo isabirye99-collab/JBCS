@@ -61,7 +61,7 @@ export default function ExpensesPage() {
       setExpenses(nextExpenses); setSuppliers(nextSuppliers);
       await Promise.all([setOfflineValue("expenses", nextExpenses), setOfflineValue("suppliers", nextSuppliers)]).catch(() => undefined);
     } catch (error) {
-      if (typeof navigator !== "undefined" && navigator.onLine) throw error;
+      if (typeof navigator !== "undefined" && navigator.onLine && !(error instanceof TypeError)) throw error;
       const [cachedExpenses, cachedSuppliers] = await Promise.all([getOfflineValue<Expense[]>("expenses"), getOfflineValue<Supplier[]>("suppliers")]);
       if (!cachedExpenses && !cachedSuppliers) throw new Error("You are offline and this device has no saved expense data yet. Connect once to prepare offline use.");
       setExpenses(cachedExpenses || []); setSuppliers(cachedSuppliers || []);
