@@ -328,34 +328,36 @@ export default function FinanceReportsPage() {
     return !!date && (!start || date >= start) && (!end || date <= end);
   };
 
+  const invalidRange = Boolean(start && end && start > end);
+
   const reportInvoices = useMemo(
-    () => invoices.filter(inRange),
-    [invoices, start, end]
+    () => (invalidRange ? [] : invoices.filter(inRange)),
+    [invoices, start, end, invalidRange]
   );
 
   const reportPayments = useMemo(
-    () => payments.filter(inRange),
-    [payments, start, end]
+    () => (invalidRange ? [] : payments.filter(inRange)),
+    [payments, start, end, invalidRange]
   );
 
   const reportExpenses = useMemo(
-    () => expenses.filter(inRange),
-    [expenses, start, end]
+    () => (invalidRange ? [] : expenses.filter(inRange)),
+    [expenses, start, end, invalidRange]
   );
 
   const reportSupplierPayments = useMemo(
-    () => supplierPayments.filter(inRange),
-    [supplierPayments, start, end]
+    () => (invalidRange ? [] : supplierPayments.filter(inRange)),
+    [supplierPayments, start, end, invalidRange]
   );
 
   const reportOwnerIncomePayments = useMemo(
-    () => ownerIncomePayments.filter(inRange),
-    [ownerIncomePayments, start, end]
+    () => (invalidRange ? [] : ownerIncomePayments.filter(inRange)),
+    [ownerIncomePayments, start, end, invalidRange]
   );
 
   const reportDirectSalesReceipts = useMemo(
-    () => directSalesReceipts.filter(inRange),
-    [directSalesReceipts, start, end]
+    () => (invalidRange ? [] : directSalesReceipts.filter(inRange)),
+    [directSalesReceipts, start, end, invalidRange]
   );
 
   const ownerIncomeReceived = reportOwnerIncomePayments.reduce((sum, row) => sum + amount(row), 0);
@@ -657,6 +659,12 @@ export default function FinanceReportsPage() {
               ))}
             </div>
           </section>
+
+          {invalidRange && (
+            <div role="alert" className="mb-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-medium text-rose-800">
+              The start date must be on or before the end date. Choose a valid reporting period to display results.
+            </div>
+          )}
 
           <section className={`${panel} mb-6`}>
             <div className="mb-3 flex items-center gap-2">
