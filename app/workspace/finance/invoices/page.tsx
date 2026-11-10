@@ -70,8 +70,20 @@ function money(value: unknown, currency = "UGX") {
   }
 }
 
+function localDate(date = new Date()) {
+  const value = new Date(date);
+  value.setMinutes(value.getMinutes() - value.getTimezoneOffset());
+  return value.toISOString().slice(0, 10);
+}
+
 function today() {
-  return new Date().toISOString().slice(0, 10);
+  return localDate();
+}
+
+function tomorrow() {
+  const date = new Date();
+  date.setDate(date.getDate() + 1);
+  return localDate(date);
 }
 
 function makeLine(): InvoiceLine {
@@ -97,7 +109,7 @@ export default function InvoicesPage() {
   const [editingInvoiceId, setEditingInvoiceId] = useState<string | null>(null);
   const [recurringInvoice, setRecurringInvoice] = useState<Invoice | null>(null);
   const [recurringFrequency, setRecurringFrequency] = useState("monthly");
-  const [recurringNextDate, setRecurringNextDate] = useState(new Date(Date.now() + 86400000).toISOString().slice(0, 10));
+  const [recurringNextDate, setRecurringNextDate] = useState(tomorrow());
   const [recurringEndDate, setRecurringEndDate] = useState("");
   const [recurringBusy, setRecurringBusy] = useState(false);
   const [actionBusy, setActionBusy] = useState<string | null>(null);
@@ -334,6 +346,10 @@ export default function InvoicesPage() {
   async function submitPayment(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!paymentInvoice) return;
+    if (!paymentDate || paymentDate > today()) {
+      setError("Choose a valid payment date that is not in the future.");
+      return;
+    }
     const balance = Math.max(0, invoiceTotal(paymentInvoice) - Number(paymentInvoice.amount_paid || 0));
     const amount = Number(paymentAmount);
     if (!Number.isFinite(amount) || amount <= 0 || amount > balance + 0.000001) {
