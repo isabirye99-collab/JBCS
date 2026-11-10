@@ -637,3 +637,26 @@ aside.fixed.inset-y-0.left-0:has(a[href^="/workspace/finance/"]) a:not([aria-cur
 aside.fixed.inset-y-0.left-0:has(a[href^="/workspace/finance/"]) a:not([aria-current="page"]):hover svg{
   color:#b51227!important;
 }
+
+
+/* Dashboard charts: quiet horizontal guides and a clean, accessible hover state. */
+.dashboard-chart-grid{
+  background-image:linear-gradient(to top,rgba(148,163,184,.22) 1px,transparent 1px);
+  background-size:100% 25%;
+  background-position:left bottom;
+  background-repeat:repeat-y;
+}
+.dashboard-chart-bar{
+  transform-origin:bottom center;
+  animation:jbcs-chart-rise .72s cubic-bezier(.2,.75,.25,1) both;
+  transition:filter .18s ease,opacity .18s ease;
+}
+.dashboard-chart-bar:hover{filter:saturate(1.15) brightness(1.04);opacity:.9}
+@keyframes jbcs-chart-rise{
+  from{transform:scaleY(.08);opacity:.45}
+  to{transform:scaleY(1);opacity:1}
+}
+@media(prefers-reduced-motion:reduce){
+  .dashboard-chart-bar{animation:none;transition:none}
+  .dashboard-metric-card{transition:none!important}
+}
