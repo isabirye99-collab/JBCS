@@ -812,7 +812,9 @@ export default function FinanceReportsPage() {
                   </div>
                   <span className="rounded-xl border border-rose-100 bg-rose-50 p-3 text-[#9f1d35]"><ChartNoAxesCombined size={21} /></span>
                 </div>
-                <AnimatedTrendChart data={monthlyFinancialTrend} />
+                <AnimatedDonut data={[["Invoiced sales", invoiced], ["Customer collections", collected], ["Expenses recorded", spent]]} total={invoiced + collected + spent} />
+                <p className="mt-4 text-xs text-slate-400">Source: invoice totals, customer payment records and direct sales receipts, plus recorded expense records, filtered by the reporting period above. Supplier payments are excluded from expense totals to prevent double-counting.</p>
+                <div className="mt-3 flex flex-wrap gap-3 text-sm"><Link href="/workspace/finance/invoices" className="font-semibold text-[#F3192D] hover:underline">Invoices</Link><Link href="/workspace/finance/payments" className="font-semibold text-[#F3192D] hover:underline">Customer payments</Link><Link href="/workspace/finance/expenses" className="font-semibold text-[#F3192D] hover:underline">Expenses</Link></div>
               </section>
 
               <section className="mb-6 grid gap-5 xl:grid-cols-2">
@@ -840,110 +842,15 @@ export default function FinanceReportsPage() {
 
               <section className="mb-6 grid gap-5 xl:grid-cols-[1.2fr_.8fr]">
                 <article className={panel}>
-                  <div className="mb-5 flex items-start justify-between gap-3">
-                    <div>
-                      <h2 className="text-lg font-bold">Expense breakdown</h2>
-                      <p className="mt-1 text-sm text-slate-500">
-                        Recorded spending by category in the selected period
-                      </p>
-                    </div>
-                    <span className="rounded-xl bg-amber-50 p-2.5 text-amber-700">
-                      <ChartNoAxesCombined size={20} />
-                    </span>
-                  </div>
-
-                  {categories.length ? (
-                    <div className="space-y-4">
-                      {categories.map(([name, value]) => (
-                        <div key={name}>
-                          <div className="mb-1.5 flex items-center justify-between gap-3 text-sm">
-                            <span className="font-medium text-slate-700">{name}</span>
-                            <span className="font-semibold tabular-nums text-slate-900">
-                              {money(value)}
-                            </span>
-                          </div>
-                          <div className="h-2.5 overflow-hidden rounded-full bg-slate-100">
-                            <div
-                              className="h-full rounded-full bg-[#F3192D]"
-                              style={{
-                                width: `${Math.max(2, (value / Math.max(1, spent)) * 100)}%`,
-                              }}
-                            />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="rounded-xl bg-slate-50 p-5 text-sm text-slate-500">
-                      No expense records found for this period.
-                    </p>
-                  )}
-
-                  <p className="mt-4 text-xs leading-5 text-slate-400">
-                    Supplier payments are displayed separately and are not added to
-                    these expense category totals.
-                  </p>
+                  <div className="mb-5 flex items-start justify-between gap-3"><div><h2 className="text-lg font-bold">Expense breakdown</h2><p className="mt-1 text-sm text-slate-500">Recorded spending by category for the selected period.</p></div><span className="rounded-xl bg-amber-50 p-2.5 text-amber-700"><FileBarChart size={20} /></span></div>
+                  <div className="overflow-x-auto"><table className="w-full text-left text-sm"><thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500"><tr><th className="p-3">Expense category</th><th className="p-3 text-right">Amount</th><th className="p-3 text-right">Share</th></tr></thead><tbody>{categories.map(([name, value]) => <tr key={name} className="border-t border-slate-100"><td className="p-3">{name}</td><td className="p-3 text-right font-semibold tabular-nums">{money(value)}</td><td className="p-3 text-right tabular-nums">{spent > 0 ? ((value / spent) * 100).toFixed(1) : "0.0"}%</td></tr>)}{!categories.length && <tr><td colSpan={3} className="p-4 text-center text-slate-500">No expense records found for this period.</td></tr>}</tbody><tfoot className="border-t-2 border-slate-200 bg-slate-50"><tr><th className="p-3 text-left">Total recorded expenses</th><th className="p-3 text-right">{money(spent)}</th><th className="p-3 text-right">100%</th></tr></tfoot></table></div>
+                  <p className="mt-4 text-xs leading-5 text-slate-400">Source: expense records grouped by category and filtered by the reporting period. Supplier payments are not added to these totals.</p><Link href="/workspace/finance/expenses" className="mt-3 inline-block text-sm font-semibold text-[#F3192D] hover:underline">View expense records</Link>
                 </article>
 
                 <article className={panel}>
-                  <div className="mb-5">
-                    <h2 className="text-lg font-bold">Financial position</h2>
-                    <p className="mt-1 text-sm text-slate-500">
-                      Customer collections and recorded supplier cash outflows
-                    </p>
-                  </div>
-
-                  <div className="space-y-5">
-                    <div>
-                      <div className="mb-2 flex justify-between text-sm">
-                        <span className="text-slate-600">Payments received</span>
-                        <strong>{money(collected)}</strong>
-                      </div>
-                      <div className="h-3 overflow-hidden rounded-full bg-slate-100">
-                        <div
-                          className="h-full rounded-full bg-emerald-500"
-                          style={{
-                            width: `${Math.min(100, (collected / maxCashBar) * 100)}%`,
-                          }}
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <div className="mb-2 flex justify-between text-sm">
-                        <span className="text-slate-600">Supplier payments</span>
-                        <strong>{money(supplierPaid)}</strong>
-                      </div>
-                      <div className="h-3 overflow-hidden rounded-full bg-slate-100">
-                        <div
-                          className="h-full rounded-full bg-orange-500"
-                          style={{
-                            width: `${Math.min(100, (supplierPaid / maxCashBar) * 100)}%`,
-                          }}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="rounded-xl bg-slate-50 p-4">
-                      <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                        Net customer-to-supplier cash movement
-                      </p>
-                      <p
-                        className={`mt-2 text-2xl font-bold ${
-                          collected - supplierPaid >= 0
-                            ? "text-emerald-700"
-                            : "text-rose-700"
-                        }`}
-                      >
-                        {money(collected - supplierPaid)}
-                      </p>
-                      <p className="mt-2 text-xs leading-5 text-slate-500">
-                        Customer payments received minus supplier payments recorded.
-                        Other expense payments, transfers, taxes and other cash
-                        movements are not included in this estimate.
-                      </p>
-                    </div>
-                  </div>
+                  <div className="mb-5"><h2 className="text-lg font-bold">Financial position</h2><p className="mt-1 text-sm text-slate-500">Cash movement summary for the selected period.</p></div>
+                  <div className="overflow-x-auto"><table className="w-full text-left text-sm"><tbody><tr className="border-b border-slate-100"><th className="p-3 font-medium text-slate-600">Customer collections</th><td className="p-3 text-right font-bold">{money(collected)}</td></tr><tr className="border-b border-slate-100"><th className="p-3 font-medium text-slate-600">Supplier payments</th><td className="p-3 text-right font-bold">{money(supplierPaid)}</td></tr><tr className="border-b border-slate-100"><th className="p-3 font-medium text-slate-600">Net customer-to-supplier movement</th><td className={`p-3 text-right text-lg font-bold ${collected-supplierPaid>=0?"text-emerald-700":"text-rose-700"}`}>{money(collected-supplierPaid)}</td></tr></tbody></table></div>
+                  <p className="mt-4 text-xs leading-5 text-slate-400">Source: customer payment records and direct sales receipts less supplier payment records. This is a cash-movement summary, not a complete balance sheet; other expenses, transfers, tax, assets and liabilities are not included.</p><div className="mt-3 flex flex-wrap gap-3 text-sm"><Link href="/workspace/finance/payments" className="font-semibold text-[#F3192D] hover:underline">Customer payments</Link><Link href="/workspace/finance/supplier-payments" className="font-semibold text-[#F3192D] hover:underline">Supplier payments</Link></div>
                 </article>
               </section>
 
