@@ -283,8 +283,25 @@ export default function SupplierPaymentsPage() {
 
   async function save(e: FormEvent) {
     e.preventDefault();
-    setBusy(true);
     setMessage("");
+    const amountValue = Number(form.amount);
+    if (!form.supplier_contact_id) {
+      setMessage("Choose a supplier before recording this payment.");
+      return;
+    }
+    if (!form.payment_date) {
+      setMessage("Choose the payment date.");
+      return;
+    }
+    if (!Number.isFinite(amountValue) || amountValue <= 0) {
+      setMessage("Payment amount must be a valid amount greater than zero.");
+      return;
+    }
+    if (!form.currency.trim()) {
+      setMessage("Choose the payment currency.");
+      return;
+    }
+    setBusy(true);
 
     try {
       const r = await fetch("/api/saas/supplier-payments", {
@@ -295,8 +312,9 @@ export default function SupplierPaymentsPage() {
           ...(editingPaymentId ? { id: editingPaymentId } : {}),
           expense_id: form.expense_id || null,
           invoice_id: form.invoice_id || null,
-          amount: Number(form.amount),
-          payment_reference: form.payment_reference || null,
+          amount: amountValue,
+          currency: form.currency.trim().toUpperCase(),
+          payment_reference: form.payment_reference.trim() || null,
         }),
       });
 
