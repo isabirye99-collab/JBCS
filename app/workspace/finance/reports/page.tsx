@@ -629,6 +629,28 @@ export default function FinanceReportsPage() {
           </div>
 
           <section className={`${panel} mb-6`}>
+            <div className="mb-3">
+              <h2 className="font-bold">Report modules</h2>
+              <p className="mt-1 text-xs text-slate-500">Open a dedicated report. Figures and tables identify their source records.</p>
+            </div>
+            <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
+              {[
+                ["Sales Report", "/workspace/finance/reports/sales"],
+                ["Expense Report", "/workspace/finance/reports/expenses"],
+                ["Supplier Payments", "/workspace/finance/reports/supplier-payments"],
+                ["Owner Income & Commissions", "/workspace/finance/reports/owner-income"],
+                ["Customer Statements", "/workspace/finance/reports/customer-statements"],
+                ["Profit & Loss", "/workspace/finance/reports/profit-loss"],
+                ["Balance Sheet", "/workspace/finance/reports/balance-sheet"],
+              ].map(([label, href]) => (
+                <Link key={href} href={href} className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm font-semibold text-slate-700 transition hover:border-rose-200 hover:bg-rose-50 hover:text-[#F3192D]">
+                  <span>{label}</span><span aria-hidden="true">→</span>
+                </Link>
+              ))}
+            </div>
+          </section>
+
+          <section className={`${panel} mb-6`}>
             <div className="mb-3 flex items-center gap-2">
               <CalendarDays size={18} className="text-[#F3192D]" />
               <h2 className="font-bold">Reporting period</h2>
