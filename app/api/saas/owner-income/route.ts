@@ -86,7 +86,7 @@ export async function POST(request: NextRequest) {
     const amount = Number(body.amount);
     const currency = clean(body.currency || "UGX", 3).toUpperCase();
     const paymentMethod = clean(body.payment_method || "other", 30);
-    if (!entryId || !dateOk(paymentDate) || paymentDate > new Date().toISOString().slice(0, 10) || !Number.isFinite(amount) || amount <= 0 || amount > 1e12 || !/^[A-Z]{3}$/.test(currency) || !methods.includes(paymentMethod)) {
+    if (!entryId || !dateOk(paymentDate) || paymentDate > todayInUganda() || !Number.isFinite(amount) || amount <= 0 || amount > 1e12 || !/^[A-Z]{3}$/.test(currency) || !methods.includes(paymentMethod)) {
       return NextResponse.json({ error: "Enter a valid payment date (not in the future), amount, currency and method." }, { status: 400 });
     }
     const response = await fetch(`${base}/rpc/record_owner_commission_payment`, {
@@ -129,7 +129,7 @@ export async function POST(request: NextRequest) {
   const amount = Number(body.amount);
   const currency = clean(body.currency || "UGX", 3).toUpperCase();
   const notes = clean(body.notes, 2000);
-  if (!["owner_income", "commission"].includes(entryType) || !["owner", "business"].includes(recipient) || !category || !payer || !description || !dateOk(earnedDate) || (expectedDate && !dateOk(expectedDate))) {
+  if (!["owner_income", "commission"].includes(entryType) || !["owner", "business"].includes(recipient) || !category || !payer || !description || !dateOk(earnedDate) || (expectedDate && (!dateOk(expectedDate) || expectedDate < earnedDate))) {
     return NextResponse.json({ error: "Complete the required fields and use valid dates." }, { status: 400 });
   }
   if (!Number.isFinite(amount) || amount <= 0 || amount > 1e12 || !/^[A-Z]{3}$/.test(currency)) {
