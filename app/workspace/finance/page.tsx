@@ -87,6 +87,8 @@ type SupplierPayment = {
   notes?: string | null;
   created_at?: string | null;
 };
+type CustomerPayment = { id: string; amount?: number | string | null; payment_date?: string | null; created_at?: string | null };
+type DirectSalesReceipt = { id: string; total?: number | string | null; sale_date?: string | null; created_at?: string | null };
 
 type NavItem = {
   label: string;
@@ -126,7 +128,7 @@ const navigation: { heading: string; items: NavItem[] }[] = [
       },
       {
         label: "Sales Receipts",
-        href: "/workspace/finance/receipts",
+        href: "/workspace/finance/sales-receipts",
         icon: Receipt,
       },
       {
@@ -402,6 +404,8 @@ export default function FinanceDashboardPage() {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [supplierPayments, setSupplierPayments] = useState<SupplierPayment[]>([]);
+  const [customerPayments, setCustomerPayments] = useState<CustomerPayment[]>([]);
+  const [directSalesReceipts, setDirectSalesReceipts] = useState<DirectSalesReceipt[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState("");
