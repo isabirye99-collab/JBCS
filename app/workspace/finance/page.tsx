@@ -442,7 +442,6 @@ export default function FinanceDashboardPage() {
       active = false;
     };
   }, []);
-  const [search, setSearch] = useState("");
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   const loadDashboard = useCallback(async (manual = false) => {
@@ -699,16 +698,7 @@ export default function FinanceDashboardPage() {
     return { paid, overdue, sent, total, paidPercent: percent(paid), overduePercent: percent(overdue), sentPercent: percent(sent) };
   }, [invoices]);
 
-  const filteredInvoices = stats.recentInvoices.filter((invoice) => {
-    const term = search.trim().toLowerCase();
-    if (!term) return true;
 
-    return [
-      invoiceNumber(invoice),
-      customerName(invoice),
-      invoice.status ?? "",
-    ].some((value) => value.toLowerCase().includes(term));
-  });
 
   const today = new Intl.DateTimeFormat("en-UG", {
     weekday: "long",
