@@ -159,6 +159,8 @@ const methods = [
   { value: "other", label: "Other" },
 ];
 
+const today = () => { const date = new Date(); date.setMinutes(date.getMinutes() - date.getTimezoneOffset()); return date.toISOString().slice(0, 10); };
+
 const money = (amount: number, currency = "UGX") =>
   `${currency} ${Number(amount || 0).toLocaleString("en-UG", {
     maximumFractionDigits: 2,
@@ -291,6 +293,10 @@ export default function SupplierPaymentsPage() {
     }
     if (!form.payment_date) {
       setMessage("Choose the payment date.");
+      return;
+    }
+    if (form.payment_date > today()) {
+      setMessage("Payment date cannot be in the future.");
       return;
     }
     if (!Number.isFinite(amountValue) || amountValue <= 0) {
