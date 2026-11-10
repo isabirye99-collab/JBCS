@@ -465,22 +465,6 @@ export default function FinanceReportsPage() {
     return [...sums.entries()].sort((a, b) => b[1] - a[1]);
   }, [reportExpenses]);
 
-  const recentInvoices = useMemo(
-    () =>
-      [...reportInvoices]
-        .sort((a, b) => dateOf(b).localeCompare(dateOf(a)))
-        .slice(0, 8),
-    [reportInvoices]
-  );
-
-  const recentSupplierPayments = useMemo(
-    () =>
-      [...reportSupplierPayments]
-        .sort((a, b) => dateOf(b).localeCompare(dateOf(a)))
-        .slice(0, 10),
-    [reportSupplierPayments]
-  );
-
   function exportCsv() {
     const rows = [
       [
@@ -761,7 +745,7 @@ export default function FinanceReportsPage() {
             </div>
           ) : (
             <>
-              <section className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              <section className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
                 <Metric
                   title="Invoiced"
                   value={formatCurrencyTotals(reportInvoices)}
@@ -779,27 +763,11 @@ export default function FinanceReportsPage() {
                 />
 
                 <Metric
-                  title="Owner income received"
-                  value={formatCurrencyTotals(reportOwnerIncomePayments)}
-                  detail={`${reportOwnerIncomePayments.length} owner income / commission payment(s)`}
-                  icon={TrendingUp}
-                  tone="bg-sky-50 text-sky-700"
-                />
-
-                <Metric
                   title="Expenses recorded"
                   value={formatCurrencyTotals(reportExpenses)}
                   detail={`${reportExpenses.length} expense record(s); supplier payments are shown separately`}
                   icon={TrendingDown}
                   tone="bg-amber-50 text-amber-700"
-                />
-
-                <Metric
-                  title="Supplier payments"
-                  value={formatCurrencyTotals(reportSupplierPayments)}
-                  detail={`${reportSupplierPayments.length} supplier payment record(s) in period`}
-                  icon={CreditCard}
-                  tone="bg-orange-50 text-orange-700"
                 />
 
                 <Metric
@@ -874,74 +842,6 @@ export default function FinanceReportsPage() {
               </section>
 
               <section className={`${panel} mb-6`}>
-                <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
-                  <div>
-                    <h2 className="text-lg font-bold">Recent supplier payments</h2>
-                    <p className="mt-1 text-sm text-slate-500">
-                      Supplier payments made during the selected period, including
-                      standalone payments
-                    </p>
-                  </div>
-                  <Link
-                    href="/workspace/finance/supplier-payments"
-                    className="text-sm font-semibold text-[#F3192D] hover:underline"
-                  >
-                    Manage supplier payments →
-                  </Link>
-                </div>
-
-                <div className="overflow-x-auto">
-                  <table className="w-full min-w-[850px] text-left text-sm">
-                    <thead>
-                      <tr className="border-b border-slate-200 text-xs uppercase tracking-wide text-slate-500">
-                        <th className="px-3 py-3">Date</th>
-                        <th className="px-3 py-3">Supplier</th>
-                        <th className="px-3 py-3">Reference</th>
-                        <th className="px-3 py-3">Linked expense</th>
-                        <th className="px-3 py-3">Linked invoice</th>
-                        <th className="px-3 py-3 text-right">Amount</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {recentSupplierPayments.length ? (
-                        recentSupplierPayments.map((row, index) => (
-                          <tr
-                            key={String(row.id ?? index)}
-                            className="border-b border-slate-100 last:border-0 hover:bg-slate-50"
-                          >
-                            <td className="px-3 py-3 text-slate-600">
-                              {labelDate(dateOf(row))}
-                            </td>
-                            <td className="px-3 py-3 font-semibold text-slate-800">
-                              {String(row.supplier_name ?? "Supplier")}
-                            </td>
-                            <td className="px-3 py-3 text-slate-600">
-                              {String(row.payment_reference ?? "—")}
-                            </td>
-                            <td className="px-3 py-3 text-slate-600">
-                              {String(row.expense_description ?? "Standalone payment")}
-                            </td>
-                            <td className="px-3 py-3 text-slate-600">
-                              {String(row.invoice_number ?? "—")}
-                            </td>
-                            <td className="px-3 py-3 text-right font-semibold tabular-nums">
-                              {money(amount(row), String(row.currency ?? "UGX"))}
-                            </td>
-                          </tr>
-                        ))
-                      ) : (
-                        <tr>
-                          <td colSpan={6} className="px-3 py-10 text-center text-slate-500">
-                            No supplier payments found for this period.
-                          </td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              </section>
-
-              <section className={`${panel} mb-6`}>
                 <div className="mb-4">
                   <h2 className="text-lg font-bold">Management Statement of Profit and Loss</h2>
                   <p className="mt-1 text-sm text-slate-500">Source: invoice totals and standalone direct sales receipts, less expense records in the selected period, grouped by currency. Supplier payments are not subtracted again as expenses.</p><div className="mt-2 flex flex-wrap gap-3 text-sm"><Link href="/workspace/finance/invoices" className="font-semibold text-[#F3192D] hover:underline">Invoices</Link><Link href="/workspace/finance/sales-receipts" className="font-semibold text-[#F3192D] hover:underline">Sales receipts</Link><Link href="/workspace/finance/expenses" className="font-semibold text-[#F3192D] hover:underline">Expenses</Link></div>
@@ -956,79 +856,7 @@ export default function FinanceReportsPage() {
                 <p className="mt-3 rounded-lg bg-amber-50 px-3 py-2 text-xs leading-5 text-amber-900">Management view only — not a full general-ledger P&amp;L. A complete balance sheet requires reconciled cash/bank, receivables, liabilities, assets, tax and owner-equity balances.</p>
               </section>
 
-              <section className={`${panel} mb-6 hidden`}>
-                <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
-                  <div>
-                    <h2 className="text-lg font-bold">Recent invoices</h2>
-                    <p className="mt-1 text-sm text-slate-500">
-                      Latest invoices within the selected period
-                    </p>
-                  </div>
-                  <Link
-                    href="/workspace/finance/invoices"
-                    className="text-sm font-semibold text-[#F3192D] hover:underline"
-                  >
-                    Open invoices →
-                  </Link>
-                </div>
 
-                <div className="overflow-x-auto">
-                  <table className="w-full min-w-[700px] text-left text-sm">
-                    <thead>
-                      <tr className="border-b border-slate-200 text-xs uppercase tracking-wide text-slate-500">
-                        <th className="px-3 py-3">Invoice</th>
-                        <th className="px-3 py-3">Customer</th>
-                        <th className="px-3 py-3">Date</th>
-                        <th className="px-3 py-3">Status</th>
-                        <th className="px-3 py-3 text-right">Amount</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {recentInvoices.length ? (
-                        recentInvoices.map((row, index) => (
-                          <tr
-                            key={String(row.id ?? index)}
-                            className="border-b border-slate-100 last:border-0 hover:bg-slate-50"
-                          >
-                            <td className="px-3 py-3 font-semibold text-slate-800">
-                              {String(
-                                row.invoice_number ??
-                                  row.invoice_no ??
-                                  row.number ??
-                                  (row.id ? `INV-${String(row.id).slice(0, 8)}` : "Invoice")
-                              )}
-                            </td>
-                            <td className="px-3 py-3 text-slate-600">
-                              {String(
-                                row.customer_name ??
-                                  (typeof row.customer === "string" ? row.customer : "") ??
-                                  "Customer"
-                              )}
-                            </td>
-                            <td className="px-3 py-3 text-slate-600">
-                              {labelDate(dateOf(row))}
-                            </td>
-                            <td className="px-3 py-3">
-                              <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold capitalize text-slate-700">
-                                {normal(row.status)}
-                              </span>
-                            </td>
-                            <td className="px-3 py-3 text-right font-semibold tabular-nums">
-                              {money(amount(row), String(row.currency ?? "UGX"))}
-                            </td>
-                          </tr>
-                        ))
-                      ) : (
-                        <tr>
-                          <td colSpan={5} className="px-3 py-10 text-center text-slate-500">
-                            No invoices found for this period.
-                          </td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              </section>
 
               <p className="text-xs leading-5 text-slate-400">
                 Figures are calculated from records returned by the finance APIs and
