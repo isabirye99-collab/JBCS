@@ -763,18 +763,10 @@ export default function FinanceReportsPage() {
                 />
               </section>
 
-              <section className={`${panel} mb-6 report-chart-panel`}>
-                <div className="mb-5 flex flex-wrap items-start justify-between gap-3">
-                  <div>
-                    <p className="text-[10px] font-bold uppercase tracking-[.16em] text-[#9f1d35]">Visual analytics</p>
-                    <h2 className="mt-1 text-xl font-bold tracking-tight text-slate-900">Financial performance</h2>
-                    <p className="mt-1 text-sm text-slate-500">Compare invoiced sales, customer collections and recorded expenses over the selected period.</p>
-                  </div>
-                  <span className="rounded-xl border border-rose-100 bg-rose-50 p-3 text-[#9f1d35]"><ChartNoAxesCombined size={21} /></span>
-                </div>
-                <AnimatedDonut data={[["Invoiced sales", invoiced], ["Customer collections", collected], ["Expenses recorded", spent]]} total={invoiced + collected + spent} />
-                <p className="mt-4 text-xs text-slate-400">Source: invoice totals, customer payment records and direct sales receipts, plus recorded expense records, filtered by the reporting period above. Supplier payments are excluded from expense totals to prevent double-counting.</p>
-                <div className="mt-3 flex flex-wrap gap-3 text-sm"><Link href="/workspace/finance/invoices" className="font-semibold text-[#F3192D] hover:underline">Invoices</Link><Link href="/workspace/finance/payments" className="font-semibold text-[#F3192D] hover:underline">Customer payments</Link><Link href="/workspace/finance/expenses" className="font-semibold text-[#F3192D] hover:underline">Expenses</Link></div>
+              <section className={`${panel} mb-6`}>
+                <div className="mb-5"><p className="text-[10px] font-bold uppercase tracking-[.16em] text-[#9f1d35]">Financial summary</p><h2 className="mt-1 text-xl font-bold tracking-tight text-slate-900">Financial performance</h2><p className="mt-1 text-sm text-slate-500">Key figures for the selected reporting period.</p></div>
+                <div className="overflow-x-auto"><table className="w-full text-left text-sm"><thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500"><tr><th className="p-3">Measure</th><th className="p-3 text-right">Amount</th><th className="p-3">Source</th></tr></thead><tbody><tr className="border-t border-slate-100"><th className="p-3 font-medium">Invoiced sales</th><td className="p-3 text-right font-bold">{money(invoiced)}</td><td className="p-3"><Link href="/workspace/finance/invoices" className="text-[#F3192D] hover:underline">Invoices</Link></td></tr><tr className="border-t border-slate-100"><th className="p-3 font-medium">Customer collections</th><td className="p-3 text-right font-bold">{money(collected)}</td><td className="p-3"><Link href="/workspace/finance/payments" className="text-[#F3192D] hover:underline">Payments and direct sales receipts</Link></td></tr><tr className="border-t border-slate-100"><th className="p-3 font-medium">Expenses recorded</th><td className="p-3 text-right font-bold">{money(spent)}</td><td className="p-3"><Link href="/workspace/finance/expenses" className="text-[#F3192D] hover:underline">Expenses</Link></td></tr><tr className="border-t border-slate-100"><th className="p-3 font-medium">Supplier payments</th><td className="p-3 text-right font-bold">{money(supplierPaid)}</td><td className="p-3"><Link href="/workspace/finance/supplier-payments" className="text-[#F3192D] hover:underline">Supplier payments</Link></td></tr></tbody></table></div>
+                <p className="mt-4 text-xs text-slate-400">Source: records returned by the linked finance modules and filtered by the reporting dates above. Supplier payments are shown separately and are not counted again as expenses. Amounts across multiple currencies should not be treated as a single converted total.</p>
               </section>
 
               <section className="mb-6 grid gap-5 xl:grid-cols-2">
