@@ -109,14 +109,61 @@ export default function ProductsServicesPage() {
     setFormOpen(true); setImportOpen(false); setMessage(""); window.scrollTo({ top: 0, behavior: "smooth" });
   }
   async function save(e: FormEvent) {
-    e.preventDefault(); setBusy(true); setMessage("");
+    e.preventDefault();
+    setMessage("");
+
+    const unitPrice = Number(form.unit_price);
+    const taxRate = Number(form.tax_rate);
+    if (!form.name.trim()) {
+      setMessage("Enter a name for this product or service.");
+      setMessageType("error");
+      return;
+    }
+    if (!Number.isFinite(unitPrice) || unitPrice < 0) {
+      setMessage("Unit price must be a valid amount of zero or more.");
+      setMessageType("error");
+      return;
+    }
+    if (!Number.isFinite(taxRate) || taxRate < 0 || taxRate > 100) {
+      setMessage("Tax rate must be a valid percentage between 0 and 100.");
+      setMessageType("error");
+      return;
+    }
+    if (!["product", "service"].includes(form.item_type)) {
+      setMessage("Choose whether this catalogue item is a product or service.");
+      setMessageType("error");
+      return;
+    }
+
+    setBusy(true);
     try {
-      const payload = { ...form, unit_price: Number(form.unit_price), tax_rate: Number(form.tax_rate), id: editingId || undefined };
-      const response = await fetch("/api/saas/items", { method: editingId ? "PATCH" : "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
-      const data = await response.json(); if (!response.ok) throw new Error(data.error || "Could not save this catalogue item.");
-      setMessage(editingId ? "Catalogue item updated." : "Catalogue item created."); setMessageType("success"); setForm(EMPTY); setEditingId(null); setFormOpen(false); await load();
-    } catch (error) { setMessage(error instanceof Error ? error.message : "Could not save this catalogue item."); setMessageType("error"); }
-    finally { setBusy(false); }
+      const payload = {
+        ...form,
+        name: form.name.trim(),
+        item_code: form.item_code.trim(),
+        unit_price: unitPrice,
+        tax_rate: taxRate,
+        id: editingId || undefined,
+      };
+      const response = await fetch("/api/saas/items", {
+        method: editingId ? "PATCH" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Could not save this catalogue item.");
+      setMessage(editingId ? "Catalogue item updated." : "Catalogue item created.");
+      setMessageType("success");
+      setForm(EMPTY);
+      setEditingId(null);
+      setFormOpen(false);
+      await load();
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Could not save this catalogue item.");
+      setMessageType("error");
+    } finally {
+      setBusy(false);
+    }
   }
   async function toggleActive(item: CatalogItem) {
     setBusy(true); setMessage("");
