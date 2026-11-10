@@ -71,7 +71,16 @@ export default function OwnerIncomePage() {
   const outstandingByCurrency = useMemo(() => entries.filter(e => e.status !== "cancelled").reduce<Record<string, number>>((acc, e) => { acc[e.currency] = (acc[e.currency] || 0) + Math.max(0, Number(e.amount) - Number(e.amount_received)); return acc; }, {}), [entries]);
 
   async function submitEntry(event: FormEvent) {
-    event.preventDefault(); setSaving(true); setMessage("");
+    event.preventDefault(); setMessage("");
+    const entryAmount = Number(entryForm.amount);
+    if (!entryForm.category.trim()) { setMessage("Enter a category for this record."); return; }
+    if (!entryForm.payer.trim()) { setMessage("Enter who is paying this income or commission."); return; }
+    if (!entryForm.description.trim()) { setMessage("Enter a description for this record."); return; }
+    if (!entryForm.earned_date) { setMessage("Choose the earned date."); return; }
+    if (!Number.isFinite(entryAmount) || entryAmount <= 0) { setMessage("Amount must be a valid number greater than zero."); return; }
+    if (!entryForm.currency.trim()) { setMessage("Choose a currency."); return; }
+    if (entryForm.expected_payment_date && entryForm.expected_payment_date < entryForm.earned_date) { setMessage("Expected payment date cannot be before the earned date."); return; }
+    setSaving(true);
     try {
       const response = await fetch("/api/saas/owner-income", { method: editingEntry ? "PATCH" : "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(editingEntry ? { ...entryForm, id: editingEntry.id } : entryForm) });
       const data = await response.json();
@@ -94,7 +103,13 @@ export default function OwnerIncomePage() {
   }
   async function submitPayment(event: FormEvent) {
     event.preventDefault(); if (!selected) return;
-    setSaving(true); setMessage("");
+    setMessage("");
+    const paymentAmount = Number(paymentForm.amount);
+    const outstanding = Math.max(0, Number(selected.amount) - Number(selected.amount_received));
+    if (!paymentForm.payment_date) { setMessage("Choose the payment date."); return; }
+    if (paymentForm.payment_date > today()) { setMessage("Payment date cannot be in the future."); return; }
+    if (!Number.isFinite(paymentAmount) || paymentAmount <= 0 || paymentAmount > outstanding) { setMessage("Payment must be greater than zero and cannot exceed the outstanding balance."); return; }
+    setSaving(true);
     try {
       const response = await fetch("/api/saas/owner-income", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...paymentForm, action: "record_payment", entry_id: selected.id }) });
       const data = await response.json();
