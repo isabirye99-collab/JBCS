@@ -431,20 +431,23 @@ export default function FinanceReportsPage() {
     0
   );
 
-  const outstanding = reportInvoices
-    .filter((row) => !paidStatus(row))
-    .reduce(
-      (sum, row) =>
-        sum +
-        Math.max(
+  const outstandingByCurrency = useMemo(() => {
+    const totals = new Map<string, number>();
+    reportInvoices
+      .filter((row) => !paidStatus(row))
+      .forEach((row) => {
+        const currency = String(row.currency ?? "UGX").toUpperCase();
+        const due = Math.max(
           0,
-          Number(
-            row.amount_due ??
-              (amount(row) - Number(row.amount_paid ?? 0))
-          ) || 0
-        ),
-      0
-    );
+          Number(row.amount_due ?? (amount(row) - Number(row.amount_paid ?? 0))) || 0
+        );
+        totals.set(currency, (totals.get(currency) ?? 0) + due);
+      });
+    return [...totals.entries()]
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([currency, total]) => money(total, currency))
+      .join(" · ") || money(0);
+  }, [reportInvoices]);
 
   const categories = useMemo(() => {
     const sums = new Map<string, number>();
@@ -739,7 +742,7 @@ export default function FinanceReportsPage() {
               <section className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                 <Metric
                   title="Invoiced"
-                  value={money(invoiced)}
+                  value={formatCurrencyTotals(reportInvoices)}
                   detail={`${reportInvoices.length} invoice record(s) in period`}
                   icon={FileText}
                   tone="bg-rose-50 text-[#F3192D]"
@@ -747,7 +750,7 @@ export default function FinanceReportsPage() {
 
                 <Metric
                   title="Payments received"
-                  value={money(collected)}
+                  value={formatCurrencyTotals(reportPayments)}
                   detail={`${reportPayments.length} customer payment record(s)`}
                   icon={TrendingUp}
                   tone="bg-emerald-50 text-emerald-700"
@@ -763,7 +766,7 @@ export default function FinanceReportsPage() {
 
                 <Metric
                   title="Expenses recorded"
-                  value={money(spent)}
+                  value={formatCurrencyTotals(reportExpenses)}
                   detail={`${reportExpenses.length} expense record(s); supplier payments are shown separately`}
                   icon={TrendingDown}
                   tone="bg-amber-50 text-amber-700"
@@ -771,7 +774,7 @@ export default function FinanceReportsPage() {
 
                 <Metric
                   title="Supplier payments"
-                  value={money(supplierPaid)}
+                  value={formatCurrencyTotals(reportSupplierPayments)}
                   detail={`${reportSupplierPayments.length} supplier payment record(s) in period`}
                   icon={CreditCard}
                   tone="bg-orange-50 text-orange-700"
@@ -779,7 +782,7 @@ export default function FinanceReportsPage() {
 
                 <Metric
                   title="Outstanding invoices"
-                  value={money(outstanding)}
+                  value={outstandingByCurrency}
                   detail="Estimated unpaid balance of invoices in the selected period"
                   icon={Activity}
                   tone="bg-violet-50 text-violet-700"
