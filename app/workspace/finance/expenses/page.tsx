@@ -3,6 +3,7 @@ import "../finance.css";
 import Link from "next/link";
 import { CalendarDays, CreditCard, FileBarChart, FilePlus2, FileText, LayoutDashboard, Package, Receipt, Settings, UsersRound, Wallet } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
+import { enqueueOfflineMutation, getOfflineValue, getPendingCount, setOfflineValue, syncOfflineMutations } from "@/lib/offline-finance";
 
 const financeNavigation = [
   { label: "Dashboard", href: "/workspace/finance", icon: LayoutDashboard },
@@ -49,14 +50,53 @@ export default function ExpensesPage() {
   const [selectedExpenseId, setSelectedExpenseId] = useState<string | null>(null); const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [search, setSearch] = useState(""); const [period, setPeriod] = useState("all"); const [message, setMessage] = useState(""); const [busy, setBusy] = useState(false); const [showForm, setShowForm] = useState(false); const [editingExpenseId, setEditingExpenseId] = useState<string | null>(null); const [detailExpense, setDetailExpense] = useState<Expense | null>(null); const [recurringExpense, setRecurringExpense] = useState<Expense | null>(null); const [recurringFrequency, setRecurringFrequency] = useState("monthly"); const [recurringNextDate, setRecurringNextDate] = useState(tomorrowDate()); const [recurringEndDate, setRecurringEndDate] = useState(""); const [recurringBusy, setRecurringBusy] = useState(false);
   const [form, setForm] = useState({ expense_date: localDate(), category: "", description: "", supplier_contact_id: "", amount: "", currency: "UGX", payment_method: "bank_transfer", notes: "" });
-  const load = useCallback(async () => { const [er, sr] = await Promise.all([fetch("/api/saas/expenses", { cache: "no-store" }), fetch("/api/saas/suppliers", { cache: "no-store" })]); const ed = await er.json(); const sd = await sr.json(); if (!er.ok) throw new Error(ed.error || "Unable to load expenses."); if (!sr.ok) throw new Error(sd.error || "Unable to load suppliers."); setExpenses(Array.isArray(ed.expenses) ? ed.expenses : []); setSuppliers(Array.isArray(sd.suppliers) ? sd.suppliers : []); }, []);
+  const load = useCallback(async () => {
+    try {
+      const [er, sr] = await Promise.all([fetch("/api/saas/expenses", { cache: "no-store" }), fetch("/api/saas/suppliers", { cache: "no-store" })]);
+      const ed = await er.json(); const sd = await sr.json();
+      if (!er.ok) throw new Error(ed.error || "Unable to load expenses.");
+      if (!sr.ok) throw new Error(sd.error || "Unable to load suppliers.");
+      const nextExpenses = Array.isArray(ed.expenses) ? ed.expenses : [];
+      const nextSuppliers = Array.isArray(sd.suppliers) ? sd.suppliers : [];
+      setExpenses(nextExpenses); setSuppliers(nextSuppliers);
+      await Promise.all([setOfflineValue("expenses", nextExpenses), setOfflineValue("suppliers", nextSuppliers)]);
+    } catch (error) {
+      if (typeof navigator !== "undefined" && navigator.onLine) throw error;
+      const [cachedExpenses, cachedSuppliers] = await Promise.all([getOfflineValue<Expense[]>("expenses"), getOfflineValue<Supplier[]>("suppliers")]);
+      if (!cachedExpenses && !cachedSuppliers) throw new Error("You are offline and this device has no saved expense data yet. Connect once to prepare offline use.");
+      setExpenses(cachedExpenses || []); setSuppliers(cachedSuppliers || []);
+      setMessage("Offline mode: showing saved records on this device. Changes will sync when you reconnect.");
+    }
+  }, []);
   useEffect(() => { load().catch(e => setMessage(e instanceof Error ? e.message : "Unable to load records.")); }, [load]);
+  const [pendingSync, setPendingSync] = useState(0);
+  const [isOnline, setIsOnline] = useState(true);
+  useEffect(() => {
+    let active = true;
+    const refreshPending = async () => { try { const n = await getPendingCount(); if (active) setPendingSync(n); } catch { /* offline storage may be unavailable */ } };
+    const sync = async () => {
+      setIsOnline(typeof navigator === "undefined" ? true : navigator.onLine);
+      if (typeof navigator !== "undefined" && navigator.onLine) {
+        try {
+          const result = await syncOfflineMutations();
+          if (active) setPendingSync(result.pending);
+          if (result.synced > 0) { await load(); if (active) setMessage(`Synced ${result.synced} offline expense change(s).`); }
+        } catch { /* retain queued changes for next attempt */ }
+      }
+      await refreshPending();
+    };
+    void sync();
+    const offline = () => setIsOnline(false);
+    window.addEventListener("online", sync); window.addEventListener("offline", offline);
+    const onVisible = () => { if (document.visibilityState === "visible") void sync(); };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => { active = false; window.removeEventListener("online", sync); window.removeEventListener("offline", offline); document.removeEventListener("visibilitychange", onVisible); };
+  }, [load]);
   const visible = useMemo(() => expenses.filter(x => { const q = search.toLowerCase(); const matches = `${x.category} ${x.description} ${x.supplier_name || ""} ${x.payment_method || ""}`.toLowerCase().includes(q); const now = new Date(); const d = new Date(`${x.expense_date}T00:00:00`); const dateMatch = period === "all" || (period === "month" && d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()) || (period === "year" && d.getFullYear() === now.getFullYear()); return matches && dateMatch; }), [expenses, search, period]);
   const selectedExpense = visible.find((expense) => expense.id === selectedExpenseId) || visible[0] || null;
   const total = visible.reduce((sum, x) => sum + Number(x.amount || 0), 0);
   async function save(e: FormEvent) {
-    e.preventDefault();
-    setMessage("");
+    e.preventDefault(); setMessage("");
     const amountValue = Number(form.amount);
     if (!form.expense_date) { setMessage("Choose the expense date."); return; }
     if (!form.category.trim()) { setMessage("Enter an expense category."); return; }
@@ -64,32 +104,33 @@ export default function ExpensesPage() {
     if (!Number.isFinite(amountValue) || amountValue <= 0) { setMessage("Expense amount must be a valid amount greater than zero."); return; }
     if (!form.currency.trim()) { setMessage("Choose the expense currency."); return; }
     setBusy(true);
+    const payload: Record<string, unknown> = { ...form, category: form.category.trim(), description: form.description.trim(), ...(editingExpenseId ? { id: editingExpenseId } : { id: crypto.randomUUID() }), amount: amountValue, currency: form.currency.trim().toUpperCase(), supplier_contact_id: form.supplier_contact_id || null };
+    const method = editingExpenseId ? "PATCH" as const : "POST" as const;
+    const optimistic: Expense = { id: String(payload.id), expense_date: String(payload.expense_date), category: String(payload.category), description: String(payload.description), supplier_contact_id: String(payload.supplier_contact_id || "") || null, supplier_name: suppliers.find(x => x.id === payload.supplier_contact_id)?.name || null, amount: amountValue, currency: String(payload.currency), payment_method: String(payload.payment_method), notes: String(payload.notes || "") };
+    const saveLocally = async (notice: string) => {
+      await enqueueOfflineMutation({ id: crypto.randomUUID(), endpoint: "/api/saas/expenses", method, body: payload });
+      const next = editingExpenseId ? expenses.map(x => x.id === optimistic.id ? optimistic : x) : [optimistic, ...expenses];
+      setExpenses(next); await setOfflineValue("expenses", next); setPendingSync(await getPendingCount()); setMessage(notice);
+    };
     try {
-      const r = await fetch("/api/saas/expenses", {
-        method: editingExpenseId ? "PATCH" : "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...form,
-          category: form.category.trim(),
-          description: form.description.trim(),
-          ...(editingExpenseId ? { id: editingExpenseId } : {}),
-          amount: amountValue,
-          currency: form.currency.trim().toUpperCase(),
-          supplier_contact_id: form.supplier_contact_id || null,
-        }),
-      });
-      const d = await r.json();
-      if (!r.ok) throw new Error(d.error || (editingExpenseId ? "Could not update expense." : "Could not save expense."));
-      setMessage(editingExpenseId ? "Expense updated successfully." : "Expense saved successfully.");
+      if (!navigator.onLine) {
+        await saveLocally("Saved on this device. It will sync automatically when you reconnect.");
+      } else {
+        try {
+          const response = await fetch("/api/saas/expenses", { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+          const data = await response.json();
+          if (!response.ok) throw new Error(data.error || (editingExpenseId ? "Could not update expense." : "Could not save expense."));
+          setMessage(editingExpenseId ? "Expense updated successfully." : "Expense saved successfully.");
+          await load();
+        } catch (error) {
+          if (error instanceof TypeError || !navigator.onLine) await saveLocally("Connection interrupted. Saved on this device and queued for automatic sync.");
+          else throw error;
+        }
+      }
       setForm(s => ({ ...s, category: "", description: "", supplier_contact_id: "", amount: "", notes: "" }));
-      setEditingExpenseId(null);
-      setShowForm(false);
-      await load();
-    } catch (e) {
-      setMessage(e instanceof Error ? e.message : "Could not save expense.");
-    } finally {
-      setBusy(false);
-    }
+      setEditingExpenseId(null); setShowForm(false);
+    } catch (error) { setMessage(error instanceof Error ? error.message : "Could not save expense."); }
+    finally { setBusy(false); }
   }
   function editExpense(x: Expense) { setEditingExpenseId(x.id); setForm({ expense_date: x.expense_date, category: x.category || "", description: x.description || "", supplier_contact_id: x.supplier_contact_id || "", amount: String(x.amount ?? ""), currency: x.currency || "UGX", payment_method: x.payment_method || "bank_transfer", notes: x.notes || "" }); setMessage(""); setShowForm(true); }
   async function deleteExpense(x: Expense) { if (!window.confirm("Delete this expense record? Linked supplier payment history will be protected.")) return; setMessage(""); try { const r = await fetch("/api/saas/expenses?id=" + encodeURIComponent(x.id), { method: "DELETE" }); const d = await r.json(); if (!r.ok) throw new Error(d.error || "Could not delete expense."); setMessage("Expense deleted."); await load(); } catch (e) { setMessage(e instanceof Error ? e.message : "Could not delete expense."); } }
@@ -123,6 +164,7 @@ export default function ExpensesPage() {
     finally { setRecurringBusy(false); }
   }
   return <div className="min-h-screen bg-[#F7F8FA] text-slate-900"><FinancePageSidebar activeHref="/workspace/finance/expenses"/><main className="jbcs-finance-page md:ml-[264px] jbcs-finance-consistent-main"><div className="jbcs-finance-top"><Link href="/workspace/finance">← Finance overview</Link><span>JOHDEN BUSINESS SUITE</span></div><header className="jbcs-finance-heading"><div><p className="jbcs-eyebrow">FINANCE / COST CONTROL</p><h1>Expenses</h1><p>Record business costs, assign suppliers and keep your expense history organised.</p></div><div className="jbcs-page-actions"><button type="button" className="jbcs-primary-button" onClick={() => { if (showForm) { setShowForm(false); setEditingExpenseId(null); } else { setEditingExpenseId(null); setForm(s => ({ ...s, expense_date: new Date().getFullYear() + "-" + String(new Date().getMonth() + 1).padStart(2, "0") + "-" + String(new Date().getDate()).padStart(2, "0"), category: "", description: "", supplier_contact_id: "", amount: "", notes: "" })); setShowForm(true); } }}>{showForm ? "Close form" : "Record expense"}</button></div></header>
+  <div className={`mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border px-4 py-3 text-sm ${isOnline ? "border-slate-200 bg-white text-slate-700" : "border-amber-300 bg-amber-50 text-amber-900"}`}><span>{isOnline ? "Online" : "Offline mode"} · {pendingSync} pending change(s) on this device</span><button type="button" disabled={!isOnline || pendingSync===0} onClick={async()=>{const result=await syncOfflineMutations();setPendingSync(result.pending);if(result.synced){await load();setMessage(`Synced ${result.synced} offline expense change(s).`);}}} className="rounded-lg border border-current px-3 py-1.5 text-xs font-semibold disabled:opacity-40">Sync now</button></div>
   {message && <div role="status" className={`mb-4 rounded-xl border px-4 py-3 text-sm ${message.toLowerCase().includes("success") || message.toLowerCase().includes("deleted") ? "border-emerald-200 bg-emerald-50 text-emerald-800" : "border-rose-200 bg-rose-50 text-rose-800"}`}>{message}</div>}
   {recurringExpense && <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 p-4" role="dialog" aria-modal="true" aria-labelledby="recurring-expense-title"><section className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl"><div className="mb-5 flex items-start justify-between gap-4"><div><p className="jbcs-eyebrow">RECURRING EXPENSE</p><h2 id="recurring-expense-title" className="text-xl font-bold">Schedule “{recurringExpense.description}”</h2><p className="mt-1 text-sm text-slate-500">This creates a schedule; it does not duplicate the current expense immediately.</p></div><button type="button" className="rounded-lg px-3 py-1 text-slate-500 hover:bg-slate-100" onClick={() => setRecurringExpense(null)} aria-label="Close">✕</button></div><form className="grid gap-4 sm:grid-cols-2" onSubmit={makeRecurring}><label className="grid gap-1 text-sm font-semibold">Frequency<select required className="rounded-lg border border-slate-200 p-3 font-normal" value={recurringFrequency} onChange={e => setRecurringFrequency(e.target.value)}><option value="weekly">Weekly</option><option value="monthly">Monthly</option><option value="quarterly">Quarterly</option><option value="yearly">Yearly</option></select></label><label className="grid gap-1 text-sm font-semibold">First scheduled date<input required type="date" className="rounded-lg border border-slate-200 p-3 font-normal" value={recurringNextDate} onChange={e => setRecurringNextDate(e.target.value)} /></label><label className="grid gap-1 text-sm font-semibold sm:col-span-2">End date (optional)<input type="date" min={recurringNextDate} className="rounded-lg border border-slate-200 p-3 font-normal" value={recurringEndDate} onChange={e => setRecurringEndDate(e.target.value)} /></label><div className="flex justify-end gap-3 sm:col-span-2"><button type="button" className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold" onClick={() => setRecurringExpense(null)}>Cancel</button><button disabled={recurringBusy} className="jbcs-primary-button">{recurringBusy ? "Saving schedule…" : "Save recurring schedule"}</button></div></form></section></div>}
   <div className="jbcs-stat-grid"><article><span>Records shown</span><strong>{visible.length}</strong><small>Based on current filters</small></article><article><span>Total shown</span><strong>{money(total)}</strong><small>Mixed currencies are not converted</small></article><article><span>Supplier-linked</span><strong>{visible.filter(x => x.supplier_contact_id).length}</strong><small>Expenses assigned to a supplier</small></article></div>
