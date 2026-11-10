@@ -46,13 +46,14 @@ export async function PATCH(request: NextRequest) {
   }
   const base = `${ctx.url}/rest/v1`;
   const h = headers(ctx);
-  const existingResponse = await fetch(`${base}/owner_income_entries?id=eq.${encodeURIComponent(id)}&workspace_id=eq.${encodeURIComponent(ctx.workspaceId)}&select=id,amount_received,currency,status&limit=1`, { headers: h, cache: "no-store" });
+  const existingResponse = await fetch(`${base}/owner_income_entries?id=eq.${encodeURIComponent(id)}&workspace_id=eq.${encodeURIComponent(ctx.workspaceId)}&select=id,amount_received,currency,status,entry_type&limit=1`, { headers: h, cache: "no-store" });
   if (!existingResponse.ok) return NextResponse.json({ error: "Unable to verify the existing record." }, { status: 502 });
   const existingRows = await existingResponse.json();
   const existing = Array.isArray(existingRows) ? existingRows[0] : null;
   if (!existing) return NextResponse.json({ error: "Record not found in this workspace." }, { status: 404 });
   const received = Number(existing.amount_received || 0);
   if (amount < received) return NextResponse.json({ error: "The amount cannot be lower than payments already received." }, { status: 400 });
+  if (received > 0 && entryType !== String(existing.entry_type)) return NextResponse.json({ error: "Record type cannot be changed after payments have been recorded." }, { status: 400 });
   if (received > 0 && currency !== String(existing.currency || "UGX").trim()) return NextResponse.json({ error: "Currency cannot be changed after payments have been recorded." }, { status: 400 });
   const status = existing.status === "cancelled" ? "cancelled" : received >= amount ? "paid" : received > 0 ? "partially_paid" : "pending";
   const response = await fetch(`${base}/owner_income_entries?id=eq.${encodeURIComponent(id)}&workspace_id=eq.${encodeURIComponent(ctx.workspaceId)}`, {
