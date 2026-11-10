@@ -115,6 +115,7 @@ export default function CustomersPage() {
   const [invoices, setInvoices] = useState<CustomerInvoice[]>([]);
   const [search, setSearch] = useState("");
   const [selectedId, setSelectedId] = useState("");
+  const [showDirectory, setShowDirectory] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -583,8 +584,20 @@ export default function CustomersPage() {
               </article>
             </div>
 
-            <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1.45fr)_minmax(340px,0.8fr)]">
-              <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <section className="mb-5 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
+              <div className="flex flex-wrap items-end gap-3">
+                <label className="min-w-[240px] flex-1 text-sm font-semibold text-slate-700">Select customer
+                  <select value={selectedId} onChange={(event) => setSelectedId(event.target.value)} className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm font-normal outline-none focus:border-[#F3192D]">
+                    <option value="">Choose a customer…</option>
+                    {customers.map((customer) => <option key={customer.id} value={customer.id}>{customer.name}{customer.phone ? ` · ${customer.phone}` : ""}</option>)}
+                  </select>
+                </label>
+                <button type="button" onClick={() => setShowDirectory((value) => !value)} className="rounded-xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-700 hover:border-rose-200 hover:text-[#A80D1B]">{showDirectory ? "Hide customer directory" : "Browse full directory"}</button>
+              </div>
+              <p className="mt-2 text-xs text-slate-500">Choose a customer to open their editable profile. Use the directory only when you need to browse or search all records.</p>
+            </section>
+            <div className={`grid items-start gap-6 ${showDirectory ? "xl:grid-cols-[minmax(0,1.45fr)_minmax(340px,0.8fr)]" : "grid-cols-1"}`}>
+              {showDirectory && <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
                 <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4 sm:px-6">
                   <div>
                     <h3 className="font-bold text-slate-900">
@@ -723,7 +736,7 @@ export default function CustomersPage() {
                     </tbody>
                   </table>
                 </div>
-              </section>
+              </section>}
 
               <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
                 <div className="border-b border-slate-100 bg-gradient-to-br from-[#20232B] via-[#A80D1B] to-[#F3192D] px-5 py-5 text-white sm:px-6">
