@@ -1038,13 +1038,13 @@ export default function FinanceReportsPage() {
               <section className={`${panel} mb-6`}>
                 <div className="mb-4">
                   <h2 className="text-lg font-bold">Management Statement of Profit and Loss</h2>
-                  <p className="mt-1 text-sm text-slate-500">Issued invoice totals less recorded expenses for the selected period, shown separately by currency.</p>
+                  <p className="mt-1 text-sm text-slate-500">Issued invoice totals plus standalone direct sales receipts, less recorded expenses for the selected period, shown separately by currency.</p>
                 </div>
                 <div className="overflow-x-auto">
                   <table className="w-full min-w-[620px] text-left text-sm">
-                    <thead><tr className="border-b border-slate-200 text-xs uppercase tracking-wide text-slate-500"><th className="px-3 py-3">Currency</th><th className="px-3 py-3 text-right">Invoice revenue</th><th className="px-3 py-3 text-right">Expenses</th><th className="px-3 py-3 text-right">Operating result</th></tr></thead>
+                    <thead><tr className="border-b border-slate-200 text-xs uppercase tracking-wide text-slate-500"><th className="px-3 py-3">Currency</th><th className="px-3 py-3 text-right">Sales revenue</th><th className="px-3 py-3 text-right">Expenses</th><th className="px-3 py-3 text-right">Operating result</th></tr></thead>
                     <tbody>{profitLossByCurrency.map((row) => <tr key={row.currency} className="border-b border-slate-100"><td className="px-3 py-3 font-semibold">{row.currency}</td><td className="px-3 py-3 text-right">{money(row.revenue, row.currency)}</td><td className="px-3 py-3 text-right">{money(row.expenses, row.currency)}</td><td className={`px-3 py-3 text-right font-bold ${row.operatingResult < 0 ? "text-rose-700" : "text-emerald-700"}`}>{money(row.operatingResult, row.currency)}</td></tr>)}
-                    {!profitLossByCurrency.length && <tr><td colSpan={4} className="px-3 py-8 text-center text-slate-500">No invoice or expense records for this period.</td></tr>}</tbody>
+                    {!profitLossByCurrency.length && <tr><td colSpan={4} className="px-3 py-8 text-center text-slate-500">No invoice, direct sales or expense records for this period.</td></tr>}</tbody>
                   </table>
                 </div>
                 <p className="mt-3 rounded-lg bg-amber-50 px-3 py-2 text-xs leading-5 text-amber-900">Management view only — not a full general-ledger P&amp;L. A complete balance sheet requires reconciled cash/bank, receivables, liabilities, assets, tax and owner-equity balances.</p>
