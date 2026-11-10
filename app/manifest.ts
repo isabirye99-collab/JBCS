@@ -13,7 +13,13 @@ export default function manifest(): MetadataRoute.Manifest {
     theme_color: "#b91c1c",
     orientation: "portrait",
     icons: [
-      { src: "/jbcs-icon.svg", sizes: "any", type: "image/svg+xml", purpose: "any" }
+      {
+        src: "/jbcs-icon.svg",
+        sizes: "any",
+        type: "image/svg+xml",
+        // Next.js MetadataRoute.Manifest accepts these purpose values individually.
+        purpose: "any"
+      }
     ],
     categories: ["business", "finance", "productivity"]
   };
