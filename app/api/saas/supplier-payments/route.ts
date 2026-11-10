@@ -158,3 +158,77 @@ export async function POST(request: NextRequest) {
     { status: 201 },
   );
 }
+
+// Update a supplier payment without allowing cross-workspace links or overpayment.
+export async function PATCH(request: NextRequest) {
+  const ctx = await getSaasContext();
+  if ("error" in ctx) {
+    return NextResponse.json({ error: ctx.error }, { status: ctx.status });
+  }
+
+  let body: Record<string, unknown>;
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: "Enter valid supplier payment details." }, { status: 400 });
+  }
+
+  const paymentId = clean(body.id, 64);
+  const supplierId = clean(body.supplier_contact_id, 64);
+  const expenseId = clean(body.expense_id, 64);
+  const invoiceId = clean(body.invoice_id, 64);
+  const paymentDate = clean(body.payment_date, 10);
+  const amount = Number(body.amount);
+  const currency = clean(body.currency || "UGX", 3).toUpperCase();
+  const method = clean(body.payment_method || "other", 30);
+  const reference = clean(body.payment_reference, 150);
+  const notes = clean(body.notes, 2000);
+
+  if (!paymentId || !supplierId || !dateOk(paymentDate)) {
+    return NextResponse.json({ error: "Choose a payment and supplier, and enter a valid payment date." }, { status: 400 });
+  }
+  if (!Number.isFinite(amount) || amount <= 0 || amount > 1e12 || Math.round(amount * 100) !== amount * 100) {
+    return NextResponse.json({ error: "Enter a valid payment amount with no more than two decimal places." }, { status: 400 });
+  }
+  if (!/^[A-Z]{3}$/.test(currency)) {
+    return NextResponse.json({ error: "Use a valid three-letter currency." }, { status: 400 });
+  }
+  if (!methods.includes(method)) {
+    return NextResponse.json({ error: "Choose a valid payment method." }, { status: 400 });
+  }
+
+  const response = await fetch(`${ctx.url}/rest/v1/rpc/update_workspace_supplier_payment`, {
+    method: "POST",
+    headers: {
+      apikey: ctx.serviceKey,
+      Authorization: `Bearer ${ctx.serviceKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      p_workspace_id: ctx.workspaceId,
+      p_payment_id: paymentId,
+      p_supplier_contact_id: supplierId,
+      p_expense_id: expenseId || null,
+      p_invoice_id: invoiceId || null,
+      p_payment_date: paymentDate,
+      p_amount: amount,
+      p_currency: currency,
+      p_payment_method: method,
+      p_payment_reference: reference || null,
+      p_notes: notes || null,
+    }),
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    let message = "Could not update supplier payment. Check the payment details.";
+    try {
+      const data = await response.json();
+      if (data.message) message = String(data.message);
+      else if (data.details) message = String(data.details);
+    } catch {}
+    return NextResponse.json({ error: message }, { status: response.status === 400 ? 400 : 502 });
+  }
+
+  return NextResponse.json({ success: true, payment: await response.json() });
+}
