@@ -1031,7 +1031,7 @@ export default function FinanceReportsPage() {
                 <p className="mt-3 rounded-lg bg-amber-50 px-3 py-2 text-xs leading-5 text-amber-900">Management view only — not a full general-ledger P&amp;L. A complete balance sheet requires reconciled cash/bank, receivables, liabilities, assets, tax and owner-equity balances.</p>
               </section>
 
-              <section className={`${panel} mb-6`}>
+              <section className={`${panel} mb-6 hidden`}>
                 <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
                   <div>
                     <h2 className="text-lg font-bold">Recent invoices</h2>
