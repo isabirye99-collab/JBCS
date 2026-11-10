@@ -1,5 +1,4 @@
-"use 
-  const selectedItem = visibleItems.find((item) => item.id === selectedItemId) || visibleItems[0] || null;client";
+"use client";
 
 import Link from "next/link";
 import {
@@ -101,6 +100,7 @@ export default function ProductsServicesPage() {
     const matchesStatus = statusFilter === "all" || (statusFilter === "active" ? item.is_active !== false : item.is_active === false);
     return matchesSearch && matchesType && matchesStatus;
   }), [items, search, typeFilter, statusFilter]);
+  const selectedItem = visibleItems.find((item) => item.id === selectedItemId) || visibleItems[0] || null;
 
   function startNew() { setEditingId(null); setForm(EMPTY); setFormOpen(true); setImportOpen(false); setMessage(""); }
   function startEdit(item: CatalogItem) {
