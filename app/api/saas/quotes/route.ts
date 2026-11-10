@@ -46,6 +46,11 @@ export async function PATCH(req: Request) {
 
   const headers = { apikey: c.serviceKey, Authorization: `Bearer ${c.serviceKey}`, "Content-Type": "application/json" };
   const quoteUrl = `${c.url}/rest/v1/quotes?id=eq.${encodeURIComponent(id)}&workspace_id=eq.${encodeURIComponent(c.workspaceId)}`;
+  const customerResponse = await fetch(`${c.url}/rest/v1/business_contacts?id=eq.${encodeURIComponent(contact_id)}&workspace_id=eq.${encodeURIComponent(c.workspaceId)}&select=id&limit=1`, { headers, cache: "no-store" });
+  if (!customerResponse.ok) return NextResponse.json({ error: "Unable to verify the selected customer." }, { status: 502 });
+  const customers = await customerResponse.json();
+  if (!Array.isArray(customers) || !customers.length) return NextResponse.json({ error: "Choose a customer belonging to this workspace." }, { status: 400 });
+
   const oldQuoteResponse = await fetch(`${quoteUrl}&select=id,quote_number,contact_id,issue_date,valid_until,currency,subtotal,tax_amount,total,status,notes,created_at,business_contacts(name,email,phone,address)`, { headers, cache: "no-store" });
   if (!oldQuoteResponse.ok) return NextResponse.json({ error: "Could not load the quotation before editing." }, { status: 502 });
   const oldQuotes = await oldQuoteResponse.json();
