@@ -3,6 +3,12 @@ import { getSaasContext } from "@/lib/saas-context";
 
 export const dynamic = "force-dynamic";
 
+const todayInUganda = () => {
+  const parts = new Intl.DateTimeFormat("en-GB", { timeZone: "Africa/Kampala", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(new Date());
+  const part = (type: string) => parts.find((item) => item.type === type)?.value || "";
+  return `${part("year")}-${part("month")}-${part("day")}`;
+};
+
 const METHODS = ["cash", "bank_transfer", "mobile_money", "card", "cheque", "other"];
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const headers = (key: string) => ({ apikey: key, Authorization: `Bearer ${key}` });
@@ -36,7 +42,7 @@ export async function PATCH(request: NextRequest) {
   const notes = clean(body.notes, 2000);
   if (!UUID.test(id)) return NextResponse.json({ error: "Choose a valid sales receipt." }, { status: 400 });
   if (contactId && !UUID.test(contactId)) return NextResponse.json({ error: "Choose a valid customer or leave the customer blank." }, { status: 400 });
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(saleDate) || Number.isNaN(Date.parse(saleDate)) || new Date(saleDate + "T00:00:00Z").toISOString().slice(0, 10) !== saleDate) return NextResponse.json({ error: "Enter a valid sale date." }, { status: 400 });
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(saleDate) || Number.isNaN(Date.parse(saleDate)) || new Date(saleDate + "T00:00:00Z").toISOString().slice(0, 10) !== saleDate || saleDate > todayInUganda()) return NextResponse.json({ error: "Enter a valid sale date." }, { status: 400 });
   if (!METHODS.includes(paymentMethod)) return NextResponse.json({ error: "Choose a supported payment method." }, { status: 400 });
   const h = { ...headers(ctx.serviceKey), "Content-Type": "application/json", Prefer: "return=representation" };
   if (contactId) {
@@ -70,13 +76,13 @@ export async function POST(request: NextRequest) {
 
   const text = (v: unknown, max: number) => typeof v === "string" ? v.trim().slice(0, max) : "";
   const contactId = text(body.contact_id, 64);
-  const saleDate = text(body.sale_date, 10) || new Date().toISOString().slice(0, 10);
+  const saleDate = text(body.sale_date, 10) || todayInUganda();
   const currency = text(body.currency, 3).toUpperCase();
   const paymentMethod = text(body.payment_method, 30);
   const paymentReference = text(body.payment_reference, 120);
   const notes = text(body.notes, 2000);
   if (contactId && !UUID.test(contactId)) return NextResponse.json({ error: "Choose a valid customer or leave the customer blank." }, { status: 400 });
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(saleDate) || Number.isNaN(Date.parse(saleDate)) || new Date(saleDate + "T00:00:00Z").toISOString().slice(0,10) !== saleDate) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(saleDate) || Number.isNaN(Date.parse(saleDate)) || new Date(saleDate + "T00:00:00Z").toISOString().slice(0,10) !== saleDate || saleDate > todayInUganda()) {
     return NextResponse.json({ error: "Enter a valid sale date." }, { status: 400 });
   }
   if (!/^[A-Z]{3}$/.test(currency)) return NextResponse.json({ error: "Choose a valid three-letter currency." }, { status: 400 });
