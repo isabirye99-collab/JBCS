@@ -186,8 +186,44 @@ export default function ProductsServicesPage() {
       let imported = 0; const failures: string[] = [];
       for (let i = 0; i < rows.length; i++) {
         const row = rows[i];
-        const response = await fetch("/api/saas/items", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ item_code: row.item_code, name: row.name, item_type: row.item_type.toLowerCase(), unit_price: Number(row.unit_price), currency: row.currency || "UGX", category: row.category || "", unit: row.unit || "unit", tax_rate: Number(row.tax_rate || 0), description: row.description || "", tax_inclusive: /^(true|yes|1)$/i.test(row.tax_inclusive || "") }) });
-        const data = await response.json(); if (response.ok) imported++; else failures.push(`Row ${i + 2}: ${data.error || "not imported"}`);
+        const itemType = String(row.item_type || "").trim().toLowerCase();
+        const unitPrice = Number(row.unit_price);
+        const taxRate = Number(row.tax_rate || 0);
+        if (!String(row.name || "").trim()) {
+          failures.push(`Row ${i + 2}: name is required.`);
+          continue;
+        }
+        if (!["product", "service"].includes(itemType)) {
+          failures.push(`Row ${i + 2}: item_type must be product or service.`);
+          continue;
+        }
+        if (!Number.isFinite(unitPrice) || unitPrice < 0) {
+          failures.push(`Row ${i + 2}: unit_price must be a valid amount of zero or more.`);
+          continue;
+        }
+        if (!Number.isFinite(taxRate) || taxRate < 0 || taxRate > 100) {
+          failures.push(`Row ${i + 2}: tax_rate must be between 0 and 100.`);
+          continue;
+        }
+        const response = await fetch("/api/saas/items", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            item_code: row.item_code,
+            name: String(row.name).trim(),
+            item_type: itemType,
+            unit_price: unitPrice,
+            currency: String(row.currency || "UGX").trim().toUpperCase(),
+            category: row.category || "",
+            unit: row.unit || "unit",
+            tax_rate: taxRate,
+            description: row.description || "",
+            tax_inclusive: /^(true|yes|1)$/i.test(row.tax_inclusive || ""),
+          }),
+        });
+        const data = await response.json();
+        if (response.ok) imported++;
+        else failures.push(`Row ${i + 2}: ${data.error || "not imported"}`);
       }
       setMessage(`CSV import finished: ${imported} imported, ${failures.length} not imported.${failures.length ? ` ${failures.slice(0, 4).join(" ")}` : ""}${failures.length > 4 ? ` Plus ${failures.length - 4} more errors.` : ""}`);
       setMessageType(failures.length ? "error" : "success"); await load();
