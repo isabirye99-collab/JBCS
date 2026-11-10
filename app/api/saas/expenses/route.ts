@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSaasContext } from "@/lib/saas-context";
 export const dynamic = "force-dynamic";
+const todayInUganda = () => { const parts = new Intl.DateTimeFormat("en-GB", { timeZone: "Africa/Kampala", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(new Date()); const part = (type: string) => parts.find((item) => item.type === type)?.value || ""; return `${part("year")}-${part("month")}-${part("day")}`; };
 const clean = (v: unknown, max: number) => typeof v === "string" ? v.trim().slice(0, max) : "";
 const dateOk = (v: string) => /^\d{4}-\d{2}-\d{2}$/.test(v) && !Number.isNaN(Date.parse(v)) && new Date(v + "T00:00:00Z").toISOString().slice(0, 10) === v;
 const methods = ["cash", "bank_transfer", "mobile_money", "card", "cheque", "other"];
@@ -18,7 +19,7 @@ export async function GET() {
 export async function POST(request: NextRequest) {
  const ctx = await getSaasContext(); if ("error" in ctx) return NextResponse.json({ error: ctx.error }, { status: ctx.status });
  let body: Record<string, unknown>; try { body = await request.json(); } catch { return NextResponse.json({ error: "Enter valid expense details." }, { status: 400 }); }
- const category = clean(body.category,100), description = clean(body.description,500), expenseDate = clean(body.expense_date,10) || new Date().toISOString().slice(0,10), currency = clean(body.currency || "UGX",3).toUpperCase(), amount = Number(body.amount), paymentMethod = clean(body.payment_method || "other",30), notes = clean(body.notes,2000), supplierId = clean(body.supplier_contact_id,64);
+ const category = clean(body.category,100), description = clean(body.description,500), expenseDate = clean(body.expense_date,10) || todayInUganda(), currency = clean(body.currency || "UGX",3).toUpperCase(), amount = Number(body.amount), paymentMethod = clean(body.payment_method || "other",30), notes = clean(body.notes,2000), supplierId = clean(body.supplier_contact_id,64);
  if (!category || !description || !dateOk(expenseDate)) return NextResponse.json({ error: "Enter a category, description and valid date." }, { status: 400 });
  if (!Number.isFinite(amount) || amount <= 0 || amount > 1e12) return NextResponse.json({ error: "Enter a valid expense amount greater than zero." }, { status: 400 });
  if (!/^[A-Z]{3}$/.test(currency)) return NextResponse.json({ error: "Use a valid three-letter currency." }, { status: 400 });
