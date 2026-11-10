@@ -118,7 +118,10 @@ export default function PaymentsPage() {
   async function savePaymentDetails(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!selectedPayment) return;
-    setError(""); setNotice(""); setSaving(true);
+    setError(""); setNotice("");
+    if (!editPaymentDate) { setError("Choose the payment date."); return; }
+    if (editPaymentDate > today()) { setError("Payment date cannot be in the future."); return; }
+    setSaving(true);
     try {
       const response = await fetch("/api/saas/payments", {
         method: "PATCH", headers: { "Content-Type": "application/json" },
