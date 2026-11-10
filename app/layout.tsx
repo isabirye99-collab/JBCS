@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import "./finance/finance.css";
+import "./workspace/finance/finance.css";
 
 export const metadata: Metadata = {
   title: {
