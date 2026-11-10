@@ -140,6 +140,16 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Check quote line descriptions, quantities, prices and tax." }, { status: 400 });
   }
 
+  const contactCheck = await fetch(
+    `${c.url}/rest/v1/business_contacts?id=eq.${encodeURIComponent(contact_id)}&workspace_id=eq.${encodeURIComponent(c.workspaceId)}&contact_type=eq.client&select=id&limit=1`,
+    { headers: { apikey: c.serviceKey, Authorization: `Bearer ${c.serviceKey}` }, cache: "no-store" },
+  );
+  if (!contactCheck.ok) return NextResponse.json({ error: "Unable to verify the selected customer." }, { status: 502 });
+  const matchingContacts = await contactCheck.json();
+  if (!Array.isArray(matchingContacts) || matchingContacts.length === 0) {
+    return NextResponse.json({ error: "Choose a customer belonging to this workspace." }, { status: 400 });
+  }
+
   const subtotal = lines.reduce((sum: number, item: any) => sum + item.quantity * item.unit_price, 0);
   const tax_amount = lines.reduce((sum: number, item: any) => sum + item.quantity * item.unit_price * item.tax_rate / 100, 0);
   const issueDate = todayInUganda();
