@@ -3,7 +3,7 @@
 
 import "../finance.css";
 import Link from "next/link";
-import { LayoutDashboard, UsersRound, Package, FileText, FilePlus2, Receipt, CreditCard, Search, Plus, RefreshCw, Printer, ArrowUpRight, WalletCards, Wallet, CalendarDays, FileBarChart, Settings } from "lucide-react";
+import { LayoutDashboard, UsersRound, Package, FileText, FilePlus2, Receipt, CreditCard, Search, Plus, RefreshCw, Printer, WalletCards, Wallet, CalendarDays, FileBarChart, Settings } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
 
 type Invoice = {
