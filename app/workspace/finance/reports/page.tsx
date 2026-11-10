@@ -784,7 +784,7 @@ export default function FinanceReportsPage() {
                     <span className="rounded-xl bg-amber-50 p-2.5 text-amber-700"><PieChart size={20} /></span>
                   </div>
                   <AnimatedDonut data={categories} total={spent} />
-                  <p className="mt-4 text-xs text-slate-400">Category percentages use recorded expense totals in the selected period. Supplier payments remain separate to avoid double-counting.</p>
+                  <p className="mt-4 text-xs text-slate-400">Source: expense records grouped by category and filtered by the selected reporting dates. Supplier payments remain separate to avoid double-counting.</p><Link href="/workspace/finance/expenses" className="mt-3 inline-block text-sm font-semibold text-[#F3192D] hover:underline">Open expense records</Link>
                 </article>
                 <article className={panel}>
                   <div className="mb-5 flex items-start justify-between gap-3">
@@ -817,7 +817,7 @@ export default function FinanceReportsPage() {
               <section className={`${panel} mb-6`}>
                 <div className="mb-4">
                   <h2 className="text-lg font-bold">Owner income received by day and month</h2>
-                  <p className="mt-1 text-sm text-slate-500">Based on actual recorded payment dates, including partial payments. Only payments within the selected reporting period are included.</p>
+                  <p className="mt-1 text-sm text-slate-500">Source: actual owner income and commission payment transactions, grouped by payment date and currency. Partial payments are included; only payments within the selected reporting period are included.</p><Link href="/workspace/finance/owner-income" className="mt-2 inline-block text-sm font-semibold text-[#F3192D] hover:underline">Open owner income records</Link>
                 </div>
                 <div className="grid gap-5 xl:grid-cols-2">
                   <div className="overflow-x-auto rounded-xl border border-slate-100">
@@ -904,7 +904,7 @@ export default function FinanceReportsPage() {
               <section className={`${panel} mb-6`}>
                 <div className="mb-4">
                   <h2 className="text-lg font-bold">Management Statement of Profit and Loss</h2>
-                  <p className="mt-1 text-sm text-slate-500">Issued invoice totals plus standalone direct sales receipts, less recorded expenses for the selected period, shown separately by currency.</p>
+                  <p className="mt-1 text-sm text-slate-500">Source: invoice totals and standalone direct sales receipts, less expense records in the selected period, grouped by currency. Supplier payments are not subtracted again as expenses.</p><div className="mt-2 flex flex-wrap gap-3 text-sm"><Link href="/workspace/finance/invoices" className="font-semibold text-[#F3192D] hover:underline">Invoices</Link><Link href="/workspace/finance/sales-receipts" className="font-semibold text-[#F3192D] hover:underline">Sales receipts</Link><Link href="/workspace/finance/expenses" className="font-semibold text-[#F3192D] hover:underline">Expenses</Link></div>
                 </div>
                 <div className="overflow-x-auto">
                   <table className="w-full min-w-[620px] text-left text-sm">
