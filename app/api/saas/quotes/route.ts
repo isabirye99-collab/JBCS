@@ -21,6 +21,84 @@ export async function GET() {
   return NextResponse.json({ quotes: Array.isArray(quotes) ? quotes : [] });
 }
 
+export async function PATCH(req: Request) {
+  const c = await getSaasContext();
+  if ("error" in c) return NextResponse.json({ error: c.error }, { status: c.status });
+
+  let body: any;
+  try { body = await req.json(); } catch { return NextResponse.json({ error: "Invalid quotation update." }, { status: 400 }); }
+  const id = String(body.id || "");
+  const contact_id = String(body.contact_id || "");
+  const currency = String(body.currency || "UGX").toUpperCase();
+  const items = Array.isArray(body.items) ? body.items.slice(0, 50) : [];
+  if (!/^[0-9a-f-]{36}$/i.test(id) || !/^[0-9a-f-]{36}$/i.test(contact_id) || !/^[A-Z]{3}$/.test(currency) || !items.length) {
+    return NextResponse.json({ error: "Select a customer and at least one quotation line." }, { status: 400 });
+  }
+  const lines = items.map((item: any) => ({
+    description: String(item.description || "").trim().slice(0, 500),
+    quantity: Number(item.quantity),
+    unit_price: Number(item.unit_price),
+    tax_rate: Number(item.tax_rate || 0),
+  }));
+  if (lines.some((item: any) => !item.description || !Number.isFinite(item.quantity) || item.quantity <= 0 || !Number.isFinite(item.unit_price) || item.unit_price < 0 || !Number.isFinite(item.tax_rate) || item.tax_rate < 0 || item.tax_rate > 100)) {
+    return NextResponse.json({ error: "Check quotation line descriptions, quantities, prices and tax." }, { status: 400 });
+  }
+
+  const headers = { apikey: c.serviceKey, Authorization: `Bearer ${c.serviceKey}`, "Content-Type": "application/json" };
+  const quoteUrl = `${c.url}/rest/v1/quotes?id=eq.${encodeURIComponent(id)}&workspace_id=eq.${encodeURIComponent(c.workspaceId)}`;
+  const oldQuoteResponse = await fetch(`${quoteUrl}&select=id,quote_number,contact_id,issue_date,valid_until,currency,subtotal,tax_amount,total,status,notes,created_at,business_contacts(name,email,phone,address)`, { headers, cache: "no-store" });
+  if (!oldQuoteResponse.ok) return NextResponse.json({ error: "Could not load the quotation before editing." }, { status: 502 });
+  const oldQuotes = await oldQuoteResponse.json();
+  const oldQuote = oldQuotes[0];
+  if (!oldQuote) return NextResponse.json({ error: "Quotation not found in this workspace." }, { status: 404 });
+  if (["accepted", "rejected", "converted"].includes(String(oldQuote.status || "").toLowerCase())) {
+    return NextResponse.json({ error: "Accepted, rejected or converted quotations cannot be edited." }, { status: 409 });
+  }
+
+  const oldItemsResponse = await fetch(`${c.url}/rest/v1/document_items?workspace_id=eq.${encodeURIComponent(c.workspaceId)}&quote_id=eq.${encodeURIComponent(id)}&document_type=eq.quote&select=id`, { headers, cache: "no-store" });
+  if (!oldItemsResponse.ok) return NextResponse.json({ error: "Could not load existing quotation lines." }, { status: 502 });
+  const oldItems: Array<{ id: string }> = await oldItemsResponse.json();
+  const subtotal = lines.reduce((sum: number, item: any) => sum + item.quantity * item.unit_price, 0);
+  const tax_amount = lines.reduce((sum: number, item: any) => sum + item.quantity * item.unit_price * item.tax_rate / 100, 0);
+  const lineRows = lines.map((item: any) => ({
+    ...item, workspace_id: c.workspaceId, document_type: "quote", quote_id: id,
+    line_total: item.quantity * item.unit_price * (1 + item.tax_rate / 100),
+  }));
+
+  const newItemsResponse = await fetch(`${c.url}/rest/v1/document_items`, {
+    method: "POST", headers: { ...headers, Prefer: "return=representation" },
+    body: JSON.stringify(lineRows), cache: "no-store",
+  });
+  if (!newItemsResponse.ok) return NextResponse.json({ error: "Updated quotation lines could not be saved. The original quotation remains unchanged." }, { status: 502 });
+  const newItems = await newItemsResponse.json();
+
+  const updateResponse = await fetch(quoteUrl, {
+    method: "PATCH", headers: { ...headers, Prefer: "return=representation" },
+    body: JSON.stringify({
+      contact_id, currency, valid_until: body.valid_until || null,
+      notes: String(body.notes || "").slice(0, 2000) || null,
+      subtotal, tax_amount, total: subtotal + tax_amount,
+    }), cache: "no-store",
+  });
+  if (!updateResponse.ok) {
+    const newIds = (Array.isArray(newItems) ? newItems : []).map((item: any) => item.id).filter(Boolean);
+    if (newIds.length) await fetch(`${c.url}/rest/v1/document_items?id=in.(${newIds.join(",")})&workspace_id=eq.${encodeURIComponent(c.workspaceId)}`, { method: "DELETE", headers, cache: "no-store" });
+    return NextResponse.json({ error: "Quotation details could not be updated. The original quotation has been retained." }, { status: 502 });
+  }
+
+  if (oldItems.length) {
+    const oldIds = oldItems.map((item) => item.id).filter(Boolean);
+    const deleteOldResponse = await fetch(`${c.url}/rest/v1/document_items?id=in.(${oldIds.join(",")})&workspace_id=eq.${encodeURIComponent(c.workspaceId)}&document_type=eq.quote`, {
+      method: "DELETE", headers, cache: "no-store",
+    });
+    if (!deleteOldResponse.ok) {
+      return NextResponse.json({ error: "Quotation header was updated, but old lines could not be replaced cleanly. Please contact support before editing this quotation again." }, { status: 502 });
+    }
+  }
+  const updatedQuote = Array.isArray(updateResponse) ? updateResponse[0] : (await updateResponse.json())[0];
+  return NextResponse.json({ quote: { ...(updatedQuote || oldQuote), document_items: Array.isArray(newItems) ? newItems : lineRows } });
+}
+
 export async function POST(req: Request) {
   const c = await getSaasContext();
   if ("error" in c) return NextResponse.json({ error: c.error }, { status: c.status });
