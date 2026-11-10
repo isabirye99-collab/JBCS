@@ -369,12 +369,14 @@ export default function SupplierPaymentsPage() {
 
         <div className="jbcs-finance-columns">
           {showForm && (
-            <section className="jbcs-panel jbcs-entry-panel">
+            <div className="fixed inset-0 z-50 flex justify-end overflow-y-auto bg-slate-950/40" role="dialog" aria-modal="true" aria-labelledby="supplier-payment-entry-title" onMouseDown={(e) => { if (e.target === e.currentTarget) setShowForm(false); }}>
+            <section className="jbcs-panel jbcs-entry-panel min-h-screen w-full max-w-2xl overflow-y-auto rounded-l-2xl bg-white shadow-2xl">
               <div className="jbcs-panel-heading">
                 <div>
                   <p className="jbcs-eyebrow">PAYMENT ENTRY</p>
-                  <h2>Record a supplier payment</h2>
+                  <h2 id="supplier-payment-entry-title">Record a supplier payment</h2>
                 </div>
+                <button type="button" className="rounded-lg border border-slate-200 px-3 py-2 text-sm" onClick={() => setShowForm(false)}>Close</button>
               </div>
 
               {migrationRequired && (
@@ -582,6 +584,7 @@ export default function SupplierPaymentsPage() {
                 </p>
               )}
             </section>
+            </div>
           )}
 
           <section className="jbcs-panel jbcs-register-panel">
