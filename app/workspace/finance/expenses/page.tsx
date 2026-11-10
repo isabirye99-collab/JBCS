@@ -59,7 +59,7 @@ export default function ExpensesPage() {
       const nextExpenses = Array.isArray(ed.expenses) ? ed.expenses : [];
       const nextSuppliers = Array.isArray(sd.suppliers) ? sd.suppliers : [];
       setExpenses(nextExpenses); setSuppliers(nextSuppliers);
-      await Promise.all([setOfflineValue("expenses", nextExpenses), setOfflineValue("suppliers", nextSuppliers)]);
+      await Promise.all([setOfflineValue("expenses", nextExpenses), setOfflineValue("suppliers", nextSuppliers)]).catch(() => undefined);
     } catch (error) {
       if (typeof navigator !== "undefined" && navigator.onLine) throw error;
       const [cachedExpenses, cachedSuppliers] = await Promise.all([getOfflineValue<Expense[]>("expenses"), getOfflineValue<Supplier[]>("suppliers")]);
