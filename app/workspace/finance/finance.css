@@ -611,3 +611,29 @@
   .finance-shell .finance-app-main>.inner-content,
   .jbcs-products-redesign>.finance-app-main>.inner-content{padding-left:13px!important;padding-right:13px!important}
 }
+
+
+/* Shared inline finance navigation used by the registers and report pages. */
+aside.fixed.inset-y-0.left-0:has(a[href^="/workspace/finance/"]) {
+  background:#fff!important;
+  border-right-color:#e2e8f0!important;
+  box-shadow:2px 0 12px #0f172a05!important;
+}
+aside.fixed.inset-y-0.left-0:has(a[href^="/workspace/finance/"]) a[aria-current="page"]{
+  background:#e9162b!important;
+  color:#fff!important;
+  box-shadow:0 4px 10px #e9162b20!important;
+}
+aside.fixed.inset-y-0.left-0:has(a[href^="/workspace/finance/"]) a[aria-current="page"] svg{
+  color:#fff!important;
+}
+aside.fixed.inset-y-0.left-0:has(a[href^="/workspace/finance/"]) a[aria-current="page"] span.h-1\.5{
+  background:#fff!important;
+}
+aside.fixed.inset-y-0.left-0:has(a[href^="/workspace/finance/"]) a:not([aria-current="page"]):hover{
+  background:#fff1f2!important;
+  color:#b51227!important;
+}
+aside.fixed.inset-y-0.left-0:has(a[href^="/workspace/finance/"]) a:not([aria-current="page"]):hover svg{
+  color:#b51227!important;
+}
