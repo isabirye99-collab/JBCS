@@ -145,7 +145,7 @@ export default function FinanceReportDetailPage() {
     : [["payment_date", "Payment date"], ["__entry", "Income / commission"], ["amount", "Amount"], ["currency", "Currency"], ["payment_method", "Method"], ["payment_reference", "Reference"]];
 
   function exportCSV() {
-    const exportRows = report.slug === "customer-statements"
+    const exportRows: Row[] = report.slug === "customer-statements"
       ? [...customerInvoices.map(row => ({ ...row, __kind: "Invoice" })), ...customerPayments.map(row => ({ ...row, __kind: "Payment" }))]
       : rows;
     const keys = report.slug === "customer-statements"
