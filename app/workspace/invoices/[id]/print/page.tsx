@@ -188,7 +188,11 @@ export default async function PrintableInvoicePage({
         String(branding.payment_instructions).trim(),
     );
 
+  const printableName = String(invoice.invoice_number || `JBCS-I-${invoice.id.slice(0, 8).toUpperCase()}`).trim().replace(/[^a-zA-Z0-9 -]/g, "").replace(/\s+/g, "-");
+
   return (
+    <>
+    <title>{printableName}</title>
     <main
       className="invoice-print-page"
       data-template-style={String(branding.template_style)}
@@ -682,5 +686,6 @@ export default async function PrintableInvoicePage({
         {invoice.status === "draft" ? "This document is a draft." : ""}
       </footer>
     </main>
+    </>
   );
 }
