@@ -1697,3 +1697,315 @@ main.jbcs-finance-page.jbcs-supplier-payments-page{
     animation:none!important;
   }
 }
+
+
+/* Sales Receipts: separate direct sales from invoice receipts without visual clutter. */
+.jbcs-sales-receipts-page{
+  background:#f6f7f9!important;
+  color:#252b36;
+}
+.jbcs-sales-receipts-page > div.mx-auto > div:first-child{
+  align-items:flex-end;
+  gap:20px;
+  padding:6px 0 22px;
+  border-bottom:1px solid #e3e8ef;
+}
+.jbcs-sales-receipts-page > div.mx-auto > div:first-child > div:first-child > a{
+  color:#697586!important;
+  font-weight:650;
+}
+.jbcs-sales-receipts-page > div.mx-auto > div:first-child > div:first-child > a:hover{
+  color:#f3192d!important;
+}
+.jbcs-sales-receipts-page h1{
+  color:#25232a;
+  font-size:clamp(1.9rem,2.8vw,2.35rem)!important;
+  letter-spacing:-.045em;
+}
+.jbcs-sales-receipts-page .jbcs-direct-receipts-panel,
+.jbcs-sales-receipts-page .jbcs-invoice-receipts-layout > section{
+  min-width:0;
+  border-color:#e1e6ee!important;
+  border-radius:14px!important;
+  box-shadow:0 1px 3px rgba(15,23,42,.04)!important;
+}
+.jbcs-sales-receipts-page .jbcs-direct-receipts-panel > div:first-child{
+  padding:18px 20px;
+  border-color:#e9edf3;
+}
+.jbcs-sales-receipts-page .jbcs-direct-receipts-panel > div:first-child h2,
+.jbcs-sales-receipts-page .jbcs-invoice-receipts-layout h2{
+  color:#252b36;
+  letter-spacing:-.025em;
+}
+.jbcs-sales-receipts-page .direct-sales-register{
+  max-height:430px;
+  background:#fff;
+}
+.jbcs-sales-receipts-page .direct-sales-register button{
+  padding:16px 18px;
+  border-bottom:1px solid #edf0f5;
+  transition:background-color .12s ease;
+}
+.jbcs-sales-receipts-page .direct-sales-register button strong{
+  color:#252b36;
+  font-size:13px;
+  font-variant-numeric:tabular-nums;
+}
+.jbcs-sales-receipts-page .direct-sales-register button[class*="bg-rose-50"]{
+  background:#fff4f5!important;
+  box-shadow:inset 3px 0 #f3192d;
+}
+.jbcs-sales-receipts-page .jbcs-invoice-receipts-layout{
+  align-items:stretch;
+}
+.jbcs-sales-receipts-page .jbcs-invoice-receipts-layout > section:first-child > div:first-child{
+  padding:18px 19px;
+  background:#fff;
+  border-color:#e9edf3;
+}
+.jbcs-sales-receipts-page .jbcs-invoice-receipts-layout > section:first-child > div:first-child input{
+  min-height:42px;
+  border-color:#dfe5ed;
+  border-radius:9px;
+}
+.jbcs-sales-receipts-page .jbcs-invoice-receipts-layout > section:first-child > div:first-child input:focus{
+  border-color:#f3192d;
+  box-shadow:0 0 0 3px rgba(243,25,45,.09);
+  outline:none;
+}
+.jbcs-sales-receipts-page .jbcs-invoice-receipts-layout > section:first-child > div:nth-child(2){
+  max-height:600px;
+  scrollbar-width:thin;
+}
+.jbcs-sales-receipts-page .jbcs-invoice-receipts-layout > section:first-child > div:nth-child(2) button{
+  padding:15px 18px;
+  border-bottom:1px solid #edf0f5;
+}
+.jbcs-sales-receipts-page .jbcs-invoice-receipts-layout > section:first-child > div:nth-child(2) button[class*="bg-rose-50"]{
+  background:#fff4f5!important;
+  box-shadow:inset 3px 0 #f3192d;
+}
+.jbcs-sales-receipts-page .jbcs-invoice-receipts-layout > section:last-child{
+  padding:clamp(16px,2vw,26px)!important;
+}
+.jbcs-sales-receipts-page .direct-sales-print table,
+.jbcs-sales-receipts-page .jbcs-invoice-receipts-layout table{
+  font-variant-numeric:tabular-nums;
+}
+.jbcs-sales-receipts-page .direct-sales-print table th,
+.jbcs-sales-receipts-page .jbcs-invoice-receipts-layout table th{
+  color:#697586;
+  font-size:10px;
+  letter-spacing:.035em;
+}
+.jbcs-sales-receipts-page a:focus-visible,
+.jbcs-sales-receipts-page button:focus-visible{
+  outline:2px solid #f3192d;
+  outline-offset:3px;
+}
+@media(max-width:1023px){
+  .jbcs-sales-receipts-page .direct-sales-register{
+    max-height:300px;
+  }
+}
+@media(max-width:640px){
+  .jbcs-sales-receipts-page{padding-left:12px!important;padding-right:12px!important}
+  .jbcs-sales-receipts-page > div.mx-auto > div:first-child{
+    align-items:flex-start;
+    padding-bottom:17px;
+  }
+  .jbcs-sales-receipts-page h1{font-size:1.8rem!important}
+  .jbcs-sales-receipts-page .jbcs-direct-receipts-panel > div:first-child,
+  .jbcs-sales-receipts-page .jbcs-invoice-receipts-layout > section:first-child > div:first-child{
+    padding:14px;
+  }
+}
+
+/* Customers: remove duplicated search clutter and make profile browsing easier. */
+.jbcs-customers-page{
+  background:#f6f7f9!important;
+  color:#252b36;
+}
+.jbcs-customers-page .jbcs-customers-header{
+  border-color:#e1e6ee!important;
+  box-shadow:0 1px 3px rgba(15,23,42,.025);
+}
+.jbcs-customers-page .jbcs-customers-header h1{
+  font-size:20px!important;
+  letter-spacing:-.025em;
+}
+.jbcs-customers-page .jbcs-customers-header > button{
+  min-height:42px;
+  border-radius:10px!important;
+  box-shadow:0 3px 8px rgba(243,25,45,.10);
+}
+.jbcs-customers-page .max-w-\\[1500px\\] > div:first-child h2{
+  color:#25232a;
+  font-size:clamp(1.8rem,2.6vw,2.2rem);
+  line-height:1.15;
+  letter-spacing:-.04em;
+}
+.jbcs-customers-page input:not([type="checkbox"]):not([type="radio"]),
+.jbcs-customers-page select,
+.jbcs-customers-page textarea{
+  border-color:#dfe5ed;
+  border-radius:9px;
+}
+.jbcs-customers-page input:focus,
+.jbcs-customers-page select:focus,
+.jbcs-customers-page textarea:focus{
+  border-color:#f3192d!important;
+  box-shadow:0 0 0 3px rgba(243,25,45,.09);
+  outline:none;
+}
+.jbcs-customers-page .jbcs-customers-kpis article,
+.jbcs-customers-page .jbcs-customers-toolbar,
+.jbcs-customers-page .jbcs-customer-quick-access,
+.jbcs-customers-page .jbcs-customer-directory{
+  border-color:#e1e6ee!important;
+  border-radius:14px!important;
+  box-shadow:0 1px 3px rgba(15,23,42,.035)!important;
+}
+.jbcs-customers-page .jbcs-customers-kpis article{
+  padding:18px 19px;
+}
+.jbcs-customers-page .jbcs-customers-kpis article > div > p{
+  color:#697586;
+  font-size:11px;
+  font-weight:700;
+}
+.jbcs-customers-page .jbcs-customers-kpis article > p:nth-child(2){
+  color:#252b36;
+  font-size:clamp(1.5rem,2.2vw,1.9rem);
+  line-height:1.2;
+  letter-spacing:-.04em;
+  font-variant-numeric:tabular-nums;
+}
+.jbcs-customers-page .jbcs-customers-kpis article > p:last-child{
+  color:#8490a0;
+  line-height:1.5;
+}
+.jbcs-customers-page .jbcs-customers-toolbar{
+  background:#fff;
+}
+.jbcs-customers-page .jbcs-customers-toolbar button{
+  min-height:42px;
+  border-radius:9px;
+}
+.jbcs-customers-page .jbcs-customer-quick-access > div:first-child,
+.jbcs-customers-page .jbcs-customer-directory > div:first-child{
+  background:#fff;
+  border-color:#e9edf3;
+}
+.jbcs-customers-page .jbcs-customer-quick-access button{
+  border-color:#e1e6ee;
+  border-radius:10px;
+  padding:14px;
+}
+.jbcs-customers-page .jbcs-customer-quick-access button[class*="bg-"]{
+  background:#fff4f5!important;
+  border-color:#f4c5cb!important;
+}
+.jbcs-customers-page .jbcs-customer-directory table{
+  font-variant-numeric:tabular-nums;
+}
+.jbcs-customers-page .jbcs-customer-directory table th{
+  background:#f8fafc;
+  color:#667085;
+  font-size:10px;
+}
+.jbcs-customers-page .jbcs-customer-directory table td{
+  padding-top:13px;
+  padding-bottom:13px;
+}
+.jbcs-customers-page a:focus-visible,
+.jbcs-customers-page button:focus-visible{
+  outline:2px solid #f3192d;
+  outline-offset:3px;
+}
+@media(max-width:640px){
+  .jbcs-customers-page .jbcs-customers-kpis article{padding:15px!important}
+  .jbcs-customers-page .jbcs-customers-toolbar{padding:14px!important}
+}
+
+/* Products & Services catalogue: align registers with the rest of Finance. */
+.jbcs-products-redesign .jbcs-catalogue-summary{
+  gap:14px;
+  margin-bottom:22px;
+}
+.jbcs-products-redesign .jbcs-catalogue-summary article{
+  border-color:#e1e6ee;
+  border-radius:14px;
+  box-shadow:0 1px 3px rgba(15,23,42,.035);
+}
+.jbcs-products-redesign .jbcs-catalogue-register{
+  border-color:#e1e6ee!important;
+  border-radius:14px!important;
+  box-shadow:0 1px 3px rgba(15,23,42,.04)!important;
+}
+.jbcs-products-redesign .jbcs-catalogue-register > div:first-child{
+  padding:17px 19px;
+  border-color:#e9edf3;
+  background:#fff;
+}
+.jbcs-products-redesign .jbcs-catalogue-register > div:first-child h2{
+  color:#252b36;
+  font-size:16px;
+  letter-spacing:-.025em;
+}
+.jbcs-products-redesign .jbcs-catalogue-register > div:first-child input,
+.jbcs-products-redesign .jbcs-catalogue-register > div:first-child select{
+  min-height:41px;
+  border-color:#dfe5ed;
+  border-radius:9px;
+}
+.jbcs-products-redesign .jbcs-catalogue-register > div:first-child input:focus,
+.jbcs-products-redesign .jbcs-catalogue-register > div:first-child select:focus{
+  border-color:#f3192d;
+  box-shadow:0 0 0 3px rgba(243,25,45,.09);
+  outline:none;
+}
+.jbcs-products-redesign .jbcs-catalogue-register > .grid{
+  min-height:490px!important;
+}
+.jbcs-products-redesign .jbcs-catalogue-register > .grid > aside{
+  background:#fff;
+  border-color:#edf0f5;
+}
+.jbcs-products-redesign .jbcs-catalogue-register > .grid > aside > div:first-child{
+  background:#fafbfc;
+  border-color:#edf0f5;
+  padding:12px 15px;
+}
+.jbcs-products-redesign .jbcs-catalogue-register > .grid > aside button{
+  padding:15px;
+  border-color:#edf0f5;
+}
+.jbcs-products-redesign .jbcs-catalogue-register > .grid > aside button[class*="bg-rose-50"]{
+  background:#fff4f5!important;
+  box-shadow:inset 3px 0 #f3192d;
+}
+.jbcs-products-redesign .jbcs-catalogue-register > .grid > div:last-child{
+  min-width:0;
+  background:#f8fafc;
+}
+.jbcs-products-redesign .jbcs-catalogue-register > .grid > div:last-child > div:first-child{
+  gap:10px;
+  padding:17px 20px;
+  border-color:#e5e9f0;
+}
+@media(max-width:900px){
+  .jbcs-products-redesign .jbcs-catalogue-register > .grid{
+    grid-template-columns:minmax(0,1fr)!important;
+  }
+  .jbcs-products-redesign .jbcs-catalogue-register > .grid > aside{
+    border-right:0;
+    border-bottom:1px solid #e2e8f0;
+  }
+}
+@media(max-width:640px){
+  .jbcs-products-redesign .jbcs-catalogue-summary article{padding:15px 16px}
+  .jbcs-products-redesign .jbcs-catalogue-register > div:first-child{padding:13px}
+  .jbcs-products-redesign .jbcs-catalogue-register > .grid{min-height:unset!important}
+}
