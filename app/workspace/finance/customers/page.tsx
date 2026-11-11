@@ -380,8 +380,8 @@ export default function CustomersPage() {
       <div className="flex min-h-screen flex-col">
         <FinanceSidebar activeHref="/workspace/finance/customers" />
 
-        <main className="min-w-0 flex-1 md:ml-[264px] jbcs-finance-consistent-main">
-          <header className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-200 bg-white/95 px-4 py-4 backdrop-blur sm:px-7 lg:px-9">
+        <main className="jbcs-customers-page min-w-0 flex-1 md:ml-[264px] jbcs-finance-consistent-main">
+          <header className="jbcs-customers-header sticky top-0 z-10 flex items-center justify-between border-b border-slate-200 bg-white/95 px-4 py-4 backdrop-blur sm:px-7 lg:px-9">
             <div className="flex items-center gap-3">
               <Link
                 href="/workspace/finance"
@@ -481,7 +481,7 @@ export default function CustomersPage() {
               </div>
             )}
 
-            <div className="grid gap-4 sm:grid-cols-3">
+            <div className="jbcs-customers-kpis grid gap-4 sm:grid-cols-3">
               <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                 <div className="flex items-center justify-between">
                   <p className="text-sm font-medium text-slate-500">
@@ -538,22 +538,20 @@ export default function CustomersPage() {
               </article>
             </div>
 
-            <section className="mb-5 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
-              <div className="flex flex-wrap items-end gap-3">
-                <label className="min-w-[240px] flex-1 text-sm font-semibold text-slate-700">Search customers
-                  <span className="relative mt-2 block"><Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={17} /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search name, phone, email or TIN…" className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-10 pr-3 text-sm font-normal outline-none focus:border-[#F3192D]" /></span>
-                </label>
+            <section className="jbcs-customers-toolbar mb-5 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div><p className="text-sm font-semibold text-slate-800">Customer directory</p><p className="mt-1 text-xs text-slate-500">Search from the header, or browse the full directory below.</p></div>
                 <button type="button" onClick={() => setShowDirectory((value) => !value)} className="rounded-xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-700 hover:border-rose-200 hover:text-[#A80D1B]">{showDirectory ? "Hide customer directory" : "Browse full directory"}</button>
               </div>
-              <p className="mt-2 text-xs text-slate-500">Five customers are shown in Quick access. Search by name, phone, email or TIN to find any other customer, then select the result to open the profile and edit it.</p>
+              <p className="mt-2 text-xs text-slate-500">Quick access shows up to five matching customers. Select a customer to open their profile and edit their details.</p>
             </section>
             
             <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,0.85fr)_minmax(0,1.5fr)]">
-<section className="mb-5 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+<section className="jbcs-customer-quick-access mb-5 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
               <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4"><div><h3 className="font-bold text-slate-900">Quick access</h3><p className="mt-1 text-xs text-slate-500">Five customer records at a time. Use search above to find anyone else.</p></div><span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">{Math.min(5, filteredCustomers.length)} shown</span></div>
               <div className="grid grid-cols-1 gap-2 p-3">{filteredCustomers.slice(0,5).map((customer) => <button key={customer.id} type="button" onClick={() => setSelectedId(customer.id)} className={`rounded-xl border p-3 text-left transition ${selectedCustomer?.id===customer.id?"border-[#F3192D] bg-[#FFF7F7]":"border-slate-200 hover:border-rose-200 hover:bg-slate-50"}`}><span className="block truncate text-sm font-bold text-slate-900">{customer.name}</span><span className="mt-1 block truncate text-xs text-slate-500">{customer.phone || customer.email || "No contact details"}</span></button>)}{filteredCustomers.length===0 && <p className="p-3 text-sm text-slate-500">No customers match that search. Try another search or add a customer.</p>}</div>
             </section>
-              {showDirectory && <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm xl:col-span-2">
+              {showDirectory && <section className="jbcs-customer-directory overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm xl:col-span-2">
                 <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4 sm:px-6">
                   <div>
                     <h3 className="font-bold text-slate-900">
