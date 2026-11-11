@@ -416,7 +416,7 @@ export default function CustomersPage() {
             </button>
           </header>
 
-          <div className="mx-auto max-w-[1500px] space-y-6 p-4 sm:p-7 lg:p-9">
+          <div className="jbcs-customers-content mx-auto max-w-[1500px] space-y-6 p-4 sm:p-7 lg:p-9">
             <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
               <div>
                 <p className="text-sm font-semibold text-[#F3192D]">
