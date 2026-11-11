@@ -635,26 +635,34 @@ export default function FinanceReportsPage() {
           </div>
 
           <section className={`${panel} mb-6`}>
-            <label htmlFor="finance-report-selector" className="mb-2 block font-bold">Generate a report</label>
-            <p className="mb-3 text-xs text-slate-500">Choose a report to open its detailed figures, date filters and export options.</p>
-            <select
-              id="finance-report-selector"
-              defaultValue=""
-              onChange={(event) => {
-                const destination = event.target.value;
-                if (destination) window.location.assign(destination);
-              }}
-              className="block w-full max-w-xl rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-800 outline-none transition focus:border-[#F3192D] focus:ring-2 focus:ring-rose-100"
-            >
-              <option value="" disabled>Select a report…</option>
-              <option value="/workspace/finance/reports/sales">Sales Report</option>
-              <option value="/workspace/finance/reports/expenses">Expense Report</option>
-              <option value="/workspace/finance/reports/supplier-payments">Supplier Payments</option>
-              <option value="/workspace/finance/reports/owner-income">Owner Income &amp; Commissions</option>
-              <option value="/workspace/finance/reports/customer-statements">Customer Statements</option>
-              <option value="/workspace/finance/reports/profit-loss">Profit &amp; Loss</option>
-              <option value="/workspace/finance/reports/balance-sheet">Balance Sheet</option>
-            </select>
+            <div className="mb-4">
+              <p className="text-[11px] font-bold uppercase tracking-[.15em] text-[#F3192D]">Explore reports</p>
+              <h2 className="mt-1 text-lg font-bold tracking-tight text-slate-900">Choose a financial report</h2>
+              <p className="mt-1 text-sm text-slate-500">Open a focused report with its own figures, filters and export options.</p>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+              {[
+                { title: "Sales report", description: "Sales performance and collections", href: "/workspace/finance/reports/sales", icon: ChartNoAxesCombined, tone: "bg-rose-50 text-[#F3192D]" },
+                { title: "Expense report", description: "Review recorded business spending", href: "/workspace/finance/reports/expenses", icon: Wallet, tone: "bg-amber-50 text-amber-700" },
+                { title: "Supplier payments", description: "Payments made to suppliers", href: "/workspace/finance/reports/supplier-payments", icon: CreditCard, tone: "bg-slate-100 text-slate-700" },
+                { title: "Owner income", description: "Owner income and commissions", href: "/workspace/finance/reports/owner-income", icon: FileBarChart, tone: "bg-violet-50 text-violet-700" },
+                { title: "Customer statements", description: "Customer balances and activity", href: "/workspace/finance/reports/customer-statements", icon: UsersRound, tone: "bg-emerald-50 text-emerald-700" },
+                { title: "Profit & loss", description: "Income, expenses and net result", href: "/workspace/finance/reports/profit-loss", icon: TrendingUp, tone: "bg-sky-50 text-sky-700" },
+                { title: "Balance sheet", description: "Assets, liabilities and equity", href: "/workspace/finance/reports/balance-sheet", icon: PieChart, tone: "bg-orange-50 text-orange-700" },
+              ].map((report) => {
+                const Icon = report.icon;
+                return (
+                  <Link key={report.href} href={report.href} className="group flex min-w-0 items-start gap-3 rounded-xl border border-slate-200 bg-white p-3.5 transition hover:border-rose-200 hover:bg-rose-50/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-300">
+                    <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${report.tone}`}><Icon size={19} /></span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-sm font-semibold text-slate-800">{report.title}</span>
+                      <span className="mt-1 block text-xs leading-5 text-slate-500">{report.description}</span>
+                    </span>
+                    <span aria-hidden="true" className="pt-0.5 text-slate-400 transition group-hover:translate-x-0.5 group-hover:text-[#F3192D]">↗</span>
+                  </Link>
+                );
+              })}
+            </div>
           </section>
 
           {invalidRange && (
