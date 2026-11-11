@@ -1031,3 +1031,12 @@ main.jbcs-finance-consistent-main input:focus,main.jbcs-finance-consistent-main 
     transition:none!important;
   }
 }
+
+
+.jbcs-reports-page .report-supporting-schedule[open] .report-schedule-toggle-label{
+  font-size:0;
+}
+.jbcs-reports-page .report-supporting-schedule[open] .report-schedule-toggle-label::after{
+  content:"Hide schedule";
+  font-size:12px;
+}
