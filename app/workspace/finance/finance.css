@@ -1288,11 +1288,6 @@ main.jbcs-finance-page.jbcs-supplier-payments-page{
 .jbcs-supplier-payments-page .jbcs-supplier-register aside button .text-blue-600{
   color:#697586!important;
 }
-.jbcs-expenses-page .jbcs-expenses-register .max-h-\\[700px\\],
-.jbcs-supplier-payments-page .jbcs-supplier-register .max-h-\\[700px\\]{
-  scrollbar-width:thin;
-  scrollbar-color:#cbd5e1 transparent;
-}
 .jbcs-expenses-page .jbcs-entry-panel,
 .jbcs-supplier-payments-page .jbcs-entry-panel{
   border-radius:16px 0 0 16px!important;
