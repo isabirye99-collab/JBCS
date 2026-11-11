@@ -1,5 +1,8 @@
 ﻿"use client";
 
+import FinanceSidebar from "@/components/finance/FinanceSidebar";
+import "../finance.css";
+
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { ArrowLeft, CheckCircle2, FileUp, LoaderCircle, UploadCloud, XCircle } from "lucide-react";
@@ -142,7 +145,9 @@ export default function FinanceImportPage() {
     } catch (e) { setError(e instanceof Error ? e.message : "CSV import failed."); }
     finally { setBusy(false); }
   }
-  return <main className="min-h-screen bg-slate-50 px-4 py-6 text-slate-900 md:px-8 jbcs-finance-consistent-main">
+  return <div className="min-h-screen bg-slate-50 text-slate-900">
+    <FinanceSidebar activeHref="/workspace/finance/import" />
+    <main className="min-h-screen px-4 py-6 md:ml-[264px] md:px-8 jbcs-finance-consistent-main">
     <div className="mx-auto max-w-6xl">
       <Link href="/workspace/finance" className="mb-5 inline-flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-slate-900"><ArrowLeft size={16}/> Back to Finance</Link>
       <div className="mb-6">
@@ -184,5 +189,6 @@ export default function FinanceImportPage() {
         </section>
       </div>
     </div>
-  </main>;
+  </main>
+  </div>;
 }

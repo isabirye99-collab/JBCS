@@ -8,6 +8,7 @@ import {
   CreditCard,
   FileCheck,
   FileText,
+  FileUp,
   LayoutDashboard,
   Package,
   Receipt,
@@ -36,6 +37,7 @@ const navigation = [
   { label: "Customers", href: "/workspace/finance/customers", icon: UsersRound },
   { label: "Products & Services", href: "/workspace/finance/items", icon: Package },
   { label: "Reports", href: "/workspace/finance/reports", icon: BarChart3 },
+  { label: "Import data", href: "/workspace/finance/import", icon: FileUp },
   { label: "Settings", href: "/workspace/settings", icon: Settings },
 ];
 
