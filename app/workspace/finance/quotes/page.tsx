@@ -317,7 +317,7 @@ export default function QuotesPage() {
           {error && <div role="alert" className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">{error}</div>}
           {notice && <div role="status" className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">{notice}</div>}
 
-          {showForm && <form onSubmit={createQuote} className="space-y-5 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+          {showForm && <form onSubmit={createQuote} className="jbcs-quote-entry space-y-5 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
             <div className="flex flex-wrap items-start justify-between gap-3 border-b border-slate-100 pb-4">
               <div><h2 className="text-xl font-bold">{editingQuote ? "Edit quotation " + (editingQuote.quote_number || "") : "New quotation"}</h2><p className="mt-1 text-sm text-slate-500">Select a customer and add catalogue services or custom quotation lines.</p></div>
               <span className="rounded-full bg-rose-50 px-3 py-1 text-xs font-bold text-[#A80D1B]">Currency: {currency}</span>
