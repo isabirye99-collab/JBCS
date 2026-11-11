@@ -1,6 +1,8 @@
 
 "use client";
 
+import FinanceSidebar from "@/components/finance/FinanceSidebar";
+
 import "../finance.css";
 import Link from "next/link";
 import {
@@ -41,72 +43,8 @@ const financeNavigation = [
 ];
 
 function FinancePageSidebar({ activeHref }: { activeHref: string }) {
-  return (
-    <>
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-[264px] flex-col border-r border-slate-200 bg-white md:flex">
-        <Link
-          href="/workspace/finance"
-          className="flex min-h-[98px] items-center gap-3 border-b border-slate-100 px-4"
-        >
-          <span className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-[#f5dfe2] bg-white">
-            <img src="/johden-logo.svg" alt="Johden logo" className="h-full w-full object-contain" />
-          </span>
-          <span>
-            <span className="block font-bold tracking-wide">JOHDEN</span>
-            <span className="mt-0.5 block text-xs text-slate-500">
-              Business Consultancy &amp; Finance
-            </span>
-          </span>
-        </Link>
-        <div className="px-4 pb-2 pt-7 text-[10px] font-bold uppercase tracking-[.2em] text-slate-400">
-          Workspace
-        </div>
-        <nav className="flex-1 space-y-1 overflow-y-auto px-2 pb-4">
-          {financeNavigation.map((item) => {
-            const Icon = item.icon;
-            const active = item.href === activeHref;
-            return (
-              <Link
-                key={item.label}
-                href={item.href}
-                aria-current={active ? "page" : undefined}
-                className={`flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold ${
-                  active
-                    ? "bg-rose-50 text-slate-900"
-                    : "text-slate-700 hover:bg-slate-50 hover:text-[#F3192D]"
-                }`}
-              >
-                <Icon size={19} className={active ? "text-[#F3192D]" : "text-slate-700"} />
-                <span className="flex-1">{item.label}</span>
-                {active && <span className="h-1.5 w-1.5 rounded-full bg-[#F3192D]" />}
-              </Link>
-            );
-          })}
-        </nav>
-        <div className="border-t border-slate-100 px-4 py-4 text-xs text-slate-400">
-          Johden Business Suite
-        </div>
-      </aside>
-      <nav aria-label="Workspace navigation" className="mb-4 flex flex-wrap gap-2 md:hidden">
-        {financeNavigation.map((item) => (
-          <Link
-            key={item.label}
-            href={item.href}
-            className={`rounded-lg border px-3 py-2 text-xs font-semibold ${
-              item.href === activeHref
-                ? "border-rose-200 bg-rose-50 text-[#F3192D]"
-                : "border-slate-200 bg-white text-slate-700"
-            }`}
-          >
-            {item.label}
-          </Link>
-        ))}
-      </nav>
-    </>
-  );
-}
-
-type Supplier = {
+  return <FinanceSidebar activeHref={activeHref} />;
+}type Supplier = {
   id: string;
   name: string;
 };

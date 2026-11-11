@@ -1,5 +1,7 @@
 "use client";
 
+import FinanceSidebar from "@/components/finance/FinanceSidebar";
+
 import "../finance.css";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState, type FormEvent, type ReactNode } from "react";
@@ -120,14 +122,7 @@ export default function OwnerIncomePage() {
   }
 
   return <div className="min-h-screen bg-[#F7F8FA] text-slate-900">
-    <aside className="fixed inset-y-0 left-0 z-30 hidden w-[264px] flex-col border-r border-slate-200 bg-white md:flex">
-      <Link href="/workspace/finance" className="flex min-h-[98px] items-center gap-3 border-b border-slate-100 px-4">
-        <span className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-[#f5dfe2] bg-white"><img src="/johden-logo.svg" alt="Johden logo" className="h-full w-full object-contain" /></span>
-        <span><span className="block font-bold tracking-wide">JOHDEN</span><span className="mt-0.5 block text-xs text-slate-500">Business Consultancy & Finance</span></span>
-      </Link>
-      <nav className="min-h-0 flex-1 overflow-y-auto px-4 py-5">{nav.map(item => { const Icon = item.icon; const active = item.href === "/workspace/finance/owner-income"; return <Link key={item.label} href={item.href} className={`mb-1 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium ${active ? "bg-[#fff0f1] text-[#9f1d35]" : "text-slate-600 hover:bg-[#fff5f5]"}`} aria-current={active ? "page" : undefined}><Icon size={18}/>{item.label}</Link>; })}</nav>
-      <Link href="/workspace/settings" className="border-t border-slate-100 p-4 text-sm text-slate-600">Settings</Link>
-    </aside>
+    <FinanceSidebar activeHref="/workspace/finance/owner-income" />
 
     <main className="min-h-screen md:ml-[264px]">
       <header className="sticky top-0 z-20 flex items-center justify-between gap-3 border-b border-slate-200 bg-white/95 px-4 py-4 backdrop-blur md:px-8">
