@@ -44,7 +44,9 @@ const financeNavigation = [
 
 function FinancePageSidebar({ activeHref }: { activeHref: string }) {
   return <FinanceSidebar activeHref={activeHref} />;
-}type Supplier = {
+}
+
+type Supplier = {
   id: string;
   name: string;
 };

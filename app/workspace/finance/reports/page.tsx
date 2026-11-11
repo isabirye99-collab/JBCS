@@ -44,7 +44,9 @@ const navigation = [
 
 function Sidebar() {
   return <FinanceSidebar activeHref="/workspace/finance/reports" />;
-}type Row = Record<string, unknown> & {
+}
+
+type Row = Record<string, unknown> & {
   id?: string;
   created_at?: string;
   currency?: string;

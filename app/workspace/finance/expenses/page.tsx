@@ -24,7 +24,9 @@ const financeNavigation = [
 
 function FinancePageSidebar({ activeHref }: { activeHref: string }) {
   return <FinanceSidebar activeHref={activeHref} />;
-}type Supplier = { id: string; name: string };
+}
+
+type Supplier = { id: string; name: string };
 type Expense = { id: string; expense_date: string; category: string; description: string; supplier_contact_id?: string | null; supplier_name?: string | null; amount: number; currency: string; payment_method?: string | null; notes?: string | null };
 const methods = [{ value: "cash", label: "Cash" }, { value: "bank_transfer", label: "Bank transfer" }, { value: "mobile_money", label: "Mobile money" }, { value: "card", label: "Card" }, { value: "cheque", label: "Cheque" }, { value: "other", label: "Other" }];
 const money = (amount: number, currency = "UGX") => `${currency} ${Number(amount || 0).toLocaleString("en-UG", { maximumFractionDigits: 2 })}`;
