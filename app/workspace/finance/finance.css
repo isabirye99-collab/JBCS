@@ -709,3 +709,68 @@ main.jbcs-finance-consistent-main input:focus,main.jbcs-finance-consistent-main 
 @media(min-width:768px) {
   .jbcs-products-redesign>.finance-app-main { margin-left:264px!important; width:calc(100% - 264px)!important; }
 }
+
+
+/* Financial Overview UX polish: visual hierarchy, quieter cards, clearer data emphasis. */
+.jbcs-dashboard-page .dashboard-topbar-title{
+  font-size:clamp(1.4rem,1.8vw,1.75rem);
+  line-height:1.15;
+  letter-spacing:-.04em;
+  color:#25232a;
+}
+.jbcs-dashboard-page .dashboard-metric-card{
+  min-height:154px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  border-color:#e2e8f0!important;
+  border-radius:14px!important;
+  padding:18px!important;
+  box-shadow:0 1px 3px rgba(15,23,42,.04)!important;
+}
+.jbcs-dashboard-page .dashboard-metric-card:hover{
+  border-color:#fecdd3!important;
+  box-shadow:0 8px 22px rgba(15,23,42,.07)!important;
+  transform:translateY(-2px)!important;
+}
+.jbcs-dashboard-page .dashboard-metric-card .text-2xl,
+.jbcs-dashboard-page .dashboard-metric-card .sm\\:text-3xl{
+  font-variant-numeric:tabular-nums;
+  letter-spacing:-.035em;
+}
+.jbcs-dashboard-page .dashboard-chart-panel,
+.jbcs-dashboard-page .dashboard-insight-panel,
+.jbcs-dashboard-page .jbcs-dashboard-actions{
+  border-color:#e2e8f0!important;
+  border-radius:14px!important;
+  box-shadow:0 1px 3px rgba(15,23,42,.04)!important;
+}
+.jbcs-dashboard-page .dashboard-chart-panel,
+.jbcs-dashboard-page .dashboard-insight-panel{
+  min-width:0;
+}
+.jbcs-dashboard-page .dashboard-chart-bar{
+  border-radius:4px 4px 0 0;
+  cursor:help;
+}
+.jbcs-dashboard-page a:focus-visible,
+.jbcs-dashboard-page button:focus-visible{
+  outline:2px solid #f3192d!important;
+  outline-offset:3px;
+}
+.jbcs-dashboard-page .jbcs-dashboard-actions a{
+  min-height:68px;
+}
+@media(max-width:767px){
+  .jbcs-dashboard-page .dashboard-topbar-title{font-size:1.35rem}
+  .jbcs-dashboard-page .dashboard-metric-card{min-height:unset;padding:16px!important}
+  .jbcs-dashboard-page .dashboard-chart-panel,
+  .jbcs-dashboard-page .dashboard-insight-panel,
+  .jbcs-dashboard-page .jbcs-dashboard-actions{padding:16px!important}
+  .jbcs-dashboard-page .jbcs-dashboard-actions a{min-height:62px}
+}
+@media(prefers-reduced-motion:reduce){
+  .jbcs-dashboard-page .dashboard-metric-card,
+  .jbcs-dashboard-page .dashboard-chart-bar,
+  .jbcs-dashboard-page .jbcs-dashboard-actions a{animation:none!important;transition:none!important;transform:none!important}
+}
