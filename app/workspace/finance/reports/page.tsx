@@ -114,7 +114,7 @@ function Metric({
   tone: string;
 }) {
   return (
-    <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+    <article className="finance-metric-card rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-sm font-medium text-slate-500">{title}</p>
@@ -130,7 +130,7 @@ function Metric({
 }
 
 
-const REPORT_CHART_COLORS = ["#9f1d35", "#f97316", "#0f766e", "#6366f1", "#0891b2", "#a855f7"];
+const REPORT_CHART_COLORS = ["#F3192D", "#F58220", "#15803D", "#1D4ED8", "#69666B", "#B91C1C"];
 
 function AnimatedDonut({ data, total }: { data: [string, number][]; total: number }) {
   const sorted = data.filter(([, value]) => value > 0).sort((a, b) => b[1] - a[1]);
