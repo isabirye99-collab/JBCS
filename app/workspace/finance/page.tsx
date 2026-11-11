@@ -718,7 +718,7 @@ export default function FinanceDashboardPage() {
             <img src="/johden-logo.svg" alt="Johden Business Consultancy Services" className="h-14 w-14 shrink-0 object-contain" />
             <div className="min-w-0">
               <p className="truncate text-base font-bold tracking-tight">
-                JOH DEN
+                JOHDEN
               </p>
               <p className="mt-0.5 text-xs text-slate-500">
                 Business Finance
@@ -1114,7 +1114,7 @@ export default function FinanceDashboardPage() {
                   key={item.label}
                   href={item.href}
                   className={`flex flex-col items-center gap-1 rounded-lg py-2 text-[10px] font-medium ${
-                    item.label === "Home"
+                    item.label === "Dashboard"
                       ? "text-[#F3192D]"
                       : "text-slate-500 hover:text-slate-900"
                   }`}
