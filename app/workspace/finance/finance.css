@@ -1390,3 +1390,310 @@ main.jbcs-finance-page.jbcs-supplier-payments-page{
     animation:none!important;
   }
 }
+
+
+/* Shared visual finish for Invoices, Payments and Quotations. */
+.jbcs-invoices-page,
+.jbcs-payments-page,
+.jbcs-quotes-page{
+  background:#f6f7f9!important;
+  color:#252b36;
+}
+.jbcs-invoices-page > div.mx-auto,
+.jbcs-payments-page > div.mx-auto,
+.jbcs-quotes-page > div.mx-auto{
+  max-width:1500px;
+}
+.jbcs-invoices-page > div.mx-auto > div:first-child,
+.jbcs-payments-page > div.mx-auto > div:first-child,
+.jbcs-quotes-page > div.mx-auto > div:first-child{
+  align-items:flex-end;
+  gap:20px;
+  padding:6px 0 22px;
+  border-bottom:1px solid #e3e8ef;
+}
+.jbcs-invoices-page > div.mx-auto > div:first-child > div:first-child > a,
+.jbcs-payments-page > div.mx-auto > div:first-child > div:first-child > a,
+.jbcs-quotes-page > div.mx-auto > div:first-child > div:first-child > a{
+  color:#697586!important;
+  font-weight:650;
+}
+.jbcs-invoices-page > div.mx-auto > div:first-child > div:first-child > a:hover,
+.jbcs-payments-page > div.mx-auto > div:first-child > div:first-child > a:hover,
+.jbcs-quotes-page > div.mx-auto > div:first-child > div:first-child > a:hover{
+  color:#f3192d!important;
+}
+.jbcs-invoices-page h1,
+.jbcs-payments-page h1,
+.jbcs-quotes-page h1{
+  color:#25232a;
+  font-size:clamp(1.9rem,2.8vw,2.35rem)!important;
+  line-height:1.12;
+  letter-spacing:-.045em;
+}
+.jbcs-invoices-page .jbcs-finance-consistent-main,
+.jbcs-payments-page .jbcs-finance-consistent-main,
+.jbcs-quotes-page .jbcs-finance-consistent-main{
+  min-width:0;
+}
+.jbcs-invoices-page .rounded-2xl.border.border-slate-200.bg-white,
+.jbcs-payments-page .rounded-2xl.border.border-slate-200.bg-white,
+.jbcs-quotes-page .rounded-2xl.border.border-slate-200.bg-white{
+  border-color:#e1e6ee;
+  box-shadow:0 1px 3px rgba(15,23,42,.035);
+}
+.jbcs-invoices-page .jbcs-invoice-entry,
+.jbcs-payments-page .jbcs-payment-entry,
+.jbcs-quotes-page .jbcs-quote-entry{
+  border-color:#e1e6ee!important;
+  border-radius:14px!important;
+  box-shadow:0 4px 16px rgba(15,23,42,.035)!important;
+}
+.jbcs-invoices-page .jbcs-invoice-entry > div:first-child,
+.jbcs-payments-page .jbcs-payment-entry > div:first-child,
+.jbcs-quotes-page .jbcs-quote-entry > div:first-child{
+  padding-bottom:17px;
+  border-color:#e8edf3;
+}
+.jbcs-invoices-page input:not([type="checkbox"]):not([type="radio"]),
+.jbcs-invoices-page select,
+.jbcs-invoices-page textarea,
+.jbcs-payments-page input:not([type="checkbox"]):not([type="radio"]),
+.jbcs-payments-page select,
+.jbcs-payments-page textarea,
+.jbcs-quotes-page input:not([type="checkbox"]):not([type="radio"]),
+.jbcs-quotes-page select,
+.jbcs-quotes-page textarea{
+  border-color:#dfe5ed;
+  border-radius:9px;
+}
+.jbcs-invoices-page input:focus,
+.jbcs-invoices-page select:focus,
+.jbcs-invoices-page textarea:focus,
+.jbcs-payments-page input:focus,
+.jbcs-payments-page select:focus,
+.jbcs-payments-page textarea:focus,
+.jbcs-quotes-page input:focus,
+.jbcs-quotes-page select:focus,
+.jbcs-quotes-page textarea:focus{
+  border-color:#f3192d!important;
+  box-shadow:0 0 0 3px rgba(243,25,45,.09);
+  outline:none;
+}
+.jbcs-invoices-page .jbcs-invoices-register,
+.jbcs-payments-page .jbcs-payments-register,
+.jbcs-quotes-page .jbcs-quotes-register{
+  border-color:#e1e6ee!important;
+  border-radius:14px!important;
+  box-shadow:0 1px 3px rgba(15,23,42,.04)!important;
+}
+.jbcs-invoices-page .jbcs-invoices-register > div:first-child,
+.jbcs-payments-page .jbcs-payments-register > div:first-child,
+.jbcs-quotes-page .jbcs-quotes-register > div:first-child{
+  padding:17px 19px;
+  border-color:#e9edf3;
+  background:#fff;
+}
+.jbcs-invoices-page .jbcs-invoices-register > div:first-child h2,
+.jbcs-payments-page .jbcs-payments-register > div:first-child h2,
+.jbcs-quotes-page .jbcs-quotes-register > div:first-child h2{
+  color:#252b36;
+  font-size:16px;
+  letter-spacing:-.025em;
+}
+.jbcs-invoices-page .jbcs-invoices-register > div:nth-child(2),
+.jbcs-payments-page .jbcs-payments-register > div:nth-child(2),
+.jbcs-quotes-page .jbcs-quotes-register > div:nth-child(2){
+  gap:10px;
+  padding:14px 19px;
+  border-color:#edf0f5;
+  background:#fbfcfe;
+}
+.jbcs-invoices-page .jbcs-invoices-register > div:nth-child(2) input,
+.jbcs-invoices-page .jbcs-invoices-register > div:nth-child(2) select,
+.jbcs-payments-page .jbcs-payments-register > div:nth-child(2) input,
+.jbcs-payments-page .jbcs-payments-register > div:nth-child(2) select,
+.jbcs-quotes-page .jbcs-quotes-register > div:nth-child(2) input,
+.jbcs-quotes-page .jbcs-quotes-register > div:nth-child(2) select{
+  min-height:41px;
+  border-color:#dfe5ed!important;
+  border-radius:9px!important;
+  background:#fff;
+  font-size:12px;
+}
+.jbcs-invoices-page .jbcs-invoices-register > .grid,
+.jbcs-payments-page .jbcs-payments-register > .grid,
+.jbcs-quotes-page .jbcs-quotes-register > .grid{
+  min-height:490px!important;
+  grid-template-columns:minmax(260px,315px) minmax(0,1fr);
+}
+.jbcs-invoices-page .jbcs-invoices-register > .grid > aside,
+.jbcs-payments-page .jbcs-payments-register > .grid > aside,
+.jbcs-quotes-page .jbcs-quotes-register > .grid > aside{
+  background:#fff;
+  border-color:#edf0f5;
+}
+.jbcs-invoices-page .jbcs-invoices-register > .grid > aside > div:first-child,
+.jbcs-payments-page .jbcs-payments-register > .grid > aside > div:first-child,
+.jbcs-quotes-page .jbcs-quotes-register > .grid > aside > div:first-child{
+  background:#fafbfc;
+  border-color:#edf0f5;
+  padding:12px 15px;
+}
+.jbcs-invoices-page .jbcs-invoices-register > .grid > aside > div:first-child span:first-child,
+.jbcs-payments-page .jbcs-payments-register > .grid > aside > div:first-child span:first-child,
+.jbcs-quotes-page .jbcs-quotes-register > .grid > aside > div:first-child span:first-child{
+  color:#697586;
+  font-size:10px;
+  letter-spacing:.07em;
+}
+.jbcs-invoices-page .jbcs-invoices-register > .grid > aside button,
+.jbcs-payments-page .jbcs-payments-register > .grid > aside button,
+.jbcs-quotes-page .jbcs-quotes-register > .grid > aside button{
+  padding:15px;
+  border-color:#edf0f5;
+  transition:background-color .12s ease;
+}
+.jbcs-invoices-page .jbcs-invoices-register > .grid > aside button[class*="bg-rose-50"],
+.jbcs-payments-page .jbcs-payments-register > .grid > aside button[class*="bg-rose-50"],
+.jbcs-quotes-page .jbcs-quotes-register > .grid > aside button[class*="bg-rose-50"]{
+  background:#fff4f5!important;
+}
+.jbcs-invoices-page .jbcs-invoices-register > .grid > div:last-child,
+.jbcs-payments-page .jbcs-payments-register > .grid > div:last-child,
+.jbcs-quotes-page .jbcs-quotes-register > .grid > div:last-child{
+  min-width:0;
+  background:#f8fafc;
+}
+.jbcs-invoices-page .jbcs-invoices-register > .grid > div:last-child > div:first-child,
+.jbcs-payments-page .jbcs-payments-register > .grid > div:last-child > div:first-child,
+.jbcs-quotes-page .jbcs-quotes-register > .grid > div:last-child > div:first-child{
+  gap:10px;
+  border-color:#e5e9f0;
+  padding:17px 20px;
+}
+.jbcs-invoices-page .jbcs-invoices-register > .grid > div:last-child > div:nth-child(2),
+.jbcs-payments-page .jbcs-payments-register > .grid > div:last-child > div:nth-child(2),
+.jbcs-quotes-page .jbcs-quotes-register > .grid > div:last-child > div:nth-child(2){
+  border-color:#e5e9f0;
+  border-radius:12px;
+}
+.jbcs-invoices-page .jbcs-invoices-register > .grid > div:last-child > div:nth-child(2) > div,
+.jbcs-payments-page .jbcs-payments-register > .grid > div:last-child > div:nth-child(2) > div,
+.jbcs-quotes-page .jbcs-quotes-register > .grid > div:last-child > div:nth-child(2) > div{
+  min-width:0;
+}
+.jbcs-payments-page .jbcs-payments-kpis > div,
+.jbcs-quotes-page .jbcs-quotes-kpis > div{
+  min-width:0;
+  border-color:#e1e6ee!important;
+  border-radius:13px!important;
+  padding:18px!important;
+  box-shadow:0 1px 3px rgba(15,23,42,.035)!important;
+}
+.jbcs-payments-page .jbcs-payments-kpis > div > p:first-child,
+.jbcs-quotes-page .jbcs-quotes-kpis > div > p:first-child{
+  color:#697586;
+  font-size:11px;
+  font-weight:700;
+}
+.jbcs-payments-page .jbcs-payments-kpis > div > p:nth-child(2),
+.jbcs-quotes-page .jbcs-quotes-kpis > div > p:nth-child(2){
+  color:#252b36;
+  font-size:clamp(1.35rem,2vw,1.8rem);
+  line-height:1.25;
+  letter-spacing:-.04em;
+  font-variant-numeric:tabular-nums;
+  overflow-wrap:anywhere;
+}
+.jbcs-payments-page .jbcs-payments-kpis > div > p:last-child,
+.jbcs-quotes-page .jbcs-quotes-kpis > div > p:last-child{
+  color:#8490a0;
+  line-height:1.5;
+}
+.jbcs-invoices-page .jbcs-invoices-register button:focus-visible,
+.jbcs-payments-page .jbcs-payments-register button:focus-visible,
+.jbcs-quotes-page .jbcs-quotes-register button:focus-visible,
+.jbcs-invoices-page a:focus-visible,
+.jbcs-payments-page a:focus-visible,
+.jbcs-quotes-page a:focus-visible{
+  outline:2px solid #f3192d;
+  outline-offset:2px;
+}
+@media(max-width:1050px){
+  .jbcs-invoices-page .jbcs-invoices-register > .grid,
+  .jbcs-payments-page .jbcs-payments-register > .grid,
+  .jbcs-quotes-page .jbcs-quotes-register > .grid{
+    grid-template-columns:minmax(230px,275px) minmax(0,1fr);
+  }
+}
+@media(max-width:900px){
+  .jbcs-invoices-page .jbcs-invoices-register > .grid,
+  .jbcs-payments-page .jbcs-payments-register > .grid,
+  .jbcs-quotes-page .jbcs-quotes-register > .grid{
+    grid-template-columns:minmax(0,1fr);
+  }
+  .jbcs-invoices-page .jbcs-invoices-register > .grid > aside,
+  .jbcs-payments-page .jbcs-payments-register > .grid > aside,
+  .jbcs-quotes-page .jbcs-quotes-register > .grid > aside{
+    border-right:0;
+    border-bottom:1px solid #e2e8f0;
+  }
+  .jbcs-invoices-page .jbcs-invoices-register > .grid > aside > div:nth-child(2),
+  .jbcs-payments-page .jbcs-payments-register > .grid > aside > div:nth-child(2),
+  .jbcs-quotes-page .jbcs-quotes-register > .grid > aside > div:nth-child(2){
+    max-height:300px;
+  }
+}
+@media(max-width:640px){
+  .jbcs-invoices-page,
+  .jbcs-payments-page,
+  .jbcs-quotes-page{
+    padding-left:12px!important;
+    padding-right:12px!important;
+  }
+  .jbcs-invoices-page > div.mx-auto > div:first-child,
+  .jbcs-payments-page > div.mx-auto > div:first-child,
+  .jbcs-quotes-page > div.mx-auto > div:first-child{
+    align-items:flex-start;
+    padding-bottom:17px;
+  }
+  .jbcs-invoices-page h1,
+  .jbcs-payments-page h1,
+  .jbcs-quotes-page h1{
+    font-size:1.8rem!important;
+  }
+  .jbcs-invoices-page .jbcs-invoices-register > div:first-child,
+  .jbcs-payments-page .jbcs-payments-register > div:first-child,
+  .jbcs-quotes-page .jbcs-quotes-register > div:first-child,
+  .jbcs-invoices-page .jbcs-invoices-register > div:nth-child(2),
+  .jbcs-payments-page .jbcs-payments-register > div:nth-child(2),
+  .jbcs-quotes-page .jbcs-quotes-register > div:nth-child(2){
+    padding:13px;
+  }
+  .jbcs-invoices-page .jbcs-invoices-register > .grid,
+  .jbcs-payments-page .jbcs-payments-register > .grid,
+  .jbcs-quotes-page .jbcs-quotes-register > .grid{
+    min-height:unset!important;
+  }
+  .jbcs-invoices-page .jbcs-invoices-register > .grid > div:last-child > div:first-child,
+  .jbcs-payments-page .jbcs-payments-register > .grid > div:last-child > div:first-child,
+  .jbcs-quotes-page .jbcs-quotes-register > .grid > div:last-child > div:first-child{
+    padding:14px;
+  }
+  .jbcs-payments-page .jbcs-payments-kpis > div,
+  .jbcs-quotes-page .jbcs-quotes-kpis > div{
+    padding:15px!important;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  .jbcs-invoices-page *,
+  .jbcs-payments-page *,
+  .jbcs-quotes-page *,
+  .jbcs-invoices-page *::before,
+  .jbcs-payments-page *::before,
+  .jbcs-quotes-page *::before{
+    transition:none!important;
+    animation:none!important;
+  }
+}
