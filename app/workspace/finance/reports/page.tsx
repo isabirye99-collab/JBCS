@@ -768,7 +768,7 @@ export default function FinanceReportsPage() {
               <details className={`${panel} report-supporting-schedule mb-6`}>
                 <summary className="report-schedule-summary">
                   <span className="report-schedule-summary-copy"><strong>Owner income schedules</strong><small>Daily and monthly receipt breakdown</small></span>
-                  <span className="report-schedule-toggle">Expand schedule <span aria-hidden="true" className="report-schedule-chevron">⌄</span></span>
+                  <span className="report-schedule-toggle"><span className="report-schedule-toggle-label">Expand schedule</span><span aria-hidden="true" className="report-schedule-chevron">⌄</span></span>
                 </summary>
                 <div className="report-schedule-content">
                 <div className="mb-4">
