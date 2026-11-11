@@ -1099,3 +1099,5 @@ main.jbcs-finance-consistent-main input:focus,main.jbcs-finance-consistent-main 
 .jbcs-finance-consistent-main .jbcs-primary-button,main.jbcs-finance-consistent-main button.bg-\\[\\#F3192D\\]{background:var(--finance-red)!important}
 .jbcs-finance-consistent-main .jbcs-primary-button:hover,main.jbcs-finance-consistent-main button.bg-\\[\\#F3192D\\]:hover{background:var(--finance-red-dark)!important}
 @media(max-width:767px){.jbcs-dashboard-page .dashboard-metric-card{padding:16px!important}.jbcs-dashboard-page .dashboard-chart-panel,.jbcs-dashboard-page .dashboard-insight-panel,.jbcs-dashboard-page .jbcs-dashboard-actions{padding:16px!important}}
+
+.finance-metric-card{border-color:var(--finance-line)!important;border-radius:var(--finance-radius-md)!important;box-shadow:var(--finance-shadow)!important}.finance-metric-card .rounded-xl{border-radius:10px}.finance-metric-card:hover{border-color:#f5bcc3!important}.jbcs-reports-page .report-chart-panel,.jbcs-reports-page .report-summary-card{border-color:var(--finance-line)!important;border-radius:var(--finance-radius-md)!important;box-shadow:var(--finance-shadow)!important}
