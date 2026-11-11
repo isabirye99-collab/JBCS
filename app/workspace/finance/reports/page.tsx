@@ -114,11 +114,11 @@ function Metric({
   tone: string;
 }) {
   return (
-    <article className="finance-metric-card rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+    <article className="report-kpi-card finance-metric-card rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-sm font-medium text-slate-500">{title}</p>
-          <p className="mt-3 text-2xl font-bold tracking-tight text-slate-900">{value}</p>
+          <p className="report-kpi-value mt-3 text-2xl font-bold tracking-tight text-slate-900">{value}</p>
         </div>
         <span className={`rounded-xl p-3 ${tone}`}>
           <Icon size={21} />
@@ -504,7 +504,7 @@ export default function FinanceReportsPage() {
     window.setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
 
-  const panel = "rounded-2xl border border-slate-200 bg-white p-5 shadow-sm";
+  const panel = "report-panel rounded-2xl border border-slate-200 bg-white p-5 shadow-sm";
 
   if (planLocked) {
     return (
@@ -534,12 +534,12 @@ export default function FinanceReportsPage() {
 
       <main className="min-h-screen px-4 py-5 sm:px-6 md:ml-[264px] md:px-8 md:py-8 jbcs-finance-consistent-main">
         <div className="mx-auto max-w-[1500px]">
-          <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
+          <div className="report-page-header mb-6 flex flex-wrap items-start justify-between gap-4">
             <div>
               <p className="text-xs font-bold uppercase tracking-[.18em] text-[#F3192D]">
                 Johden Business Suite / Finance
               </p>
-              <h1 className="mt-2 text-3xl font-bold tracking-tight">
+              <h1 className="report-page-title mt-2 text-3xl font-bold tracking-tight">
                 Financial reports
               </h1>
               <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
@@ -569,13 +569,13 @@ export default function FinanceReportsPage() {
             </div>
           </div>
 
-          <section className={`${panel} mb-6`}>
-            <div className="mb-4">
+          <section className={`${panel} report-library-panel mb-6`}>
+            <div className="report-section-heading mb-4">
               <p className="text-[11px] font-bold uppercase tracking-[.15em] text-[#F3192D]">Explore reports</p>
               <h2 className="mt-1 text-lg font-bold tracking-tight text-slate-900">Choose a financial report</h2>
               <p className="mt-1 text-sm text-slate-500">Open a focused report with its own figures, filters and export options.</p>
             </div>
-            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <div className="report-library-grid grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
               {[
                 { title: "Sales report", description: "Sales performance and collections", href: "/workspace/finance/reports/sales", icon: ChartNoAxesCombined, tone: "bg-rose-50 text-[#F3192D]" },
                 { title: "Expense report", description: "Review recorded business spending", href: "/workspace/finance/reports/expenses", icon: Wallet, tone: "bg-amber-50 text-amber-700" },
@@ -587,7 +587,7 @@ export default function FinanceReportsPage() {
               ].map((report) => {
                 const Icon = report.icon;
                 return (
-                  <Link key={report.href} href={report.href} className="group flex min-w-0 items-start gap-3 rounded-xl border border-slate-200 bg-white p-3.5 transition hover:border-rose-200 hover:bg-rose-50/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-300">
+                  <Link key={report.href} href={report.href} className="report-library-card group flex min-w-0 items-start gap-3 rounded-xl border border-slate-200 bg-white p-3.5 transition hover:border-rose-200 hover:bg-rose-50/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-300">
                     <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${report.tone}`}><Icon size={19} /></span>
                     <span className="min-w-0 flex-1">
                       <span className="block text-sm font-semibold text-slate-800">{report.title}</span>
@@ -606,8 +606,8 @@ export default function FinanceReportsPage() {
             </div>
           )}
 
-          <section className={`${panel} mb-6`}>
-            <div className="mb-3 flex items-center gap-2">
+          <section className={`${panel} report-period-panel mb-6`}>
+            <div className="report-section-heading mb-3 flex items-center gap-2">
               <CalendarDays size={18} className="text-[#F3192D]" />
               <h2 className="font-bold">Reporting period</h2>
             </div>
@@ -620,7 +620,7 @@ export default function FinanceReportsPage() {
                   value={start}
                   max={end || undefined}
                   onChange={(event) => setStart(event.target.value)}
-                  className="rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800"
+                  className="report-date-input rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800"
                 />
               </label>
 
@@ -631,7 +631,7 @@ export default function FinanceReportsPage() {
                   value={end}
                   min={start || undefined}
                   onChange={(event) => setEnd(event.target.value)}
-                  className="rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800"
+                  className="report-date-input rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800"
                 />
               </label>
 
@@ -659,7 +659,7 @@ export default function FinanceReportsPage() {
                         setEnd("");
                       }
                     }}
-                    className="rounded-lg border border-slate-200 px-3 py-2.5 text-xs font-semibold text-slate-600 hover:border-rose-200 hover:bg-rose-50 hover:text-[#F3192D]"
+                    className="report-period-preset rounded-lg border border-slate-200 px-3 py-2.5 text-xs font-semibold text-slate-600 hover:border-rose-200 hover:bg-rose-50 hover:text-[#F3192D]"
                   >
                     {period.label}
                   </button>
@@ -688,7 +688,7 @@ export default function FinanceReportsPage() {
             </div>
           ) : (
             <>
-              <section className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+              <section className="report-kpi-grid mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
                 <Metric
                   title="Invoiced"
                   value={formatCurrencyTotals(reportInvoices)}
@@ -722,23 +722,23 @@ export default function FinanceReportsPage() {
                 />
               </section>
 
-              <section className={`${panel} mb-6`}>
-                <div className="mb-5"><p className="text-[10px] font-bold uppercase tracking-[.16em] text-[#9f1d35]">Financial summary</p><h2 className="mt-1 text-xl font-bold tracking-tight text-slate-900">Financial performance</h2><p className="mt-1 text-sm text-slate-500">Key figures for the selected reporting period.</p></div>
+              <section className={`${panel} report-summary-panel mb-6`}>
+                <div className="report-section-heading mb-5"><p className="text-[10px] font-bold uppercase tracking-[.16em] text-[#9f1d35]">Financial summary</p><h2 className="mt-1 text-xl font-bold tracking-tight text-slate-900">Financial performance</h2><p className="mt-1 text-sm text-slate-500">Key figures for the selected reporting period.</p></div>
                 <div className="overflow-x-auto"><table className="w-full text-left text-sm"><thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500"><tr><th className="p-3">Measure</th><th className="p-3 text-right">Amount</th><th className="p-3">Source</th></tr></thead><tbody><tr className="border-t border-slate-100"><th className="p-3 font-medium">Invoiced sales</th><td className="p-3 text-right font-bold">{formatCurrencyTotals(reportInvoices)}</td><td className="p-3"><Link href="/workspace/finance/invoices" className="text-[#F3192D] hover:underline">Invoices</Link></td></tr><tr className="border-t border-slate-100"><th className="p-3 font-medium">Customer collections</th><td className="p-3 text-right font-bold">{formatCurrencyTotals(reportPayments)}</td><td className="p-3"><Link href="/workspace/finance/payments" className="text-[#F3192D] hover:underline">Payments and direct sales receipts</Link></td></tr><tr className="border-t border-slate-100"><th className="p-3 font-medium">Expenses recorded</th><td className="p-3 text-right font-bold">{formatCurrencyTotals(reportExpenses)}</td><td className="p-3"><Link href="/workspace/finance/expenses" className="text-[#F3192D] hover:underline">Expenses</Link></td></tr><tr className="border-t border-slate-100"><th className="p-3 font-medium">Supplier payments</th><td className="p-3 text-right font-bold">{formatCurrencyTotals(reportSupplierPayments)}</td><td className="p-3"><Link href="/workspace/finance/supplier-payments" className="text-[#F3192D] hover:underline">Supplier payments</Link></td></tr></tbody></table></div>
                 <p className="mt-4 text-xs text-slate-400">Source: records returned by the linked finance modules and filtered by the reporting dates above. Supplier payments are shown separately and are not counted again as expenses. Amounts across multiple currencies should not be treated as a single converted total.</p>
               </section>
 
-              <section className="mb-6 grid gap-5 xl:grid-cols-2">
-                <article className={panel}>
-                  <div className="mb-5 flex items-start justify-between gap-3">
+              <section className="report-visual-grid mb-6 grid gap-5 xl:grid-cols-2">
+                <article className={`${panel} report-visual-card`}>
+                  <div className="report-section-heading mb-5 flex items-start justify-between gap-3">
                     <div><h2 className="text-lg font-bold">Expense mix</h2><p className="mt-1 text-sm text-slate-500">Pie chart of recorded expenses by category.</p></div>
                     <span className="rounded-xl bg-amber-50 p-2.5 text-amber-700"><PieChart size={20} /></span>
                   </div>
                   <AnimatedDonut data={categories} total={spent} />
                   <p className="mt-4 text-xs text-slate-400">Source: expense records grouped by category and filtered by the selected reporting dates. Supplier payments remain separate to avoid double-counting.</p><Link href="/workspace/finance/expenses" className="mt-3 inline-block text-sm font-semibold text-[#F3192D] hover:underline">Open expense records</Link>
                 </article>
-                <article className={panel}>
-                  <div className="mb-5 flex items-start justify-between gap-3">
+                <article className={`${panel} report-visual-card`}>
+                  <div className="report-section-heading mb-5 flex items-start justify-between gap-3">
                     <div><h2 className="text-lg font-bold">Cash movement</h2><p className="mt-1 text-sm text-slate-500">Pie chart comparing customer collections with supplier payments for the selected dates.</p></div>
                     <span className="rounded-xl bg-emerald-50 p-2.5 text-emerald-700"><PieChart size={20} /></span>
                   </div>
@@ -751,21 +751,26 @@ export default function FinanceReportsPage() {
                 </article>
               </section>
 
-              <section className="mb-6 grid gap-5 xl:grid-cols-[1.2fr_.8fr]">
-                <article className={panel}>
-                  <div className="mb-5 flex items-start justify-between gap-3"><div><h2 className="text-lg font-bold">Expense breakdown</h2><p className="mt-1 text-sm text-slate-500">Recorded spending by category for the selected period.</p></div><span className="rounded-xl bg-amber-50 p-2.5 text-amber-700"><FileBarChart size={20} /></span></div>
+              <section className="report-breakdown-grid mb-6 grid gap-5 xl:grid-cols-[1.2fr_.8fr]">
+                <article className={`${panel} report-breakdown-card`}>
+                  <div className="report-section-heading mb-5 flex items-start justify-between gap-3"><div><h2 className="text-lg font-bold">Expense breakdown</h2><p className="mt-1 text-sm text-slate-500">Recorded spending by category for the selected period.</p></div><span className="rounded-xl bg-amber-50 p-2.5 text-amber-700"><FileBarChart size={20} /></span></div>
                   <div className="overflow-x-auto"><table className="w-full text-left text-sm"><thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500"><tr><th className="p-3">Expense category</th><th className="p-3 text-right">Amount</th><th className="p-3 text-right">Share</th></tr></thead><tbody>{categories.map(([name, value]) => <tr key={name} className="border-t border-slate-100"><td className="p-3">{name}</td><td className="p-3 text-right font-semibold tabular-nums">{money(value)}</td><td className="p-3 text-right tabular-nums">{spent > 0 ? ((value / spent) * 100).toFixed(1) : "0.0"}%</td></tr>)}{!categories.length && <tr><td colSpan={3} className="p-4 text-center text-slate-500">No expense records found for this period.</td></tr>}</tbody><tfoot className="border-t-2 border-slate-200 bg-slate-50"><tr><th className="p-3 text-left">Total recorded expenses</th><th className="p-3 text-right">{formatCurrencyTotals(reportExpenses)}</th><th className="p-3 text-right">100%</th></tr></tfoot></table></div>
                   <p className="mt-4 text-xs leading-5 text-slate-400">Source: expense records grouped by category and filtered by the reporting period. Supplier payments are not added to these totals.</p><Link href="/workspace/finance/expenses" className="mt-3 inline-block text-sm font-semibold text-[#F3192D] hover:underline">View expense records</Link>
                 </article>
 
-                <article className={panel}>
-                  <div className="mb-5"><h2 className="text-lg font-bold">Financial position</h2><p className="mt-1 text-sm text-slate-500">Cash movement summary for the selected period.</p></div>
+                <article className={`${panel} report-breakdown-card report-cash-position-card`}>
+                  <div className="report-section-heading mb-5"><h2 className="text-lg font-bold">Financial position</h2><p className="mt-1 text-sm text-slate-500">Cash movement summary for the selected period.</p></div>
                   <div className="overflow-x-auto"><table className="w-full text-left text-sm"><tbody><tr className="border-b border-slate-100"><th className="p-3 font-medium text-slate-600">Customer collections</th><td className="p-3 text-right font-bold">{formatCurrencyTotals(reportPayments)}</td></tr><tr className="border-b border-slate-100"><th className="p-3 font-medium text-slate-600">Supplier payments</th><td className="p-3 text-right font-bold">{formatCurrencyTotals(reportSupplierPayments)}</td></tr><tr className="border-b border-slate-100"><th className="p-3 font-medium text-slate-600">Net customer-to-supplier movement</th><td className={`p-3 text-right text-lg font-bold ${collected-supplierPaid>=0?"text-emerald-700":"text-rose-700"}`}>{money(collected-supplierPaid)}</td></tr></tbody></table></div>
                   <p className="mt-4 text-xs leading-5 text-slate-400">Source: customer payment records and direct sales receipts less supplier payment records. This is a cash-movement summary, not a complete balance sheet; other expenses, transfers, tax, assets and liabilities are not included.</p><div className="mt-3 flex flex-wrap gap-3 text-sm"><Link href="/workspace/finance/payments" className="font-semibold text-[#F3192D] hover:underline">Customer payments</Link><Link href="/workspace/finance/supplier-payments" className="font-semibold text-[#F3192D] hover:underline">Supplier payments</Link></div>
                 </article>
               </section>
 
-              <section className={`${panel} mb-6`}>
+              <details className={`${panel} report-supporting-schedule mb-6`}>
+                <summary className="report-schedule-summary">
+                  <span className="report-schedule-summary-copy"><strong>Owner income schedules</strong><small>Daily and monthly receipt breakdown</small></span>
+                  <span className="report-schedule-toggle">Expand schedule <span aria-hidden="true" className="report-schedule-chevron">⌄</span></span>
+                </summary>
+                <div className="report-schedule-content">
                 <div className="mb-4">
                   <h2 className="text-lg font-bold">Owner income received by day and month</h2>
                   <p className="mt-1 text-sm text-slate-500">Source: actual owner income and commission payment transactions, grouped by payment date and currency. Partial payments are included; only payments within the selected reporting period are included.</p><Link href="/workspace/finance/owner-income" className="mt-2 inline-block text-sm font-semibold text-[#F3192D] hover:underline">Open owner income records</Link>
@@ -782,10 +787,11 @@ export default function FinanceReportsPage() {
                     {!monthlyOwnerIncome.length && <p className="p-5 text-sm text-slate-500">No owner income receipts in this period.</p>}
                   </div>
                 </div>
-              </section>
+                </div>
+              </details>
 
-              <section className={`${panel} mb-6`}>
-                <div className="mb-4">
+              <section className={`${panel} report-profit-loss-panel mb-6`}>
+                <div className="report-section-heading mb-4">
                   <h2 className="text-lg font-bold">Management Statement of Profit and Loss</h2>
                   <p className="mt-1 text-sm text-slate-500">Source: invoice totals and standalone direct sales receipts, less expense records in the selected period, grouped by currency. Supplier payments are not subtracted again as expenses.</p><div className="mt-2 flex flex-wrap gap-3 text-sm"><Link href="/workspace/finance/invoices" className="font-semibold text-[#F3192D] hover:underline">Invoices</Link><Link href="/workspace/finance/sales-receipts" className="font-semibold text-[#F3192D] hover:underline">Sales receipts</Link><Link href="/workspace/finance/expenses" className="font-semibold text-[#F3192D] hover:underline">Expenses</Link></div>
                 </div>
