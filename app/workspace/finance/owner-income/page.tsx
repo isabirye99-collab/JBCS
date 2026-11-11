@@ -124,12 +124,12 @@ export default function OwnerIncomePage() {
   return <div className="min-h-screen bg-[#F7F8FA] text-slate-900">
     <FinanceSidebar activeHref="/workspace/finance/owner-income" />
 
-    <main className="min-h-screen md:ml-[264px]">
+    <main className="min-h-screen md:ml-[264px] jbcs-finance-consistent-main">
       <header className="sticky top-0 z-20 flex items-center justify-between gap-3 border-b border-slate-200 bg-white/95 px-4 py-4 backdrop-blur md:px-8">
         <div><Link href="/workspace/finance" className="mb-1 inline-flex items-center gap-1 text-xs font-semibold text-slate-500 hover:text-[#9f1d35]"><ArrowLeft size={14}/> Finance dashboard</Link><h1 className="text-xl font-bold tracking-tight md:text-2xl">Owner’s Income & Commissions</h1><p className="mt-1 text-sm text-slate-500">Track owner earnings, commissions and incoming payments.</p></div>
         <button onClick={() => { setEditingEntry(null); setEntryForm({ ...emptyEntry, earned_date: today() }); setMessage(""); setModal("entry"); }} className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-[#F3192D] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#c91527]"><Plus size={16}/> Add record</button>
       </header>
-      <section className="space-y-6 p-4 md:p-8">
+      <section className="finance-owner-income space-y-6 p-4 md:p-8">
         {message && <div role="alert" className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">{message}</div>}
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           <Summary title="Total records" value={String(entries.length)} detail="Owner income and commissions"/>
