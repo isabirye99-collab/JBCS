@@ -702,3 +702,10 @@ main.jbcs-finance-consistent-main input:focus,main.jbcs-finance-consistent-main 
 .finance-metric-card{border-color:var(--finance-line)!important;border-radius:var(--finance-radius-md)!important;box-shadow:var(--finance-shadow)!important}.finance-metric-card .rounded-xl{border-radius:10px}.finance-metric-card:hover{border-color:#f5bcc3!important}
 .jbcs-reports-page .report-chart-panel,.jbcs-reports-page .report-summary-card{border-color:var(--finance-line)!important;border-radius:var(--finance-radius-md)!important;box-shadow:var(--finance-shadow)!important}
 @media(max-width:767px){.jbcs-dashboard-page .dashboard-metric-card{padding:16px!important}.jbcs-dashboard-page .dashboard-chart-panel,.jbcs-dashboard-page .dashboard-insight-panel,.jbcs-dashboard-page .jbcs-dashboard-actions{padding:16px!important}}
+
+
+/* Responsive layout for the shared FinanceSidebar on Products & Services */
+.jbcs-products-redesign>.finance-app-main { margin-left:0!important; width:100%!important; min-width:0!important; }
+@media(min-width:768px) {
+  .jbcs-products-redesign>.finance-app-main { margin-left:264px!important; width:calc(100% - 264px)!important; }
+}
