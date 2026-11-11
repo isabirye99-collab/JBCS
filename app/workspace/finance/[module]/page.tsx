@@ -1,5 +1,4 @@
 import { redirect } from "next/navigation";
-import "../finance.css";
 import FinanceModule from "./FinanceModule";
 
 export default async function FinanceModulePage({
