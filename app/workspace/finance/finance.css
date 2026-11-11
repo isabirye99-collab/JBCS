@@ -773,3 +773,261 @@ main.jbcs-finance-consistent-main input:focus,main.jbcs-finance-consistent-main 
   .jbcs-dashboard-page .dashboard-chart-bar,
   .jbcs-dashboard-page .jbcs-dashboard-actions a{animation:none!important;transition:none!important;transform:none!important}
 }
+
+
+/* Reports workspace: clearer hierarchy, compact report links and readable tables. */
+.jbcs-reports-page .report-page-header{
+  align-items:center;
+  padding:0 0 22px;
+  border-bottom:1px solid #e4e7ec;
+}
+.jbcs-reports-page .report-page-title{
+  color:#25232a;
+  font-size:clamp(1.9rem,2.7vw,2.35rem);
+  line-height:1.12;
+  letter-spacing:-.045em;
+}
+.jbcs-reports-page .report-panel{
+  min-width:0;
+  padding:clamp(16px,1.5vw,22px)!important;
+  border-color:#e1e6ee!important;
+  border-radius:14px!important;
+  background:#fff!important;
+  box-shadow:0 1px 3px rgba(15,23,42,.035)!important;
+}
+.jbcs-reports-page .report-section-heading h2{
+  color:#252b36;
+  letter-spacing:-.02em;
+}
+.jbcs-reports-page .report-library-panel{
+  padding-bottom:19px!important;
+}
+.jbcs-reports-page .report-library-grid{
+  gap:10px;
+}
+.jbcs-reports-page .report-library-card{
+  min-height:78px;
+  align-items:center;
+  padding:12px!important;
+  border-color:#e5e9f0!important;
+  border-radius:11px!important;
+  background:#fff!important;
+}
+.jbcs-reports-page .report-library-card:hover{
+  background:#fff8f8!important;
+  border-color:#f4c5cb!important;
+  box-shadow:0 3px 10px rgba(159,29,53,.045);
+}
+.jbcs-reports-page .report-library-card > span:first-child{
+  width:38px;
+  height:38px;
+  border-radius:10px;
+}
+.jbcs-reports-page .report-period-panel{
+  background:linear-gradient(180deg,#fff 0%,#fcfcfd 100%)!important;
+}
+.jbcs-reports-page .report-date-input{
+  min-height:42px;
+  min-width:158px;
+  border-color:#dce2ea!important;
+  border-radius:9px!important;
+  transition:border-color .15s ease,box-shadow .15s ease;
+}
+.jbcs-reports-page .report-date-input:focus{
+  border-color:#f3192d!important;
+  box-shadow:0 0 0 3px rgba(243,25,45,.1)!important;
+  outline:none;
+}
+.jbcs-reports-page .report-period-preset{
+  min-height:42px;
+  border-color:#e1e6ee!important;
+  border-radius:9px!important;
+  background:#fff;
+  transition:background .15s ease,border-color .15s ease,color .15s ease;
+}
+.jbcs-reports-page .report-period-preset:hover{
+  border-color:#f4c5cb!important;
+  background:#fff4f5!important;
+}
+.jbcs-reports-page .report-kpi-grid{
+  align-items:stretch;
+}
+.jbcs-reports-page .report-kpi-card{
+  display:flex;
+  min-width:0;
+  min-height:142px;
+  flex-direction:column;
+  justify-content:space-between;
+  gap:12px;
+  padding:18px!important;
+  border-color:#e1e6ee!important;
+  border-radius:13px!important;
+  box-shadow:0 1px 3px rgba(15,23,42,.035)!important;
+}
+.jbcs-reports-page .report-kpi-value{
+  overflow-wrap:anywhere;
+  font-size:clamp(1.05rem,1.7vw,1.5rem);
+  line-height:1.3;
+  letter-spacing:-.035em;
+  font-variant-numeric:tabular-nums;
+}
+.jbcs-reports-page .report-summary-panel table,
+.jbcs-reports-page .report-breakdown-card table,
+.jbcs-reports-page .report-cash-position-card table,
+.jbcs-reports-page .report-profit-loss-panel table{
+  width:100%;
+  border-collapse:collapse;
+  font-variant-numeric:tabular-nums;
+}
+.jbcs-reports-page table thead th{
+  background:#f8fafc;
+  color:#667085;
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.055em;
+  white-space:nowrap;
+}
+.jbcs-reports-page table tbody tr{
+  transition:background-color .12s ease;
+}
+.jbcs-reports-page table tbody tr:hover{
+  background:#fbfcfe;
+}
+.jbcs-reports-page table td,
+.jbcs-reports-page table th{
+  vertical-align:middle;
+}
+.jbcs-reports-page .report-visual-grid,
+.jbcs-reports-page .report-breakdown-grid{
+  align-items:stretch;
+}
+.jbcs-reports-page .report-visual-card,
+.jbcs-reports-page .report-breakdown-card{
+  min-width:0;
+  height:100%;
+}
+.jbcs-reports-page .report-donut-wrap{
+  display:flex;
+  width:100%;
+  max-width:230px;
+  min-height:160px;
+  align-items:center;
+  justify-content:center;
+  margin-inline:auto;
+}
+.jbcs-reports-page .report-donut{
+  display:block;
+  width:100%;
+  max-width:220px;
+  height:auto;
+}
+.jbcs-reports-page .report-supporting-schedule{
+  padding:0!important;
+  overflow:hidden;
+}
+.jbcs-reports-page .report-schedule-summary{
+  display:flex;
+  min-height:82px;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  padding:18px 22px;
+  cursor:pointer;
+  list-style:none;
+  outline-offset:-3px;
+}
+.jbcs-reports-page .report-schedule-summary::-webkit-details-marker{
+  display:none;
+}
+.jbcs-reports-page .report-schedule-summary-copy strong{
+  display:block;
+  color:#252b36;
+  font-size:14px;
+  font-weight:750;
+}
+.jbcs-reports-page .report-schedule-summary-copy small{
+  display:block;
+  margin-top:4px;
+  color:#7a8493;
+  font-size:12px;
+}
+.jbcs-reports-page .report-schedule-toggle{
+  display:inline-flex;
+  flex-shrink:0;
+  align-items:center;
+  gap:8px;
+  color:#9f1d35;
+  font-size:12px;
+  font-weight:750;
+}
+.jbcs-reports-page .report-schedule-chevron{
+  display:inline-block;
+  font-size:18px;
+  line-height:1;
+  transition:transform .15s ease;
+}
+.jbcs-reports-page .report-supporting-schedule[open] .report-schedule-summary{
+  border-bottom:1px solid #e8edf3;
+}
+.jbcs-reports-page .report-supporting-schedule[open] .report-schedule-toggle{
+  color:#6b7280;
+}
+.jbcs-reports-page .report-supporting-schedule[open] .report-schedule-toggle::first-letter{
+  color:#6b7280;
+}
+.jbcs-reports-page .report-supporting-schedule[open] .report-schedule-chevron{
+  transform:rotate(180deg);
+}
+.jbcs-reports-page .report-schedule-content{
+  padding:clamp(16px,1.5vw,22px);
+}
+.jbcs-reports-page .report-profit-loss-panel > p:last-child{
+  border:1px solid #f8df9d;
+  line-height:1.6;
+}
+.jbcs-reports-page a:focus-visible,
+.jbcs-reports-page button:focus-visible,
+.jbcs-reports-page summary:focus-visible{
+  outline:2px solid #f3192d!important;
+  outline-offset:3px;
+}
+@media(max-width:767px){
+  .jbcs-reports-page .report-page-header{
+    align-items:flex-start;
+    padding-bottom:18px;
+  }
+  .jbcs-reports-page .report-page-title{
+    font-size:1.85rem;
+  }
+  .jbcs-reports-page .report-panel{
+    padding:15px!important;
+    border-radius:12px!important;
+  }
+  .jbcs-reports-page .report-library-card{
+    min-height:72px;
+  }
+  .jbcs-reports-page .report-kpi-card{
+    min-height:125px;
+    padding:15px!important;
+  }
+  .jbcs-reports-page .report-kpi-value{
+    font-size:clamp(1rem,4vw,1.35rem);
+  }
+  .jbcs-reports-page .report-schedule-summary{
+    min-height:76px;
+    padding:15px;
+  }
+  .jbcs-reports-page .report-schedule-toggle{
+    gap:4px;
+    font-size:11px;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  .jbcs-reports-page *,
+  .jbcs-reports-page *::before,
+  .jbcs-reports-page *::after{
+    scroll-behavior:auto!important;
+    animation:none!important;
+    transition:none!important;
+  }
+}
