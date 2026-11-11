@@ -782,11 +782,10 @@ export default function FinanceDashboardPage() {
                   {today}
                 </div>
                 <h2 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
-                  Welcome to your workspace
+                  Finance overview
                 </h2>
                 <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
-                  Keep track of customers, sales, outstanding invoices and
-                  business expenses from one place.
+                  A real-time summary of collections, invoices, expenses and cash movement.
                 </p>
               </div>
 
@@ -881,7 +880,7 @@ export default function FinanceDashboardPage() {
                     </div>
                     <SectionTitle title="Performance overview" subtitle="Collected sales compared with recorded expenses" />
                   </div>
-                  <span className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-500">Last 6 months</span>
+                  <span className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-500">Latest 6 months</span>
                 </div>
 
                 <div className="mt-6 flex flex-wrap items-center gap-4 text-xs font-medium text-slate-600">
