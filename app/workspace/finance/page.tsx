@@ -907,26 +907,10 @@ export default function FinanceDashboardPage() {
               </div>
             )}
 
-            <section className="grid gap-4 sm:grid-cols-2 2xl:grid-cols-5">
-              <MetricCard
-                title="Total customers"
-                value={
-                  loading && customers.length === 0
-                    ? "—"
-                    : customers.length.toLocaleString("en-UG")
-                }
-                detail="Customers registered in your workspace"
-                icon={Users}
-                tone="blue"
-                href="/workspace/finance/customers"
-              />
+            <section aria-label="Key financial indicators" className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
               <MetricCard
                 title="Outstanding invoices"
-                value={
-                  loading && invoices.length === 0
-                    ? "—"
-                    : money(stats.outstanding)
-                }
+                value={loading && invoices.length === 0 ? "—" : money(stats.outstanding)}
                 detail={`${stats.overdueCount} overdue invoice${stats.overdueCount === 1 ? "" : "s"}`}
                 icon={CircleDollarSign}
                 tone="amber"
@@ -934,11 +918,7 @@ export default function FinanceDashboardPage() {
               />
               <MetricCard
                 title="Sales collected this month"
-                value={
-                  loading && invoices.length === 0
-                    ? "—"
-                    : money(stats.monthlySales)
-                }
+                value={loading && invoices.length === 0 ? "—" : money(stats.monthlySales)}
                 detail="Invoice payments and direct sales receipts recorded this month"
                 icon={ChartNoAxesCombined}
                 tone="green"
@@ -946,28 +926,22 @@ export default function FinanceDashboardPage() {
               />
               <MetricCard
                 title="Expenses this month"
-                value={
-                  loading && expenses.length === 0
-                    ? "—"
-                    : money(stats.monthlyExpenses)
-                }
+                value={loading && expenses.length === 0 ? "—" : money(stats.monthlyExpenses)}
                 detail="Expense records only; supplier payments are shown separately"
                 icon={Wallet}
                 tone="purple"
                 href="/workspace/finance/expenses"
               />
-              {(planKey === "pro" || isSuperAdmin) && <MetricCard
-                title="Supplier payments this month"
-                value={
-                  loading && supplierPayments.length === 0
-                    ? "—"
-                    : money(stats.monthlySupplierPayments)
-                }
-                detail="Cash paid to suppliers this month; open the supplier payment register for details"
-                icon={CreditCard}
-                tone="amber"
-                href="/workspace/finance/supplier-payments"
-              />}
+              {(planKey === "pro" || isSuperAdmin) && (
+                <MetricCard
+                  title="Supplier payments this month"
+                  value={loading && supplierPayments.length === 0 ? "—" : money(stats.monthlySupplierPayments)}
+                  detail="Cash paid to suppliers this month"
+                  icon={CreditCard}
+                  tone="amber"
+                  href="/workspace/finance/supplier-payments"
+                />
+              )}
             </section>
 
             <section className="grid gap-6 xl:grid-cols-[1.5fr_1fr]">
@@ -1065,17 +1039,18 @@ export default function FinanceDashboardPage() {
                 <div>
                   <p className="text-[11px] font-bold uppercase tracking-[.16em] text-[#F3192D]">Quick actions</p>
                   <h2 className="mt-1 text-lg font-bold tracking-tight text-slate-900">Get things done</h2>
-                  <p className="mt-1 text-sm text-slate-500">Shortcuts to your most-used finance tasks.</p>
+                  <p className="mt-1 text-sm text-slate-500">Jump straight to a common finance task.</p>
                 </div>
                 {(planKey === "pro" || isSuperAdmin) && <Link href="/workspace/finance/reports" className="inline-flex items-center gap-2 text-sm font-semibold text-[#9f1d35] hover:underline">Open financial reports <ArrowRight size={15} /></Link>}
               </div>
               <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                 {[
-                  { title: "Create an invoice", description: "Bill a customer", icon: FilePlus2, href: "/workspace/finance/invoices", tone: "bg-rose-50 text-[#F3192D]" },
-                  { title: "Add a customer", description: "Register a client", icon: Users, href: "/workspace/finance/customers", tone: "bg-emerald-50 text-emerald-700" },
+                  { title: "Record a payment", description: "Register customer money received", icon: CreditCard, href: "/workspace/finance/payments", tone: "bg-rose-50 text-[#F3192D]" },
                   { title: "Record an expense", description: "Track business spending", icon: Wallet, href: "/workspace/finance/expenses", tone: "bg-amber-50 text-amber-700" },
-                  { title: "Owner income & commissions", description: "Manage owner records", icon: CircleDollarSign, href: "/workspace/finance/owner-income", tone: "bg-slate-100 text-slate-700" },
-                ].filter((action) => isSuperAdmin || planKey === "pro" || action.title !== "Owner income & commissions").map((action) => {
+                  { title: "Manage customers", description: "Open your customer register", icon: Users, href: "/workspace/finance/customers", tone: "bg-emerald-50 text-emerald-700" },
+                  { title: "Supplier payments", description: "Review and record supplier payments", icon: CreditCard, href: "/workspace/finance/supplier-payments", tone: "bg-slate-100 text-slate-700", pro: true },
+                  { title: "Owner income & commissions", description: "Manage owner records", icon: CircleDollarSign, href: "/workspace/finance/owner-income", tone: "bg-slate-100 text-slate-700", pro: true },
+                ].filter((action) => !action.pro || isSuperAdmin || planKey === "pro").map((action) => {
                   const Icon = action.icon;
                   return <Link key={action.title} href={action.href} className="group flex min-w-0 items-center gap-3 rounded-xl border border-slate-200 p-3.5 transition hover:border-rose-200 hover:bg-rose-50/40">
                     <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${action.tone}`}><Icon size={19} /></span>
