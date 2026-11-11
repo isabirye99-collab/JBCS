@@ -424,14 +424,14 @@ export default function InvoicesPage() {
     <div className="min-h-screen bg-[#F7F8FA] text-slate-900">
       <FinanceSidebar activeHref="/workspace/finance/invoices" />
 
-      <main className="min-w-0 flex-1 px-4 py-5 sm:px-6 lg:px-8 md:ml-[264px] jbcs-finance-consistent-main">
+      <main className="jbcs-invoices-page min-w-0 flex-1 px-4 py-5 sm:px-6 lg:px-8 md:ml-[264px] jbcs-finance-consistent-main">
         
         <div className="mx-auto max-w-[1440px] space-y-6">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <Link href="/workspace/finance" className="text-sm font-semibold text-slate-500 hover:text-[#F3192D]">← Finance overview</Link>
             <div className="mt-4 flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#F3192D] text-lg font-black text-white shadow-sm">J</div>
+              <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-xl border border-rose-100 bg-white p-1.5 shadow-sm"><img src="/johden-logo.svg" alt="Johden" className="h-full w-full object-contain" /></div>
               <div><p className="text-xs font-bold uppercase tracking-[.18em] text-[#F3192D]">Johden Business Suite</p><h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Invoices</h1></div>
             </div>
             <p className="mt-2 max-w-2xl text-sm text-slate-500">Create professional invoices, review outstanding balances and keep your customer billing organised.</p>
@@ -502,7 +502,7 @@ export default function InvoicesPage() {
           <div className="flex flex-wrap justify-end gap-3 border-t border-slate-100 pt-4"><button type="button" onClick={() => { setShowForm(false); setEditingInvoiceId(null); }} className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700">Cancel</button><button type="submit" disabled={saving || customers.length === 0} className="rounded-xl bg-[#F3192D] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#CF1022] disabled:cursor-not-allowed disabled:opacity-60">{saving ? "Saving invoice…" : editingInvoiceId ? "Save changes" : "Save invoice"}</button></div>
         </form>}
 
-        <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <section className="jbcs-invoices-register overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
           <div className="flex flex-col gap-3 border-b border-slate-200 bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
             <div><h2 className="text-lg font-bold">All Invoices <span className="text-sm font-medium text-slate-400">({filteredInvoices.length})</span></h2><p className="mt-1 text-xs text-slate-500">Select an invoice to preview its details and actions.</p></div>
             <div className="flex flex-wrap gap-2">
