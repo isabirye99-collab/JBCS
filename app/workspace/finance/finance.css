@@ -733,8 +733,7 @@ main.jbcs-finance-consistent-main input:focus,main.jbcs-finance-consistent-main 
   box-shadow:0 8px 22px rgba(15,23,42,.07)!important;
   transform:translateY(-2px)!important;
 }
-.jbcs-dashboard-page .dashboard-metric-card .text-2xl,
-.jbcs-dashboard-page .dashboard-metric-card .sm\\:text-3xl{
+.jbcs-dashboard-page .dashboard-metric-card .text-2xl{
   font-variant-numeric:tabular-nums;
   letter-spacing:-.035em;
 }
