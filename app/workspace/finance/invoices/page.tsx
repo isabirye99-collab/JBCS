@@ -460,7 +460,7 @@ export default function InvoicesPage() {
           </section>
         </div>}
 
-        {showForm && <form onSubmit={createInvoice} className="space-y-5 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+        {showForm && <form onSubmit={createInvoice} className="jbcs-invoice-entry space-y-5 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
           <div className="flex flex-wrap items-start justify-between gap-3 border-b border-slate-100 pb-4">
             <div><h2 className="text-xl font-bold">{editingInvoiceId ? "Edit invoice" : "New invoice"}</h2><p className="mt-1 text-sm text-slate-500">{editingInvoiceId ? "Update invoice details. Invoices with recorded payments are protected." : "Choose a customer and add services from your catalogue or enter a custom line."}</p></div>
             <span className="rounded-full bg-rose-50 px-3 py-1 text-xs font-bold text-[#A80D1B]">Currency: {currency}</span>
