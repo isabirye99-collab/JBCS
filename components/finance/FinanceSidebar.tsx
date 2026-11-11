@@ -26,7 +26,7 @@ type FinanceSidebarProps = {
 };
 
 const navigation = [
-  { label: "Dashboard", href: "/workspace/finance", icon: LayoutDashboard },
+  { label: "Overview", href: "/workspace/finance", icon: LayoutDashboard },
   { label: "Invoices", href: "/workspace/finance/invoices", icon: FileText },
   { label: "Quotations", href: "/workspace/finance/quotes", icon: FileCheck },
   { label: "Payments", href: "/workspace/finance/payments", icon: CreditCard },
