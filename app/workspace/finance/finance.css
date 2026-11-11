@@ -1840,7 +1840,7 @@ main.jbcs-finance-page.jbcs-supplier-payments-page{
   border-radius:10px!important;
   box-shadow:0 3px 8px rgba(243,25,45,.10);
 }
-.jbcs-customers-page .max-w-\\[1500px\\] > div:first-child h2{
+.jbcs-customers-page .jbcs-customers-content > div:first-child h2{
   color:#25232a;
   font-size:clamp(1.8rem,2.6vw,2.2rem);
   line-height:1.15;
@@ -1903,7 +1903,7 @@ main.jbcs-finance-page.jbcs-supplier-payments-page{
   border-radius:10px;
   padding:14px;
 }
-.jbcs-customers-page .jbcs-customer-quick-access button[class*="bg-"]{
+.jbcs-customers-page .jbcs-customer-quick-access button[class*="border-[#F3192D]"]{
   background:#fff4f5!important;
   border-color:#f4c5cb!important;
 }
