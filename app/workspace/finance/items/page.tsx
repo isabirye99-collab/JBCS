@@ -1,5 +1,7 @@
 "use client";
 
+import FinanceSidebar from "@/components/finance/FinanceSidebar";
+
 import Link from "next/link";
 import {
   Home, Users, Package, FileText, FileCheck, Receipt, ArrowLeftRight,
@@ -231,15 +233,10 @@ export default function ProductsServicesPage() {
     finally { setBusy(false); if (fileRef.current) fileRef.current.value = ""; }
   }
 
-  return <div className="finance-shell jbcs-products-redesign">
-    <aside className="finance-side-rail">
-      <Link href="/workspace/finance" className="finance-side-brand jbcs-product-brand" aria-label="Johden Business Suite home"><span className="jbcs-product-brand-mark"><img src="/johden-logo.svg" alt="" /></span><span className="jbcs-product-brand-copy"><strong>JOHDEN</strong><small>Business Consultancy &amp; Finance</small></span></Link>
-      <div className="finance-side-label">FINANCE WORKSPACE</div>
-      <nav className="finance-side-nav" aria-label="Finance navigation">{NAV.map((item) => { const Icon = item.icon; const active = item.href === "/workspace/finance/items"; return <Link key={item.href} href={item.href} className={active ? "selected" : ""} aria-current={active ? "page" : undefined}><Icon size={16} strokeWidth={1.9} /><span>{item.label}</span></Link>; })}</nav>
-      <div className="finance-side-bottom" style={{ marginTop: "auto", borderTop: "1px solid #484348", padding: "16px 10px 0", color: "#bcb5bb", fontSize: 11, lineHeight: 1.6 }}>Johden Business Suite<br />Finance &amp; Billing</div>
-    </aside>
+  return <div className="min-h-screen bg-[#F7F8FA] jbcs-products-redesign">
+    <FinanceSidebar activeHref="/workspace/finance/items" />
 
-    <main className="finance-app-main jbcs-finance-consistent-main" style={{ flex: 1, minWidth: 0 }}>
+    <main className="finance-app-main md:ml-[264px] jbcs-finance-consistent-main" style={{ flex: 1, minWidth: 0 }}>
       <div className="inner-content" style={{ padding: "24px clamp(14px, 2.6vw, 38px) 48px" }}>
         <div className="jbcs-finance-top"><span>JOHDEN BUSINESS SUITE / FINANCE</span><Link href="/workspace/finance">Back to Finance overview</Link></div>
         <header className="jbcs-finance-heading"><div><p className="jbcs-eyebrow">CATALOGUE MANAGEMENT</p><h1>Products &amp; Services</h1><p>Manage the products and services available for quotes and invoices.</p></div><div className="jbcs-page-actions"><button type="button" className="jbcs-secondary-button" onClick={() => { setImportOpen((v) => !v); setFormOpen(false); }}><Upload size={15} style={{ marginRight: 7 }} />Import CSV</button><button type="button" className="jbcs-primary-button" onClick={startNew}><Plus size={16} style={{ marginRight: 7 }} />Add product or service</button></div></header>

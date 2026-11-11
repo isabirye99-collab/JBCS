@@ -1,6 +1,8 @@
 
 "use client";
 
+import FinanceSidebar from "@/components/finance/FinanceSidebar";
+
 import Link from "next/link";
 import {
   useCallback,
@@ -375,74 +377,10 @@ export default function CustomersPage() {
 
   return (
     <div className="min-h-screen bg-[#F7F8FA] text-slate-800">
-      <div className="flex min-h-screen">
-        <aside className="hidden w-[250px] shrink-0 border-r border-slate-200 bg-white lg:flex lg:flex-col">
-          <Link
-            href="/workspace/finance"
-            className="flex items-center gap-3 border-b border-slate-100 px-6 py-6"
-          >
-            <span className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-[#f5dfe2] bg-white">
-              <img
-                src="/johden-logo.svg"
-                alt="Johden logo"
-                className="h-full w-full object-contain"
-              />
-            </span>
+      <div className="flex min-h-screen flex-col">
+        <FinanceSidebar activeHref="/workspace/finance/customers" />
 
-            <span>
-              <span className="block text-sm font-extrabold tracking-wide text-slate-900">
-                JOHDEN
-              </span>
-              <span className="block text-xs text-slate-500">
-                Business Consultancy &amp; Finance
-              </span>
-            </span>
-          </Link>
-
-          <div className="px-4 pt-6">
-            <p className="px-3 pb-3 text-[10px] font-bold tracking-[0.18em] text-slate-400">
-              WORKSPACE
-            </p>
-
-            <nav className="space-y-1 overflow-y-auto">
-              {navigation.map((item) => {
-                const Icon = item.icon;
-                const active = item.label === "Customers";
-
-                return (
-                  <Link
-                    key={item.label}
-                    href={item.href}
-                    className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition ${
-                      active
-                        ? "bg-[#FDE8EA] text-[#A80D1B]"
-                        : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-                    }`}
-                  >
-                    <Icon size={18} />
-                    {item.label}
-                    {active && (
-                      <ChevronRight className="ml-auto" size={16} />
-                    )}
-                  </Link>
-                );
-              })}
-            </nav>
-          </div>
-
-          <div className="mt-auto border-t border-slate-100 p-5">
-            <div className="rounded-xl bg-slate-50 p-3">
-              <p className="text-xs font-semibold text-slate-700">
-                Johden Business Suite
-              </p>
-              <p className="mt-1 text-xs leading-5 text-slate-500">
-                Customer records, invoices and finance in one place.
-              </p>
-            </div>
-          </div>
-        </aside>
-
-        <main className="min-w-0 flex-1 jbcs-finance-consistent-main">
+        <main className="min-w-0 flex-1 md:ml-[264px] jbcs-finance-consistent-main">
           <header className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-200 bg-white/95 px-4 py-4 backdrop-blur sm:px-7 lg:px-9">
             <div className="flex items-center gap-3">
               <Link
