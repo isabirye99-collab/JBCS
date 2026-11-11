@@ -337,7 +337,7 @@ function MetricCard({
   value: string;
   detail: string;
   icon: typeof Users;
-  tone: "blue" | "green" | "amber" | "purple";
+  tone: "blue" | "green" | "amber" | "purple" | "orange" | "slate";
   href?: string;
 }) {
   const tones = {
@@ -345,6 +345,8 @@ function MetricCard({
     green: "bg-emerald-50 text-emerald-700",
     amber: "bg-amber-50 text-amber-700",
     purple: "bg-violet-50 text-violet-700",
+    orange: "bg-orange-50 text-orange-700",
+    slate: "bg-slate-100 text-slate-700",
   };
 
   const card = (
@@ -723,8 +725,8 @@ export default function FinanceDashboardPage() {
                   <p className="text-xs font-medium text-slate-500">
                     Johden Business Consultancy Services
                   </p>
-                  <h1 className="truncate text-lg font-bold tracking-tight sm:text-xl">
-                    Dashboard
+                  <h1 className="dashboard-topbar-title truncate font-bold tracking-tight">
+                    Financial Overview
                   </h1>
                 </div>
               </div>
@@ -782,10 +784,10 @@ export default function FinanceDashboardPage() {
                   {today}
                 </div>
                 <h2 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
-                  Finance overview
+                  Business at a glance
                 </h2>
                 <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
-                  A real-time summary of collections, invoices, expenses and cash movement.
+                  See what has been collected, what is outstanding, and where cash is going.
                 </p>
               </div>
 
@@ -856,7 +858,7 @@ export default function FinanceDashboardPage() {
                 value={loading && expenses.length === 0 ? "—" : money(stats.monthlyExpenses)}
                 detail="Expense records only; supplier payments are shown separately"
                 icon={Wallet}
-                tone="purple"
+                tone="orange"
                 href="/workspace/finance/expenses"
               />
               {(planKey === "pro" || isSuperAdmin) && (
@@ -865,7 +867,7 @@ export default function FinanceDashboardPage() {
                   value={loading && supplierPayments.length === 0 ? "—" : money(stats.monthlySupplierPayments)}
                   detail="Cash paid to suppliers this month"
                   icon={CreditCard}
-                  tone="amber"
+                  tone="slate"
                   href="/workspace/finance/supplier-payments"
                 />
               )}
@@ -996,7 +998,7 @@ export default function FinanceDashboardPage() {
                       hour: "2-digit",
                       minute: "2-digit",
                     })}`
-                  : "Dashboard"}
+                  : "Financial overview"}
               </p>
             </footer>
           </div>
@@ -1041,7 +1043,7 @@ export default function FinanceDashboardPage() {
                   key={item.label}
                   href={item.href}
                   className={`flex flex-col items-center gap-1 rounded-lg py-2 text-[10px] font-medium ${
-                    item.label === "Dashboard"
+                    item.label === "Home"
                       ? "text-[#F3192D]"
                       : "text-slate-500 hover:text-slate-900"
                   }`}
