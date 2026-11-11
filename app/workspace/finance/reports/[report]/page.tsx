@@ -1,5 +1,8 @@
 "use client";
 
+import FinanceSidebar from "@/components/finance/FinanceSidebar";
+import "../../finance.css";
+
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
@@ -161,35 +164,30 @@ export default function FinanceReportDetailPage() {
 
   return (
     <div className="min-h-screen bg-[#F7F8FA] text-slate-900">
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-[264px] flex-col border-r border-slate-200 bg-white md:flex">
-        <Link href="/workspace/finance" className="flex min-h-[98px] items-center gap-3 border-b border-slate-100 px-4">
-          <span className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-xl border border-[#f5dfe2] bg-white"><img src="/johden-logo.svg" alt="Johden logo" className="h-full w-full object-contain" /></span>
-          <span><span className="block font-bold tracking-wide">JOHDEN</span><span className="mt-0.5 block text-xs text-slate-500">Business Consultancy & Finance</span></span>
-        </Link>
-        <div className="px-4 pb-2 pt-7 text-[10px] font-bold uppercase tracking-[.2em] text-slate-400">Finance & Billing</div>
-        <nav className="flex-1 space-y-1 overflow-y-auto px-2 pb-4">
-          {[
-            { label: "Overview", href: "/workspace/finance", icon: FileBarChart },
-            { label: "Invoices", href: "/workspace/finance/invoices", icon: FileText },
-            { label: "Quotations", href: "/workspace/finance/quotes", icon: FileText },
-            { label: "Payments & Receipts", href: "/workspace/finance/payments", icon: Receipt },
-            { label: "Expenses", href: "/workspace/finance/expenses", icon: Wallet },
-            { label: "Supplier Payments", href: "/workspace/finance/supplier-payments", icon: CreditCard },
-            { label: "Owner Income & Commissions", href: "/workspace/finance/owner-income", icon: Wallet },
-            { label: "Customers", href: "/workspace/finance/customers", icon: UsersRound },
-            { label: "Products & Services", href: "/workspace/finance/items", icon: FileText },
-            { label: "Reports", href: "/workspace/finance/reports", icon: FileBarChart },
-          ].map(item => {
-            const Icon = item.icon;
-            return <Link key={item.href} href={item.href} className={item.href === "/workspace/finance/reports" ? "flex items-center gap-3 rounded-xl bg-rose-50 px-3 py-3 text-sm font-semibold text-[#F3192D]" : "flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50"}><Icon size={18} />{item.label}</Link>;
-          })}
-          <div className="ml-5 border-l border-slate-200 pl-3">
-            {reportOptions.map(item => <Link key={item.slug} href={`/workspace/finance/reports/${item.slug}`} className={item.slug === report.slug ? "block rounded-lg bg-rose-50 px-3 py-2 text-xs font-semibold text-[#F3192D]" : "block rounded-lg px-3 py-2 text-xs text-slate-600 hover:bg-slate-50"}>{item.title}</Link>)}
-          </div>
-        </nav>
-      </aside>
+      <FinanceSidebar activeHref="/workspace/finance/reports" />
 
-      <main className="min-h-screen px-4 pb-10 pt-5 md:ml-[264px] md:px-8">
+      <main className="min-h-screen px-4 pb-10 pt-5 md:ml-[264px] md:px-8 jbcs-finance-consistent-main">
+        <nav aria-label="Report type navigation" className="mb-5 flex max-w-full gap-2 overflow-x-auto pb-2">
+          {reportOptions.map((item) => {
+            const active = item.slug === report.slug;
+            return (
+              <Link
+                key={item.slug}
+                href={`/workspace/finance/reports/${item.slug}`}
+                aria-current={active ? "page" : undefined}
+                title={item.description}
+                className={`shrink-0 rounded-lg border px-3 py-2 text-xs font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F3192D] ${
+                  active
+                    ? "border-[#F3192D] bg-[#F3192D] text-white"
+                    : "border-slate-200 bg-white text-slate-700 hover:border-rose-200 hover:text-[#C91024]"
+                }`}
+              >
+                {item.title}
+              </Link>
+            );
+          })}
+        </nav>
+        
         <div className="mb-6 flex items-center justify-between gap-3">
           <Link href="/workspace/finance/reports" className="inline-flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-[#F3192D]"><ArrowLeft size={17} /> Reports & Analytics</Link>
           <button type="button" onClick={exportCSV} className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold shadow-sm"><Download size={16} /> Export CSV</button>
