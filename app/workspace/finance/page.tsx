@@ -363,9 +363,6 @@ function MetricCard({
         </div>
       </div>
       <p className="mt-4 text-xs leading-5 text-slate-500">{detail}</p>
-      <div className="dashboard-metric-glow mt-4 h-1 overflow-hidden rounded-full bg-slate-100">
-        <div className={`dashboard-metric-glow-fill h-full rounded-full ${tone === "green" ? "bg-emerald-500" : tone === "amber" ? "bg-amber-500" : tone === "purple" ? "bg-violet-500" : "bg-[#F3192D]"}`} />
-      </div>
     </div>
   );
   return href ? <Link href={href} aria-label={`Open ${title}`} className="block h-full rounded-2xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F3192D]">{card}</Link> : card;
