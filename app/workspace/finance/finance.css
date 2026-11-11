@@ -1,684 +1,1101 @@
-/* JBCS billing workspace visual refinement — scoped to the private finance page */
-.invoice-product-page{background:#f7f7f9;color:#282428}
-.invoice-product-page>.site-header{padding:0 clamp(18px,4vw,64px);height:76px;box-shadow:0 2px 12px #30232805}
-.invoice-product-page>.site-header .brand{font-size:13px;letter-spacing:.025em;white-space:nowrap}
-.invoice-product-page>.site-header .desktop-nav{gap:clamp(12px,2vw,26px);font-size:12px}
-.invoice-product-page>.invoice-product-hero{padding:clamp(32px,5vw,62px) clamp(20px,6vw,88px);display:grid;grid-template-columns:minmax(0,1.1fr) minmax(240px,.8fr);gap:32px;align-items:center;background:linear-gradient(120deg,#fff7f5 0%,#fff 55%,#fff0ed 100%);border-bottom:1px solid #f0e3e4}
-.invoice-product-page .invoice-hero-copy{max-width:700px}
-.invoice-product-page .invoice-product-hero h1{font-size:clamp(34px,4.2vw,56px);line-height:1.12;letter-spacing:-.05em;margin:18px 0}
-.invoice-product-page .invoice-product-hero p{font-size:15px;line-height:1.85;max-width:620px}
-.invoice-product-page .invoice-hero-art{max-width:420px;justify-self:center;width:100%;position:relative}
-.invoice-product-page .invoice-hero-art svg{width:100%;height:auto;display:block;filter:drop-shadow(0 12px 20px #5c18200b)}
-.invoice-product-page .invoice-art-caption{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid #f0e5e5;border-radius:10px;padding:12px 15px;box-shadow:0 8px 24px #3023280b;max-width:260px;margin:-10px 0 0 auto;position:relative}
-.invoice-product-page .invoice-art-caption>span{display:grid;place-items:center;width:32px;height:32px;background:#eaf8ef;color:#218650;border-radius:50%;font-weight:800}
-.invoice-product-page .invoice-art-caption b,.invoice-product-page .invoice-art-caption small{display:block}
-.invoice-product-page .invoice-art-caption b{font-size:12px}
-.invoice-product-page .invoice-art-caption small{font-size:10px;color:#817981}
-.invoice-product-page>.inner-content{max-width:1500px;margin:auto;padding:clamp(24px,4vw,52px) clamp(16px,5vw,70px) 70px}
-.invoice-product-page .invoice-feature-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
-.invoice-product-page .invoice-feature-card{background:#fff;border:1px solid #eae6e8;border-radius:12px;padding:23px;box-shadow:0 5px 20px #30232806;min-width:0}
-.invoice-product-page .invoice-feature-card h3{font:800 18px/1.35 Manrope,sans-serif;letter-spacing:-.025em;margin:0 0 14px}
-.invoice-product-page .invoice-feature-card p{font-size:13px;color:#716a72;line-height:1.7}
-.invoice-product-page .invoice-feature-number{font-size:10px;letter-spacing:.12em;font-weight:800;color:#8a8089}
-.invoice-product-page .invoice-feature-card>h3:not(:first-child){margin-top:10px}
-.invoice-product-page .invoice-feature-card .admin-client-form{display:grid;gap:13px}
-.invoice-product-page .admin-client-form label,.invoice-product-page label{display:grid;gap:6px;font-size:12px;font-weight:700;color:#494249;min-width:0}
-.invoice-product-page .admin-client-form input,.invoice-product-page .admin-client-form select,.invoice-product-page input,.invoice-product-page select{width:100%;min-width:0;min-height:42px;padding:10px 12px;border:1px solid #e3dcdf;border-radius:7px;background:#fff;color:#292429;outline:none}
-.invoice-product-page input:focus,.invoice-product-page select:focus{border-color:#9f1d35;box-shadow:0 0 0 3px #9f1d3512}
-.invoice-product-page .admin-client-form button,.invoice-product-page table button{border:0;border-radius:7px;background:#9f1d35;color:#fff;padding:11px 14px;font-size:12px;font-weight:800;cursor:pointer}
-.invoice-product-page button:disabled{opacity:.55;cursor:not-allowed}
-.invoice-product-page .invoice-list-panel,.invoice-product-page #expense-list{border:1px solid #eae6e8!important;border-radius:12px!important;padding:clamp(15px,2.5vw,26px)!important;box-shadow:0 5px 22px #30232806}
-.invoice-product-page .invoice-list-heading{display:flex;justify-content:space-between;align-items:flex-end;gap:18px;flex-wrap:wrap;margin-bottom:18px}
-.invoice-product-page .invoice-list-heading h2{font:800 28px/1.2 Manrope,sans-serif;letter-spacing:-.04em;margin:8px 0}
-.invoice-product-page .invoice-list-heading p{font-size:12px;color:#716a72;margin:0}
-.invoice-product-page .invoice-list-heading input{max-width:310px}
-.invoice-product-page table{min-width:650px;border-collapse:separate!important;border-spacing:0!important}
-.invoice-product-page table th{background:#faf8f9;color:#827982;font-size:10px;letter-spacing:.07em;text-transform:uppercase;font-weight:800}
-.invoice-product-page table th,.invoice-product-page table td{border-bottom:1px solid #eee9ec;padding:13px 12px!important;font-size:12px;vertical-align:middle}
-.invoice-product-page table tbody tr:hover{background:#fff9f8}
-.invoice-product-page table a{color:#81172b;font-weight:800;white-space:nowrap}
-.invoice-product-page #overview{margin-bottom:22px!important}
-.invoice-product-page #overview h2{font-size:clamp(25px,3vw,34px)!important;letter-spacing:-.04em}
-.invoice-product-page .admin-error,.invoice-product-page .admin-success{padding:12px 15px;border-radius:8px;font-size:12px}
-.invoice-product-page .admin-error{background:#fff0f1;color:#a81122;border:1px solid #f6cbd0}
-.invoice-product-page .admin-success{background:#edf9f0;color:#176c3b;border:1px solid #c9ebd2}
-.invoice-product-page #expense-list h2{font:800 22px Manrope,sans-serif;margin:0 0 15px}
-.invoice-product-page>.site-footer{background:#fff;border-top:1px solid #eee8ea}
-@media(max-width:850px){.invoice-product-page>.invoice-product-hero{grid-template-columns:1fr}.invoice-product-page .invoice-hero-art{max-width:340px}.invoice-product-page .invoice-feature-grid{grid-template-columns:1fr}.invoice-product-page>.site-header{height:auto;min-height:70px;flex-wrap:wrap;padding:12px 18px}.invoice-product-page>.site-header .desktop-nav{order:3;width:100%;overflow:auto}.invoice-product-page .invoice-list-heading input{max-width:none;width:100%}}
-@media(max-width:520px){.invoice-product-page .invoice-feature-card{padding:17px}.invoice-product-page .invoice-product-hero h1{font-size:36px}.invoice-product-page .invoice-art-caption{margin-top:-2px}.invoice-product-page #overview{align-items:flex-start!important}.invoice-product-page #overview>.button{width:100%}}
+
+"use client";
+
+import FinanceSidebar from "@/components/finance/FinanceSidebar";
 
 
-/* Finance application layout refresh: compact accounting workspace, not a marketing landing page */
-.invoice-product-page{background:#f5f6f8!important;color:#29252a}
-.invoice-product-page>.site-header{height:68px;position:sticky;top:0;z-index:30;background:#fff;border-bottom:1px solid #e7e8ec;padding:0 clamp(16px,3vw,42px);box-shadow:0 2px 8px #1e293b08}
-.invoice-product-page>.site-header .brand{font-size:13px;font-weight:800;letter-spacing:.04em}
-.invoice-product-page>.site-header .desktop-nav{gap:6px;font-size:12px}
-.invoice-product-page>.site-header .desktop-nav a{padding:9px 12px;border-radius:7px;color:#5d5961}
-.invoice-product-page>.site-header .desktop-nav a:hover,.invoice-product-page>.site-header .desktop-nav a:focus{background:#fff0f1;color:#81172b}
-.invoice-product-page>.site-header .button{padding:9px 13px;border-radius:7px}
-.invoice-product-page>.invoice-product-hero{display:none!important}
-.invoice-product-page>.inner-content{max-width:1600px;margin:0 auto;padding:30px clamp(16px,3vw,42px) 64px}
-.invoice-product-page #overview{background:transparent;margin-bottom:20px!important;align-items:center}
-.invoice-product-page #overview .eyebrow{font-size:9px}
-.invoice-product-page #overview h2{font-size:clamp(25px,2.5vw,34px)!important;margin-top:5px!important;color:#29252a}
-.invoice-product-page #overview>.button{border-radius:7px;padding:11px 16px}
-.invoice-product-page .invoice-feature-grid{gap:16px}
-.invoice-product-page .invoice-feature-card{border:1px solid #e5e7eb;border-radius:11px;padding:20px;background:#fff;box-shadow:0 2px 7px #20283805}
-.invoice-product-page .invoice-feature-card h3{font-size:25px;line-height:1.25;margin:8px 0 5px;color:#29252a}
-.invoice-product-page .invoice-feature-card p{font-size:12px;line-height:1.6;margin:0;color:#77717a}
-.invoice-product-page .invoice-feature-number{font-size:9px;letter-spacing:.1em;color:#77717a}
-.invoice-product-page .invoice-feature-grid#customers{align-items:start}
-.invoice-product-page #customers .invoice-feature-card h3{font-size:18px;margin:0 0 17px}
-.invoice-product-page .invoice-feature-card .admin-client-form{gap:14px}
-.invoice-product-page .admin-client-form label,.invoice-product-page label{font-size:12px;color:#464149}
-.invoice-product-page input,.invoice-product-page select,.invoice-product-page textarea{border:1px solid #dfe2e7;border-radius:7px;min-height:42px;padding:10px 12px;font-size:12px}
-.invoice-product-page .admin-client-form button,.invoice-product-page table button{border-radius:7px;padding:11px 15px;background:#9f1d35;color:#fff}
-.invoice-product-page .invoice-list-panel,.invoice-product-page #expense-list{margin-top:22px!important;background:#fff;border:1px solid #e5e7eb!important;border-radius:11px!important;padding:22px!important;box-shadow:0 2px 7px #20283805}
-.invoice-product-page .invoice-list-heading{align-items:center}
-.invoice-product-page .invoice-list-heading h2{font-size:24px;letter-spacing:-.03em;margin:5px 0}
-.invoice-product-page .invoice-list-heading p{font-size:12px}
-.invoice-product-page .invoice-list-heading input{max-width:340px}
-.invoice-product-page table{min-width:680px}
-.invoice-product-page table th{background:#f8f8fa;color:#77717a;font-size:10px;letter-spacing:.05em}
-.invoice-product-page table th,.invoice-product-page table td{padding:14px 12px!important;border-bottom:1px solid #eef0f3;font-size:12px}
-.invoice-product-page table tbody tr:last-child td{border-bottom:0}
-.invoice-product-page table tbody tr:hover{background:#fff8f8}
-.invoice-product-page table a{color:#bd172b}
-.invoice-product-page #expense-list h2{font-size:22px;margin-bottom:16px}
-.invoice-product-page>.site-footer{background:#fff;border-top:1px solid #e7e8ec}
-@media(max-width:850px){.invoice-product-page>.site-header{height:auto;min-height:66px;padding:10px 16px}.invoice-product-page>.site-header .desktop-nav{gap:2px}.invoice-product-page>.site-header .desktop-nav a{padding:8px}.invoice-product-page>.inner-content{padding:22px 15px 48px}.invoice-product-page .invoice-feature-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.invoice-product-page .invoice-list-heading input{max-width:none;width:100%}}
-@media(max-width:520px){.invoice-product-page .invoice-feature-grid{grid-template-columns:1fr}.invoice-product-page .invoice-feature-card{padding:17px}.invoice-product-page #overview{gap:12px}.invoice-product-page #overview>.button{width:100%}.invoice-product-page .invoice-list-panel,.invoice-product-page #expense-list{padding:15px!important}.invoice-product-page>.site-header .brand{font-size:11px}.invoice-product-page>.site-header form .button{padding:8px 10px}}
+import "./finance.css";
+import Link from "next/link";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  Activity,
+  ArrowDownRight,
+  ArrowRight,
+  ArrowUpRight,
+  Bell,
+  BriefcaseBusiness,
+  CalendarDays,
+  ChartNoAxesCombined,
+  CheckCircle2,
+  ChevronDown,
+  CircleDollarSign,
+  Clock3,
+  CreditCard,
+  FileBarChart,
+  FilePlus2,
+  FileText,
+  LayoutDashboard,
+  LoaderCircle,
+  Package,
+  Plus,
+  Receipt,
+  RefreshCw,
+  Search,
+  Settings,
+  ShoppingBag,
+  Users,
+  Wallet,
+  XCircle,
+} from "lucide-react";
 
+type Customer = {
+  id: string;
+  name?: string;
+  email?: string | null;
+  phone?: string | null;
+  created_at?: string;
+};
 
-/* Accounting-app shell inspired by the original Johden finance design */
-.finance-shell{display:flex!important;align-items:stretch;min-height:100vh;background:#f5f6f8!important}
-.finance-shell>.finance-side-rail{width:244px;flex:0 0 244px;min-height:100vh;background:#292629;color:#fff;padding:22px 15px 18px;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto}
-.finance-side-brand{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:#fff;border-radius:6px;padding:12px 8px;margin:0 3px 22px;color:#9f1d35}
-.finance-side-brand span{font:800 20px/1.1 Manrope,Arial,sans-serif;letter-spacing:.07em}
-.finance-side-brand small{font-size:8px;letter-spacing:.16em;color:#625b62}
-.finance-side-workspace{display:flex;align-items:center;gap:10px;padding:11px 9px;background:#3a363a;border:1px solid #4a4549;border-radius:8px}
-.finance-side-mark{width:34px;height:34px;flex:0 0 34px;display:grid;place-items:center;border-radius:8px;background:#9f1d35;color:#fff;font-weight:800}
-.finance-side-workspace b,.finance-side-workspace small,.finance-side-bottom b,.finance-side-bottom small{display:block}
-.finance-side-workspace b,.finance-side-bottom b{font-size:11px;color:#fff}
-.finance-side-workspace small,.finance-side-bottom small{font-size:9px;color:#b9b1b7;margin-top:3px}
-.finance-side-label{margin:26px 10px 9px;color:#a69da5;font-size:9px;font-weight:800;letter-spacing:.16em}
-.finance-side-nav{display:grid;gap:5px}
-.finance-side-nav a{display:flex;align-items:center;gap:11px;padding:11px 12px;border-radius:7px;color:#d2cbd1;font-size:12px;font-weight:600;transition:background .15s,color .15s}
-.finance-side-nav a>span{width:19px;text-align:center;font-size:17px}
-.finance-side-nav a i{font-style:normal;margin-left:auto;background:#ffffff20;border-radius:12px;padding:2px 7px;font-size:10px}
-.finance-side-nav a:hover{background:#3a363a;color:#fff}
-.finance-side-nav a.selected{background:transparent;color:#fff;box-shadow:none}
-.finance-side-bottom{display:flex;align-items:center;gap:10px;border-top:1px solid #484247;padding:17px 5px 12px;margin-top:auto}
-.finance-side-back{font-size:10px;color:#d0c7ce;padding:12px 7px 9px}
-.finance-side-back:hover{color:#fff}
-.finance-side-signout{width:100%;text-align:left;background:transparent;border:1px solid #4a4549;border-radius:7px;color:#e6dfe4;padding:10px 12px;font-size:11px;cursor:pointer}
-.finance-side-signout:hover{background:#3a363a;color:#fff}
-.finance-app-main{min-width:0;flex:1}
-.finance-app-main>.site-header{display:none!important}
-.finance-app-main>.inner-content{padding-top:30px}
-.finance-shell .finance-anchor{display:block;position:relative;top:-18px}
-@media(max-width:900px){.finance-shell>.finance-side-rail{width:205px;flex-basis:205px;padding:16px 10px}.finance-side-nav a{padding:10px 8px}.finance-app-main>.inner-content{padding:24px 16px 48px}}
-@media(max-width:650px){.finance-shell{display:block!important}.finance-shell>.finance-side-rail{position:relative;top:auto;width:100%;height:auto;min-height:0;padding:12px;overflow:visible}.finance-side-brand{align-items:flex-start;margin:0 0 12px;padding:9px 12px;width:max-content;min-width:155px}.finance-side-brand span{font-size:16px}.finance-side-workspace,.finance-side-label,.finance-side-bottom,.finance-side-back,.finance-side-rail>form{display:none}.finance-side-label:first-of-type{display:none}.finance-side-nav{display:flex;gap:5px;overflow-x:auto;padding:3px 0 6px}.finance-side-nav a{white-space:nowrap;flex:0 0 auto;padding:9px 11px;background:#3a363a}.finance-side-nav a.selected{background:#3a363a}.finance-side-nav a i{display:none}.finance-side-nav+.finance-side-label{display:none}.finance-side-nav+.finance-side-label+.finance-side-nav{display:none}.finance-app-main>.inner-content{padding:22px 13px 40px}}
+type Invoice = {
+  id: string;
+  invoice_number?: string | null;
+  invoice_no?: string | null;
+  number?: string | null;
+  customer_name?: string | null;
+  customer?: { name?: string } | string | null;
+  total?: number | string | null;
+  total_amount?: number | string | null;
+  amount?: number | string | null;
+  amount_due?: number | string | null;
+  status?: string | null;
+  due_date?: string | null;
+  issue_date?: string | null;
+  created_at?: string | null;
+  currency?: string | null;
+};
 
+type Expense = {
+  id: string;
+  description?: string | null;
+  name?: string | null;
+  category?: string | null;
+  amount?: number | string | null;
+  total?: number | string | null;
+  expense_date?: string | null;
+  date?: string | null;
+  created_at?: string | null;
+};
 
-/* Final polish pass: stronger accounting hierarchy, form rhythm and readable registers */
-.finance-shell .finance-app-main{background:#f5f6f8}
-.finance-shell .finance-app-main>.inner-content{max-width:1480px;margin:0 auto}
-.finance-shell .finance-app-main #overview{padding:2px 0 18px;border-bottom:1px solid #e6e8ed}
-.finance-shell .finance-app-main #overview h2{font-weight:800;line-height:1.16}
-.finance-shell .finance-app-main .invoice-feature-card{transition:border-color .16s ease,box-shadow .16s ease}
-.finance-shell .finance-app-main .invoice-feature-card:focus-within{border-color:#e6b4ba;box-shadow:0 0 0 3px #9f1d350b}
-.finance-shell .finance-app-main .invoice-feature-card form button,
-.finance-shell .finance-app-main table button{min-height:40px;font-weight:700;transition:background .15s ease,transform .15s ease}
-.finance-shell .finance-app-main .invoice-feature-card form button:hover,
-.finance-shell .finance-app-main table button:hover{background:#a91527}
-.finance-shell .finance-app-main .invoice-list-panel,
-.finance-shell .finance-app-main #expense-list{overflow:hidden}
-.finance-shell .finance-app-main .invoice-list-panel>div:last-child,
-.finance-shell .finance-app-main #expense-list>div{max-width:100%;overflow-x:auto}
-.finance-shell .finance-app-main table{width:100%;font-variant-numeric:tabular-nums}
-.finance-shell .finance-app-main table td{color:#39343b}
-.finance-shell .finance-app-main table td:first-child{font-weight:650}
-.finance-shell .finance-app-main .invoice-list-heading{padding-bottom:15px;border-bottom:1px solid #eef0f3}
-.finance-shell .finance-app-main .invoice-list-heading input{background:#fbfbfc}
-.finance-shell .finance-app-main .admin-error,.finance-shell .finance-app-main .admin-success{margin:0 0 14px}
-.finance-shell .finance-side-nav a:focus-visible,
-.finance-shell .finance-side-brand:focus-visible,
-.finance-shell .finance-side-signout:focus-visible{outline:2px solid #ffb2bc;outline-offset:3px}
-@media(max-width:650px){
-  .finance-shell .finance-app-main #overview{align-items:flex-start!important}
-  .finance-shell .finance-app-main #overview h2{font-size:27px!important}
-  .finance-shell .finance-app-main .invoice-list-heading{align-items:stretch}
-  .finance-shell .finance-app-main .invoice-list-heading>div{width:100%}
-  .finance-shell .finance-app-main .invoice-list-heading input{width:100%;max-width:none}
-  .finance-shell .finance-app-main .invoice-feature-card form>div{grid-template-columns:minmax(0,1fr)!important}
-}
+type SupplierPayment = {
+  id: string;
+  supplier_name?: string | null;
+  expense_description?: string | null;
+  invoice_number?: string | null;
+  payment_date?: string | null;
+  amount?: number | string | null;
+  currency?: string | null;
+  payment_method?: string | null;
+  payment_reference?: string | null;
+  notes?: string | null;
+  created_at?: string | null;
+};
+type CustomerPayment = { id: string; amount?: number | string | null; payment_date?: string | null; created_at?: string | null };
+type DirectSalesReceipt = { id: string; total?: number | string | null; sale_date?: string | null; created_at?: string | null };
 
+type NavItem = {
+  label: string;
+  href: string;
+  icon: typeof LayoutDashboard;
+};
 
-/* Johden dashboard redesign — accounting layout inspired by the supplied reference,
-   using Johden's red, charcoal and orange brand palette. */
-.finance-topbar{height:66px;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:0 clamp(16px,3vw,38px);background:#fff;border-bottom:1px solid #e8e8ec;position:sticky;top:0;z-index:20}
-.finance-topbar-search{display:flex;align-items:center;gap:10px;width:min(440px,48%);height:40px;padding:0 13px;border:1px solid #e3e4e8;border-radius:8px;background:#fafafb;color:#7c7880}
-.finance-topbar-search>span{font-size:23px;line-height:1}
-.finance-topbar-search input{border:0!important;box-shadow:none!important;background:transparent!important;min-height:36px!important;padding:5px!important;font-size:12px!important}
-.finance-topbar-actions{display:flex;align-items:center;gap:13px}
-.finance-company-name{font-size:10px;font-weight:800;letter-spacing:.06em;color:#514b52;white-space:nowrap}
-.finance-topbar-icon{width:34px;height:34px;display:grid;place-items:center;border:1px solid #e8e5e7;border-radius:8px;color:#5b555d}
-.finance-topbar-add{width:36px;height:36px;display:grid;place-items:center;border-radius:8px;background:#9f1d35;color:#fff;font-size:23px;line-height:1}
-.finance-profile-mark{width:34px;height:34px;display:grid;place-items:center;border-radius:50%;background:#fff0ed;border:1px solid #f4d0d2;color:#bd172b;font-weight:900}
-.finance-shell .finance-app-main>.inner-content{padding-top:28px}
-.finance-receivables-card,.finance-analytics-card{background:#fff;border:1px solid #e5e7eb;border-radius:12px;box-shadow:0 3px 14px #25232a08;overflow:hidden}
-.finance-receivables-card{margin:0 0 22px}
-.finance-panel-heading{min-height:54px;padding:15px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px;border-bottom:1px solid #eceef1;background:#fbfbfc}
-.finance-panel-heading h3{font:700 16px/1.3 Manrope,sans-serif;margin:0;color:#302b31}
-.finance-panel-heading p{font-size:10px;color:#88818a;margin:4px 0 0}
-.finance-new-link{font-size:11px;font-weight:800;color:#bd172b;white-space:nowrap}
-.finance-receivables-total{padding:17px 20px 8px;font:800 clamp(23px,3vw,31px)/1.2 Manrope,sans-serif;color:#2d282e;font-variant-numeric:tabular-nums}
-.finance-receivables-track{height:10px;display:flex;gap:2px;margin:3px 20px 17px;overflow:hidden;border-radius:3px;background:#f0f0f2}
-.finance-receivables-track span{display:block;min-width:0}
-.finance-receivables-track span:nth-child(1){background:#3687e8}
-.finance-receivables-track span:nth-child(2){background:#f8c45e}
-.finance-receivables-track span:nth-child(3){background:#f3a321}
-.finance-receivables-track span:nth-child(4){background:#f58220}
-.finance-receivables-track span:nth-child(5){background:#ed5638}
-.finance-ageing-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));border-top:1px solid #eceef1;padding:13px 10px 15px}
-.finance-ageing-grid>div{padding:5px 12px;border-right:1px solid #eceef1;min-width:0}
-.finance-ageing-grid>div:last-child{border:0}
-.finance-ageing-grid small{display:block;color:#85808a;font-size:9px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;margin-bottom:5px}
-.finance-ageing-grid>div:first-child small{color:#3687e8}
-.finance-ageing-grid>div:not(:first-child) small{color:#d45b36}
-.finance-ageing-grid strong{display:block;font-size:clamp(12px,1.5vw,17px);font-weight:700;color:#302b31;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
-.finance-currency-note{margin:0;padding:0 20px 14px;color:#7a737c;font-size:10px}
-.finance-analytics-grid{display:grid;grid-template-columns:minmax(0,1.8fr) minmax(210px,.7fr);gap:18px;margin-bottom:26px}
-.finance-analytics-card{min-width:0}
-.finance-period-label{font-size:9px;font-weight:800;letter-spacing:.07em;color:#7c7580;background:#f0f1f4;border-radius:5px;padding:6px 9px}
-.finance-chart-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(170px,.42fr);gap:12px;padding:20px 18px 8px;align-items:center}
-.finance-chart{height:190px;display:flex;min-width:0;position:relative}
-.finance-chart-axis{width:35px;display:flex;flex-direction:column;justify-content:space-between;padding:1px 5px 22px 0;color:#96909a;font-size:8px;text-align:right}
-.finance-chart svg{width:calc(100% - 35px);height:190px;overflow:visible}
-.finance-chart-summary{display:grid;gap:15px;border-left:1px solid #eceef1;padding:5px 0 5px 18px}
-.finance-chart-summary small{display:block;color:#77717b;font-size:9px;margin-bottom:3px}
-.finance-chart-summary strong{display:block;font:700 15px/1.3 Manrope,sans-serif;color:#302b31;font-variant-numeric:tabular-nums}
-.finance-chart-summary>div:first-child small{color:#3687e8}
-.finance-chart-summary>div:nth-child(2) small{color:#21986a}
-.finance-chart-summary>div:nth-child(3) small{color:#e56b43}
-.finance-chart-legend{display:flex;gap:18px;padding:5px 20px 12px;color:#77717b;font-size:9px}
-.finance-chart-legend span{display:flex;align-items:center;gap:6px}
-.finance-chart-legend i{display:inline-block;width:8px;height:8px;border-radius:2px}
-.finance-chart-legend .sales-dot{background:#3687e8}
-.finance-chart-legend .expenses-dot{background:#31bd83}
-.finance-data-note{font-size:9px;color:#96909a;padding:0 20px 15px;margin:0}
-.finance-kpi-stack{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.finance-kpi-stack article{background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:16px;box-shadow:0 3px 12px #25232a06;min-width:0}
-.finance-kpi-stack small{display:block;font-size:9px;font-weight:800;letter-spacing:.08em;color:#8a838d;text-transform:uppercase}
-.finance-kpi-stack strong{display:block;font:800 24px/1.2 Manrope,sans-serif;color:#302b31;margin:8px 0 5px}
-.finance-kpi-stack span{display:block;color:#817b84;font-size:9px;line-height:1.5;overflow-wrap:anywhere}
-.finance-shell .finance-app-main #customers{margin-top:24px}
-.finance-shell .finance-app-main #customers .invoice-feature-card{border-radius:11px}
-.finance-shell .finance-app-main .invoice-list-panel{margin-top:24px!important}
-@media(max-width:1050px){
- .finance-analytics-grid{grid-template-columns:1fr}
- .finance-kpi-stack{grid-template-columns:repeat(4,minmax(0,1fr))}
-}
-@media(max-width:760px){
- .finance-topbar{height:auto;min-height:60px;padding:10px 13px;flex-wrap:wrap}
- .finance-topbar-search{width:100%;order:2}
- .finance-topbar-actions{width:100%;justify-content:flex-end}
- .finance-company-name{margin-right:auto;font-size:9px}
- .finance-ageing-grid{grid-template-columns:repeat(3,minmax(0,1fr));row-gap:8px}
- .finance-ageing-grid>div:nth-child(3){border-right:0}
- .finance-ageing-grid>div:nth-child(4){border-top:1px solid #eceef1;padding-top:12px}
- .finance-ageing-grid>div:nth-child(5){border-top:1px solid #eceef1;padding-top:12px}
- .finance-chart-layout{grid-template-columns:1fr}
- .finance-chart-summary{grid-template-columns:repeat(3,minmax(0,1fr));border-left:0;border-top:1px solid #eceef1;padding:14px 0 0}
- .finance-chart-summary strong{font-size:12px}
- .finance-kpi-stack{grid-template-columns:repeat(2,minmax(0,1fr))}
-}
-@media(max-width:430px){
- .finance-ageing-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
- .finance-ageing-grid>div:nth-child(2),.finance-ageing-grid>div:nth-child(4){border-right:0}
- .finance-ageing-grid>div:nth-child(3){border-right:1px solid #eceef1}
- .finance-chart-legend{padding-left:12px}
-}
+const navigation: { heading: string; items: NavItem[] }[] = [
+  {
+    heading: "WORKSPACE",
+    items: [
+      {
+        label: "Dashboard",
+        href: "/workspace/finance",
+        icon: LayoutDashboard,
+      },
+      {
+        label: "Customers",
+        href: "/workspace/finance/customers",
+        icon: Users,
+      },
+      
+    ],
+  },
+  {
+    heading: "SALES",
+    items: [
+      {
+        label: "Invoices",
+        href: "/workspace/finance/invoices",
+        icon: FileText,
+      },
+      {
+        label: "Quotes",
+        href: "/workspace/finance/quotes",
+        icon: FilePlus2,
+      },
+      {
+        label: "Sales Receipts",
+        href: "/workspace/finance/sales-receipts",
+        icon: Receipt,
+      },
+      {
+        label: "Payments",
+        href: "/workspace/finance/payments",
+        icon: CreditCard,
+      },
+    ],
+  },
+  {
+    heading: "FINANCE",
+    items: [
+      {
+        label: "Expenses",
+        href: "/workspace/finance/expenses",
+        icon: Wallet,
+      },
+      {
+        label: "Owner's Income & Commissions",
+        href: "/workspace/finance/owner-income",
+        icon: Wallet,
+      },
+      {
+        label: "Reports",
+        href: "/workspace/finance/reports",
+        icon: FileBarChart,
+      },
+    ],
+  },
+];
 
-.finance-table-subline{display:block;margin-top:4px;color:#8b838d;font-size:10px;font-weight:400}
-.finance-status-pill{display:inline-flex;align-items:center;border-radius:20px;padding:5px 9px;background:#f0f1f3;color:#625b65;font-size:10px;font-weight:800;text-transform:capitalize;white-space:nowrap}
-.finance-status-paid{background:#e8f7ee;color:#187548}
-.finance-status-issued,.finance-status-sent{background:#eaf2ff;color:#245da8}
-.finance-status-part-paid{background:#fff5df;color:#98610a}
-.finance-status-overdue{background:#fff0ed;color:#b32624}
-.finance-status-draft{background:#f1f0f2;color:#77717a}
-.finance-status-void,.finance-status-cancelled{background:#f3eeee;color:#8a7373}
-
-
-/* Compact finance home and expanded product navigation */
-.finance-dashboard-heading{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:28px clamp(18px,3vw,42px) 22px;background:#fff;border-bottom:1px solid #e8e9ed}
-.finance-dashboard-heading h1{font:800 clamp(25px,3vw,36px)/1.15 Manrope,sans-serif;letter-spacing:-.045em;margin:9px 0 6px;color:#29252a}
-.finance-dashboard-heading p{font-size:13px;color:#77717a;margin:0;line-height:1.6}
-.finance-dashboard-heading .button{white-space:nowrap}
-.finance-side-nav a.module-pending{opacity:.52;cursor:not-allowed}
-.finance-side-nav a.module-pending small{margin-left:auto;color:#f4b6bd;font-size:8px;font-weight:700;letter-spacing:.04em}
-.finance-side-nav a.module-pending:hover{background:transparent;color:#d2cbd1}
-.finance-side-rail>.finance-side-label:first-of-type{margin-top:22px}
-.finance-shell .finance-side-nav{gap:3px}
-.finance-shell .finance-side-nav a{padding:9px 10px;font-size:11px}
-.finance-shell .finance-side-nav a>span{font-size:15px}
-.finance-shell .finance-app-main>.inner-content{padding-top:24px}
-@media(max-width:900px){.finance-dashboard-heading{padding:22px 18px}.finance-side-rail .finance-side-nav a{font-size:10px}}
-@media(max-width:650px){.finance-dashboard-heading{align-items:flex-start;flex-direction:column;padding:20px 15px}.finance-dashboard-heading .button{width:100%;justify-content:center}.finance-side-rail .finance-side-nav{max-height:150px;overflow:auto;flex-wrap:wrap;justify-content:flex-start}.finance-side-rail .finance-side-nav a{flex:0 0 auto}}
-
-/* JBCS Expenses + Supplier Payments: uses the established Johden red/charcoal palette. */
-.jbcs-finance-page{min-height:100vh;background:#f5f6f8;color:#29252a;padding:22px clamp(14px,2.6vw,38px) 56px;font-family:inherit}
-.jbcs-finance-top{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:2px 0 22px;font-size:12px;color:#77717a}.jbcs-finance-top a{color:#b7192d;text-decoration:none;font-weight:700}.jbcs-finance-top span{font-size:10px;letter-spacing:.12em;font-weight:800;color:#6d6670}
-.jbcs-finance-heading{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:22px}.jbcs-finance-heading h1{font-size:clamp(28px,3vw,38px);line-height:1.1;letter-spacing:-.045em;margin:5px 0 9px;font-weight:800}.jbcs-finance-heading p:not(.jbcs-eyebrow){font-size:13px;color:#77717a;margin:0;line-height:1.65}.jbcs-eyebrow{font-size:9px;letter-spacing:.13em;font-weight:800;color:#a31a2a;margin:0}.jbcs-secondary-button,.jbcs-primary-button{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;border-radius:7px;padding:11px 15px;font-size:12px;font-weight:800;cursor:pointer}.jbcs-secondary-button{background:#fff;color:#393239;border:1px solid #e1e3e8}.jbcs-primary-button{background:#9f1d35;color:#fff;border:1px solid #9f1d35}.jbcs-primary-button:disabled{opacity:.55;cursor:not-allowed}
-.jbcs-stat-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:18px}.jbcs-stat-grid article{background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:17px 19px;min-width:0}.jbcs-stat-grid article span,.jbcs-stat-grid article small{display:block;font-size:11px;color:#77717a}.jbcs-stat-grid article strong{display:block;font-size:25px;letter-spacing:-.035em;margin:8px 0 5px;overflow-wrap:anywhere}.jbcs-finance-columns{display:grid;grid-template-columns:minmax(280px,.82fr) minmax(0,1.18fr);gap:16px;align-items:start}.jbcs-panel{background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:20px;min-width:0;box-shadow:0 2px 7px #20283805}.jbcs-panel-heading{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:18px}.jbcs-panel-heading h2{font-size:19px;letter-spacing:-.025em;margin:5px 0 0;font-weight:800}.jbcs-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}.jbcs-form-grid label{display:grid;gap:6px;font-size:11px;font-weight:700;color:#4a444b;min-width:0}.jbcs-form-grid input,.jbcs-form-grid select,.jbcs-form-grid textarea,.jbcs-filters input,.jbcs-filters select,.jbcs-search{width:100%;min-width:0;border:1px solid #dfe2e7;border-radius:7px;background:#fff;padding:10px 11px;color:#29252a;font:inherit;font-size:12px;outline:none}.jbcs-form-grid input,.jbcs-form-grid select{min-height:40px}.jbcs-form-grid textarea{resize:vertical}.jbcs-form-grid input:focus,.jbcs-form-grid select:focus,.jbcs-form-grid textarea:focus,.jbcs-filters input:focus,.jbcs-filters select:focus,.jbcs-search:focus{border-color:#9f1d35;box-shadow:0 0 0 3px #9f1d3512}.jbcs-span-2{grid-column:1/-1}.jbcs-help{font-size:10px;font-weight:400;color:#77717a;line-height:1.5}.jbcs-message{border:1px solid #f2c6cc;background:#fff1f2;color:#9f1728;border-radius:7px;padding:10px 12px;font-size:12px;line-height:1.5}.jbcs-message.success{border-color:#cde8d5;background:#effaf2;color:#176c3b}.jbcs-filters{display:grid;grid-template-columns:minmax(0,1fr) 125px;gap:9px;margin-bottom:14px}.jbcs-table-wrap{width:100%;overflow:auto}.jbcs-table{width:100%;min-width:570px;border-collapse:collapse;text-align:left}.jbcs-table th{font-size:9px;text-transform:uppercase;letter-spacing:.06em;color:#77717a;background:#f8f8fa}.jbcs-table th,.jbcs-table td{padding:12px 10px;border-bottom:1px solid #eef0f3;vertical-align:top;font-size:11px}.jbcs-table td strong,.jbcs-table td small{display:block}.jbcs-table td strong{font-size:11px;font-weight:750;line-height:1.5}.jbcs-table td small{font-size:10px;color:#77717a;margin-top:4px;line-height:1.45}.jbcs-table tbody tr:last-child td{border-bottom:0}.jbcs-table tbody tr:hover{background:#fff9f8}.jbcs-amount{white-space:nowrap;font-weight:800}.jbcs-empty{text-align:center;color:#77717a;padding:28px 12px!important}.jbcs-history-panel{margin-top:16px}.jbcs-search{max-width:330px}.jbcs-finance-page button:focus-visible,.jbcs-finance-page a:focus-visible{outline:2px solid #9f1d35;outline-offset:2px}
-@media(max-width:1050px){.jbcs-finance-columns{grid-template-columns:1fr}.jbcs-stat-grid article strong{font-size:22px}}
-@media(max-width:620px){.jbcs-finance-page{padding:16px 12px 38px}.jbcs-finance-top span{font-size:8px}.jbcs-stat-grid{grid-template-columns:1fr;gap:9px}.jbcs-stat-grid article{padding:14px 16px}.jbcs-stat-grid article strong{font-size:22px;margin:5px 0}.jbcs-panel{padding:15px}.jbcs-form-grid{grid-template-columns:1fr}.jbcs-span-2{grid-column:auto}.jbcs-filters{grid-template-columns:1fr}.jbcs-search{max-width:none;width:100%}.jbcs-finance-heading{align-items:flex-start}}
-
-
-
-/* Finance register layout refresh: full-width registers with optional entry panels */
-.jbcs-page-actions{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:10px}
-.jbcs-finance-columns{display:grid;grid-template-columns:minmax(0,1fr);gap:22px}
-.jbcs-register-panel{width:100%;min-width:0}
-.jbcs-entry-panel{width:100%;min-width:0}
-.jbcs-finance-heading{align-items:center}
-.jbcs-page-actions .jbcs-primary-button,.jbcs-page-actions .jbcs-secondary-button{white-space:nowrap}
-@media(max-width:760px){.jbcs-page-actions{justify-content:flex-start}.jbcs-finance-heading{align-items:flex-start;gap:16px}.jbcs-page-actions>*{flex:1 1 auto}}
-
-/* Johden consistent finance sidebar */
-.finance-module-layout { display: flex; min-height: 100vh; }
-.finance-module-sidebar { font-family: Arial, sans-serif; }
-.finance-module-sidebar a,
-.finance-module-sidebar button { transition: background-color .15s ease, color .15s ease; }
-.finance-module-sidebar a:hover,
-.finance-module-sidebar button:hover { background: #fff5f5 !important; color: #9f1d35 !important; }
-.finance-module-sidebar a:focus-visible,
-.finance-module-sidebar button:focus-visible { outline: 2px solid #9f1d35; outline-offset: 2px; }
-@media (max-width: 650px) {
-  .finance-module-layout { display: block !important; }
-  .finance-module-sidebar {
-    position: relative !important;
-    top: auto !important;
-    width: 100% !important;
-    height: auto !important;
-    min-height: 0 !important;
-    padding: 12px !important;
-    overflow: visible !important;
-    border-right: 0 !important;
-    border-bottom: 1px solid #e5e7eb !important;
+function asNumber(value: unknown): number {
+  if (typeof value === "number") {
+    return Number.isFinite(value) ? value : 0;
   }
-  .finance-module-sidebar > a:first-child { width: 100%; min-height: 70px !important; margin-bottom: 10px !important; }
-  .finance-module-sidebar > a:first-child img { width: 180px !important; max-height: 55px !important; }
-  .finance-module-nav {
-    display: flex;
-    gap: 4px;
-    max-height: none !important;
-    overflow-x: auto !important;
-    overflow-y: hidden !important;
-    padding-bottom: 8px;
+
+  if (typeof value === "string") {
+    const parsed = Number(value.replace(/,/g, "").trim());
+    return Number.isFinite(parsed) ? parsed : 0;
   }
-  .finance-module-nav a { flex: 0 0 auto; }
-  .finance-module-footer { display: flex; gap: 8px; align-items: center; }
-  .finance-module-footer > a,
-  .finance-module-footer > form { flex: 1; min-width: 0; }
-  .finance-module-footer > form { margin-top: 0 !important; }
+
+  return 0;
 }
 
-/* Shared typography and control rhythm for Finance modules.
-   Presentation-only overrides: do not change data, calculations, or behavior. */
-.jbcs-finance-consistent-main,
-.jbcs-finance-consistent-main * {
-  font-family: 'DM Sans', Arial, sans-serif;
+function invoiceAmount(invoice: Invoice): number {
+  return asNumber(
+    invoice.amount_due ?? invoice.total_amount ?? invoice.total ?? invoice.amount
+  );
 }
-.jbcs-finance-consistent-main {
-  line-height: 1.55;
-  color: #29252a;
+
+function expenseAmount(expense: Expense): number {
+  return asNumber(expense.amount ?? expense.total);
 }
-.jbcs-finance-consistent-main h1 {
-  font-size: clamp(1.65rem, 2.4vw, 2.15rem);
-  line-height: 1.2;
-  letter-spacing: -0.035em;
-  font-weight: 800;
+
+function supplierPaymentAmount(payment: SupplierPayment): number {
+  return asNumber(payment.amount);
 }
-.jbcs-finance-consistent-main h2 {
-  line-height: 1.3;
-  letter-spacing: -0.02em;
+
+function invoiceNumber(invoice: Invoice): string {
+  return (
+    invoice.invoice_number ??
+    invoice.invoice_no ??
+    invoice.number ??
+    `INV-${invoice.id.slice(0, 8).toUpperCase()}`
+  );
 }
-.jbcs-finance-consistent-main h3 {
-  line-height: 1.35;
-  letter-spacing: -0.01em;
+
+function customerName(invoice: Invoice): string {
+  if (typeof invoice.customer === "string") return invoice.customer;
+
+  return (
+    invoice.customer_name ??
+    invoice.customer?.name ??
+    "Customer"
+  );
 }
-.jbcs-finance-consistent-main input:not([type="checkbox"]):not([type="radio"]),
-.jbcs-finance-consistent-main select,
-.jbcs-finance-consistent-main textarea {
-  font-family: 'DM Sans', Arial, sans-serif;
-  line-height: 1.45;
+
+function dateLabel(value?: string | null): string {
+  if (!value) return "—";
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "—";
+
+  return new Intl.DateTimeFormat("en-UG", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  }).format(date);
 }
-.jbcs-finance-consistent-main table {
-  border-collapse: collapse;
-}
-.jbcs-finance-consistent-main th {
-  font-size: 10px;
-  line-height: 1.4;
-  letter-spacing: .045em;
-}
-.jbcs-finance-consistent-main td {
-  line-height: 1.5;
-}
-.finance-owner-income,
-.finance-owner-income * {
-  font-family: 'DM Sans', Arial, sans-serif !important;
-}
-.finance-owner-income input:not([type="checkbox"]):not([type="radio"]),
-.finance-owner-income select,
-.finance-owner-income textarea {
-  min-height: 40px !important;
-  padding: 9px 11px !important;
-  border-radius: 8px !important;
-  font-size: 13px !important;
-  line-height: 1.45 !important;
-}
-.finance-owner-income textarea {
-  min-height: 88px !important;
-}
-.finance-owner-income table th {
-  font-size: 10px !important;
-  line-height: 1.4 !important;
-}
-.finance-owner-income table td {
-  line-height: 1.5 !important;
-}
-@media (max-width: 640px) {
-  .jbcs-finance-consistent-main h1 {
-    font-size: 1.6rem;
+
+function money(value: number, currency = "UGX"): string {
+  try {
+    return new Intl.NumberFormat("en-UG", {
+      style: "currency",
+      currency,
+      maximumFractionDigits: 0,
+    }).format(value);
+  } catch {
+    return `${currency} ${Math.round(value).toLocaleString("en-UG")}`;
   }
 }
 
-
-/* Owner income: white content canvas, isolated from shared finance grey canvas. */
-.finance-owner-income { background: #fff !important; width: 100%; min-height: 100vh; }
-.finance-owner-income > .owner-income-content { background: #fff !important; min-height: 100vh; }
-
-
-/* Products & Services: align the catalogue with the Payments workspace design. */
-.jbcs-products-redesign{display:block!important;min-height:100vh;background:#f7f8fa!important;color:#0f172a;font-family:'DM Sans',Arial,sans-serif}
-.jbcs-products-redesign>.finance-side-rail{position:fixed!important;inset:0 auto 0 0;width:264px!important;flex:0 0 264px!important;height:100vh!important;min-height:100vh!important;overflow-y:auto;background:#fff!important;color:#0f172a!important;border-right:1px solid #e2e8f0;padding:0 12px 16px!important;z-index:30;box-shadow:1px 0 0 #0f172a03}
-.jbcs-products-redesign .jbcs-product-brand{display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:flex-start!important;gap:11px!important;min-height:98px!important;width:auto!important;margin:0 -12px 0!important;padding:15px 16px!important;border-radius:0!important;border-bottom:1px solid #f1f5f9;background:#fff!important;color:#0f172a!important;text-decoration:none}
-.jbcs-products-redesign .jbcs-product-brand-mark{display:flex!important;align-items:center!important;justify-content:center!important;width:44px!important;height:44px!important;min-width:44px!important;padding:3px!important;overflow:hidden!important;border:1px solid #f5dfe2;border-radius:12px!important;background:#fff!important}
-.jbcs-products-redesign .jbcs-product-brand-mark img{display:block;width:100%!important;height:100%!important;max-height:none!important;max-width:100%!important;object-fit:contain}
-.jbcs-products-redesign .jbcs-product-brand-copy{display:block!important;min-width:0!important;line-height:1.3!important}
-.jbcs-products-redesign .jbcs-product-brand-copy strong{display:block!important;font-size:15px!important;font-weight:800!important;letter-spacing:.06em!important;color:#0f172a!important}
-.jbcs-products-redesign .jbcs-product-brand-copy small{display:block!important;margin-top:3px!important;font-size:10px!important;letter-spacing:0!important;color:#64748b!important;white-space:normal}
-.jbcs-products-redesign .finance-side-label{margin-top:22px!important;padding:0 10px 10px!important;color:#94a3b8!important;font-size:10px!important;font-weight:800!important;letter-spacing:.2em!important}
-.jbcs-products-redesign .finance-side-nav{display:grid!important;gap:4px!important}
-.jbcs-products-redesign .finance-side-nav a{display:flex!important;align-items:center!important;gap:12px!important;min-height:42px!important;padding:10px 12px!important;border-radius:11px!important;background:transparent!important;color:#475569!important;font-size:12px!important;font-weight:650!important;text-decoration:none!important}
-.jbcs-products-redesign .finance-side-nav a svg{flex:0 0 18px;color:#475569}
-.jbcs-products-redesign .finance-side-nav a:hover{background:#f8fafc!important;color:#f3192d!important}
-.jbcs-products-redesign .finance-side-nav a:hover svg{color:#f3192d}
-.jbcs-products-redesign .finance-side-nav a.selected{background:#fff0f1!important;color:#f3192d!important}
-.jbcs-products-redesign .finance-side-nav a.selected svg{color:#f3192d}
-.jbcs-products-redesign .finance-side-bottom{margin-top:auto!important;border-top:1px solid #f1f5f9!important;padding:16px 10px 0!important;color:#94a3b8!important;font-size:11px!important}
-.jbcs-products-redesign>.finance-app-main{margin-left:264px!important;width:calc(100% - 264px)!important;min-width:0!important;background:#f7f8fa!important}
-.jbcs-products-redesign>.finance-app-main>.inner-content{max-width:1440px!important;margin:0 auto!important;padding:24px clamp(16px,2.5vw,36px) 48px!important}
-.jbcs-products-redesign .jbcs-finance-top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:24px;color:#64748b;font-size:10px;font-weight:800;letter-spacing:.13em}
-.jbcs-products-redesign .jbcs-finance-top a{color:#64748b;font-size:12px;font-weight:650;letter-spacing:0;text-decoration:none}
-.jbcs-products-redesign .jbcs-finance-top a:hover{color:#f3192d}
-.jbcs-products-redesign .jbcs-finance-heading{margin-bottom:24px;align-items:flex-end}
-.jbcs-products-redesign .jbcs-finance-heading h1{font-size:clamp(30px,3vw,40px);letter-spacing:-.045em;color:#0f172a}
-.jbcs-products-redesign .jbcs-finance-heading p:not(.jbcs-eyebrow){font-size:13px;color:#64748b}
-.jbcs-products-redesign .jbcs-eyebrow{color:#f3192d;font-size:10px;letter-spacing:.16em}
-.jbcs-products-redesign .jbcs-page-actions{gap:9px}
-.jbcs-products-redesign .jbcs-primary-button,.jbcs-products-redesign .jbcs-secondary-button{min-height:42px;border-radius:11px;padding:11px 15px;font-size:12px;transition:background .15s ease,border-color .15s ease,transform .15s ease}
-.jbcs-products-redesign .jbcs-primary-button{background:#f3192d;border-color:#f3192d;box-shadow:0 2px 4px #f3192d1a}
-.jbcs-products-redesign .jbcs-primary-button:hover:not(:disabled){background:#cf1022;border-color:#cf1022;transform:translateY(-1px)}
-.jbcs-products-redesign .jbcs-secondary-button{background:#fff;border-color:#e2e8f0;color:#334155}
-.jbcs-products-redesign .jbcs-secondary-button:hover:not(:disabled){border-color:#fecdd3;background:#fffafa;color:#f3192d}
-.jbcs-products-redesign .jbcs-stat-grid{gap:16px;margin-bottom:22px}
-.jbcs-products-redesign .jbcs-stat-grid article{position:relative;overflow:hidden;border:1px solid #e2e8f0;border-radius:16px;padding:20px;background:#fff;box-shadow:0 2px 8px #0f172a05}
-.jbcs-products-redesign .jbcs-stat-grid article:before{content:"";position:absolute;inset:0 auto 0 0;width:3px;background:#f3192d}
-.jbcs-products-redesign .jbcs-stat-grid article span{font-size:12px;color:#64748b;font-weight:600}
-.jbcs-products-redesign .jbcs-stat-grid article strong{font-size:30px;color:#0f172a;letter-spacing:-.045em;margin:10px 0 6px}
-.jbcs-products-redesign .jbcs-stat-grid article small{font-size:11px;color:#94a3b8;line-height:1.55}
-.jbcs-products-redesign .jbcs-panel{border:1px solid #e2e8f0;border-radius:16px;padding:22px;background:#fff;box-shadow:0 2px 8px #0f172a05}
-.jbcs-products-redesign .jbcs-panel-heading{padding-bottom:16px;margin-bottom:18px;border-bottom:1px solid #f1f5f9}
-.jbcs-products-redesign .jbcs-panel-heading h2{font-size:19px;letter-spacing:-.035em;color:#0f172a}
-.jbcs-products-redesign .jbcs-form-grid label{font-size:12px;color:#334155}
-.jbcs-products-redesign .jbcs-form-grid input,.jbcs-products-redesign .jbcs-form-grid select,.jbcs-products-redesign .jbcs-form-grid textarea,.jbcs-products-redesign .jbcs-filters input,.jbcs-products-redesign .jbcs-filters select{border-color:#e2e8f0;border-radius:10px;padding:11px 12px;font-size:12px}
-.jbcs-products-redesign .jbcs-form-grid input:focus,.jbcs-products-redesign .jbcs-form-grid select:focus,.jbcs-products-redesign .jbcs-form-grid textarea:focus,.jbcs-products-redesign .jbcs-filters input:focus,.jbcs-products-redesign .jbcs-filters select:focus{border-color:#f3192d;box-shadow:0 0 0 3px #f3192d12}
-.jbcs-products-redesign .jbcs-filters{gap:10px}
-.jbcs-products-redesign .jbcs-table-wrap{border:1px solid #eef2f7;border-radius:12px}
-.jbcs-products-redesign .jbcs-table{min-width:850px}
-.jbcs-products-redesign .jbcs-table th{padding:14px 12px;background:#f8fafc;color:#64748b;font-size:10px;letter-spacing:.08em}
-.jbcs-products-redesign .jbcs-table td{padding:14px 12px;border-bottom:1px solid #f1f5f9;font-size:12px;color:#334155}
-.jbcs-products-redesign .jbcs-table td strong{font-size:12px;color:#0f172a}
-.jbcs-products-redesign .jbcs-table td small{font-size:11px;color:#64748b}
-.jbcs-products-redesign .jbcs-table tbody tr:hover{background:#fffafa}
-.jbcs-products-redesign .jbcs-amount{font-variant-numeric:tabular-nums;color:#0f172a}
-.jbcs-products-redesign .jbcs-message{border-radius:12px;padding:13px 15px}
-.jbcs-products-redesign :focus-visible{outline-color:#f3192d}
-@media(max-width:900px){.jbcs-products-redesign>.finance-side-rail{width:220px!important}.jbcs-products-redesign>.finance-app-main{margin-left:220px!important;width:calc(100% - 220px)!important}.jbcs-products-redesign .jbcs-stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:650px){.jbcs-products-redesign{display:block!important}.jbcs-products-redesign>.finance-side-rail{position:sticky!important;top:0!important;inset:auto!important;width:100%!important;height:auto!important;min-height:0!important;padding:0 10px 8px!important;overflow:visible!important;box-shadow:0 4px 12px #0f172a08}.jbcs-products-redesign .jbcs-product-brand{min-height:68px!important;margin:0 -10px 0!important;padding:10px 13px!important}.jbcs-products-redesign .jbcs-product-brand-mark{width:38px!important;height:38px!important;min-width:38px!important}.jbcs-products-redesign .jbcs-product-brand-copy strong{font-size:13px!important}.jbcs-products-redesign .jbcs-product-brand-copy small{font-size:9px!important}.jbcs-products-redesign .finance-side-label,.jbcs-products-redesign .finance-side-bottom{display:none!important}.jbcs-products-redesign .finance-side-nav{display:flex!important;gap:5px!important;overflow-x:auto!important;padding:7px 0 2px!important;scrollbar-width:thin}.jbcs-products-redesign .finance-side-nav a{flex:0 0 auto!important;min-height:36px!important;padding:8px 10px!important;white-space:nowrap;font-size:11px!important;background:#f8fafc!important}.jbcs-products-redesign .finance-side-nav a.selected{background:#fff0f1!important}.jbcs-products-redesign>.finance-app-main{margin-left:0!important;width:100%!important}.jbcs-products-redesign>.finance-app-main>.inner-content{padding:20px 13px 36px!important}.jbcs-products-redesign .jbcs-finance-heading{align-items:flex-start!important}.jbcs-products-redesign .jbcs-page-actions{width:100%;justify-content:stretch}.jbcs-products-redesign .jbcs-page-actions>*{flex:1 1 auto}.jbcs-products-redesign .jbcs-stat-grid{grid-template-columns:1fr;gap:10px}.jbcs-products-redesign .jbcs-stat-grid article{padding:15px 17px}.jbcs-products-redesign .jbcs-stat-grid article strong{font-size:25px}.jbcs-products-redesign .jbcs-panel{padding:15px}.jbcs-products-redesign .jbcs-table-wrap{border-radius:10px}}
-
-
-
-/* Modern finance dashboard motion */
-.dashboard-metric-card{position:relative;isolation:isolate;overflow:hidden}
-.dashboard-metric-card:before{content:"";position:absolute;inset:0 0 auto;height:3px;background:linear-gradient(90deg,#9f1d35,#f3192d,#fda4af);transform:scaleX(0);transform-origin:left;transition:transform .55s ease}
-.dashboard-metric-card:hover:before{transform:scaleX(1)}
-.dashboard-metric-glow-fill{width:72%;transform:scaleX(0);transform-origin:left;animation:dashboardMetricFill 1.15s cubic-bezier(.22,1,.36,1) .18s forwards}
-.dashboard-chart-panel{animation:dashboardPanelEnter .55s ease-out both}
-.dashboard-insight-panel{animation:dashboardPanelEnter .65s ease-out .08s both}
-.dashboard-chart-grid{background-image:linear-gradient(to bottom,transparent calc(25% - 1px),#f1f5f9 25%,transparent calc(25% + 1px),transparent calc(50% - 1px),#f1f5f9 50%,transparent calc(50% + 1px),transparent calc(75% - 1px),#f1f5f9 75%,transparent calc(75% + 1px))}
-.dashboard-chart-bar{transform:scaleY(0);transform-origin:bottom;animation:dashboardBarRise .8s cubic-bezier(.22,1,.36,1) forwards;transition:filter .2s ease,opacity .2s ease;min-height:0}
-.dashboard-chart-bar:hover{filter:brightness(1.12);opacity:.88}
-@keyframes dashboardBarRise{from{transform:scaleY(0)}to{transform:scaleY(1)}}
-@keyframes dashboardMetricFill{to{transform:scaleX(1)}}
-@keyframes dashboardPanelEnter{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-@media(prefers-reduced-motion:reduce){.dashboard-metric-card,.dashboard-chart-panel,.dashboard-insight-panel,.dashboard-chart-bar,.dashboard-metric-glow-fill{animation:none!important;transition:none!important;transform:none!important}.dashboard-metric-glow-fill{width:72%}}
-
-
-/* Animated analytics for finance reports */
-.report-chart-panel{animation:reportPanelEnter .55s ease-out both}
-.report-chart-grid{background-image:linear-gradient(to bottom,transparent calc(25% - 1px),#e9edf3 25%,transparent calc(25% + 1px),transparent calc(50% - 1px),#e9edf3 50%,transparent calc(50% + 1px),transparent calc(75% - 1px),#e9edf3 75%,transparent calc(75% + 1px));background-size:100% 100%}
-.report-animated-bar{transform-origin:bottom left;animation:reportBarGrow .9s cubic-bezier(.22,1,.36,1) both;transition:filter .18s ease,opacity .18s ease}
-.report-animated-bar:hover{filter:brightness(1.12);opacity:.86}
-.report-donut-wrap{width:100%;max-width:220px;margin:0 auto}
-.report-donut{width:100%;height:auto;overflow:visible;transform:rotate(-90deg)}
-.report-donut-segment{animation:reportDonutFade .85s ease-out both;transition:opacity .2s ease}
-.report-donut-segment:hover{opacity:.78}
-.report-donut-total,.report-donut-caption{fill:#1e293b;font-family:inherit;transform:rotate(90deg);transform-origin:21px 21px}
-.report-donut-total{font-size:7px;font-weight:800}
-.report-donut-caption{fill:#64748b;font-size:2.6px}
-@keyframes reportBarGrow{from{transform:scaleY(0);opacity:.45}to{transform:scaleY(1);opacity:1}}
-@keyframes reportDonutFade{from{opacity:0}to{opacity:1}}
-@keyframes reportPanelEnter{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-@media(prefers-reduced-motion:reduce){.report-chart-panel,.report-animated-bar,.report-donut-segment{animation:none!important;transition:none!important;transform:none!important}.report-donut-segment{animation:none!important;opacity:1}}
-
-.report-animated-fill{transform-origin:left center;animation:reportFillGrow .95s cubic-bezier(.22,1,.36,1) both;transition:filter .18s ease}
-.report-animated-fill:hover{filter:brightness(1.1)}
-@keyframes reportFillGrow{from{transform:scaleX(0);opacity:.55}to{transform:scaleX(1);opacity:1}}
-@media(prefers-reduced-motion:reduce){.report-animated-fill{animation:none!important;transition:none!important;transform:none!important}}
-
-
-/* Reference-aligned Finance shell: white navigation rail, Johden red active state,
-   crisp register panels, and compact responsive behaviour. */
-.finance-shell>.finance-side-rail,
-.jbcs-products-redesign>.finance-side-rail{
-  background:#fff!important;
-  color:#111827!important;
-  border-right:1px solid #e2e8f0!important;
-  box-shadow:2px 0 10px #0f172a05!important;
-}
-.finance-shell .finance-side-brand,
-.jbcs-products-redesign .finance-side-brand,
-.jbcs-products-redesign .jbcs-product-brand{
-  background:#fff!important;
-  color:#111827!important;
-  border:0!important;
-  border-bottom:1px solid #e5e7eb!important;
-  border-radius:0!important;
-  box-shadow:none!important;
-}
-.finance-shell .finance-side-brand span,
-.jbcs-products-redesign .finance-side-brand span,
-.jbcs-products-redesign .jbcs-product-brand-copy strong{color:#111827!important}
-.finance-shell .finance-side-brand small,
-.jbcs-products-redesign .finance-side-brand small,
-.jbcs-products-redesign .jbcs-product-brand-copy small{color:#9f1d35!important}
-.finance-shell .finance-side-workspace,
-.jbcs-products-redesign .finance-side-workspace{
-  background:#f8fafc!important;
-  border-color:#e5e7eb!important;
-}
-.finance-shell .finance-side-workspace b,
-.finance-shell .finance-side-bottom b,
-.jbcs-products-redesign .finance-side-workspace b,
-.jbcs-products-redesign .finance-side-bottom b{color:#111827!important}
-.finance-shell .finance-side-workspace small,
-.finance-shell .finance-side-bottom small,
-.jbcs-products-redesign .finance-side-workspace small,
-.jbcs-products-redesign .finance-side-bottom small{color:#64748b!important}
-.finance-shell .finance-side-label,
-.jbcs-products-redesign .finance-side-label{color:#64748b!important}
-.finance-shell .finance-side-nav a,
-.jbcs-products-redesign .finance-side-nav a{
-  color:#1f2937!important;
-  border-radius:9px!important;
-  font-weight:600!important;
-  transition:background .18s ease,color .18s ease,transform .18s ease!important;
-}
-.finance-shell .finance-side-nav a:hover,
-.jbcs-products-redesign .finance-side-nav a:hover{
-  color:#b51227!important;
-  background:#fff1f2!important;
-}
-.finance-shell .finance-side-nav a.selected,
-.jbcs-products-redesign .finance-side-nav a.selected{
-  color:#fff!important;
-  background:#e9162b!important;
-  box-shadow:0 4px 10px #e9162b20!important;
-}
-.finance-shell .finance-side-nav a.selected span,
-.jbcs-products-redesign .finance-side-nav a.selected span{color:#fff!important}
-.finance-shell .finance-side-bottom,
-.jbcs-products-redesign .finance-side-bottom{border-top-color:#e5e7eb!important}
-.finance-shell .finance-side-back,
-.jbcs-products-redesign .finance-side-back{color:#64748b!important}
-.finance-shell .finance-side-back:hover,
-.jbcs-products-redesign .finance-side-back:hover{color:#b51227!important}
-.finance-shell .finance-side-signout,
-.jbcs-products-redesign .finance-side-signout{
-  border-color:#e5e7eb!important;
-  color:#334155!important;
-  background:#fff!important;
-}
-.finance-shell .finance-side-signout:hover,
-.jbcs-products-redesign .finance-side-signout:hover{
-  color:#b51227!important;background:#fff1f2!important;border-color:#fecdd3!important;
-}
-.finance-shell .finance-app-main>.inner-content,
-.jbcs-products-redesign>.finance-app-main>.inner-content{padding-left:clamp(18px,2.1vw,32px)!important;padding-right:clamp(18px,2.1vw,32px)!important}
-.finance-shell .invoice-list-panel,
-.finance-shell #expense-list,
-.jbcs-products-redesign .jbcs-panel,
-.jbcs-products-redesign .invoice-list-panel{
-  border-color:#dfe4eb!important;
-  border-radius:14px!important;
-  box-shadow:0 2px 8px #0f172a06!important;
-}
-.finance-shell .invoice-feature-card,
-.jbcs-products-redesign .invoice-feature-card{
-  border-color:#e2e8f0!important;
-  border-radius:13px!important;
-  box-shadow:0 2px 8px #0f172a05!important;
-}
-.finance-shell .invoice-feature-card:hover,
-.jbcs-products-redesign .invoice-feature-card:hover{
-  border-color:#fecdd3!important;
-  box-shadow:0 8px 22px #9f1d350c!important;
-}
-.finance-shell .finance-side-signout:focus-visible,
-.finance-shell .finance-side-nav a:focus-visible,
-.jbcs-products-redesign .finance-side-nav a:focus-visible{outline:2px solid #f3192d!important;outline-offset:3px}
-@media(max-width:650px){
-  .finance-shell>.finance-side-rail,
-  .jbcs-products-redesign>.finance-side-rail{border-right:0!important;border-bottom:1px solid #e2e8f0!important}
-  .finance-shell .finance-side-nav a,
-  .jbcs-products-redesign .finance-side-nav a{background:#f8fafc!important;color:#334155!important}
-  .finance-shell .finance-side-nav a.selected,
-  .jbcs-products-redesign .finance-side-nav a.selected{background:#e9162b!important;color:#fff!important}
-  .finance-shell .finance-app-main>.inner-content,
-  .jbcs-products-redesign>.finance-app-main>.inner-content{padding-left:13px!important;padding-right:13px!important}
+function monthStart(): Date {
+  const now = new Date();
+  return new Date(now.getFullYear(), now.getMonth(), 1);
 }
 
+function isThisMonth(value?: string | null): boolean {
+  if (!value) return false;
 
-/* Shared inline finance navigation used by the registers and report pages. */
-aside.fixed.inset-y-0.left-0:has(a[href^="/workspace/finance/"]) {
-  background:#fff!important;
-  border-right-color:#e2e8f0!important;
-  box-shadow:2px 0 12px #0f172a05!important;
-}
-aside.fixed.inset-y-0.left-0:has(a[href^="/workspace/finance/"]) a[aria-current="page"]{
-  background:#e9162b!important;
-  color:#fff!important;
-  box-shadow:0 4px 10px #e9162b20!important;
-}
-aside.fixed.inset-y-0.left-0:has(a[href^="/workspace/finance/"]) a[aria-current="page"] svg{
-  color:#fff!important;
-}
-aside.fixed.inset-y-0.left-0:has(a[href^="/workspace/finance/"]) a[aria-current="page"] span.h-1\.5{
-  background:#fff!important;
-}
-aside.fixed.inset-y-0.left-0:has(a[href^="/workspace/finance/"]) a:not([aria-current="page"]):hover{
-  background:#fff1f2!important;
-  color:#b51227!important;
-}
-aside.fixed.inset-y-0.left-0:has(a[href^="/workspace/finance/"]) a:not([aria-current="page"]):hover svg{
-  color:#b51227!important;
+  const date = new Date(value);
+  return (
+    !Number.isNaN(date.getTime()) &&
+    date >= monthStart() &&
+    date <= new Date()
+  );
 }
 
-
-/* Dashboard charts: quiet horizontal guides and a clean, accessible hover state. */
-.dashboard-chart-grid{
-  background-image:linear-gradient(to top,rgba(148,163,184,.22) 1px,transparent 1px);
-  background-size:100% 25%;
-  background-position:left bottom;
-  background-repeat:repeat-y;
-}
-.dashboard-chart-bar{
-  transform-origin:bottom center;
-  animation:jbcs-chart-rise .72s cubic-bezier(.2,.75,.25,1) both;
-  transition:filter .18s ease,opacity .18s ease;
-}
-.dashboard-chart-bar:hover{filter:saturate(1.15) brightness(1.04);opacity:.9}
-@keyframes jbcs-chart-rise{
-  from{transform:scaleY(.08);opacity:.45}
-  to{transform:scaleY(1);opacity:1}
-}
-@media(prefers-reduced-motion:reduce){
-  .dashboard-chart-bar{animation:none;transition:none}
-  .dashboard-metric-card{transition:none!important}
+function normalStatus(value?: string | null): string {
+  return (value ?? "unknown").trim().toLowerCase().replace(/[_-]+/g, " ");
 }
 
-
-/* Cleaner Johden dashboard and reporting canvas */
-.jbcs-dashboard-page,.jbcs-reports-page{background:#f6f7f9!important}
-.jbcs-dashboard-page .dashboard-metric-card{border-radius:15px!important;box-shadow:0 2px 8px rgba(15,23,42,.035)!important;padding:18px 20px!important}
-.jbcs-dashboard-page .dashboard-metric-card:hover{transform:translateY(-2px)!important;box-shadow:0 8px 22px rgba(15,23,42,.07)!important}
-.jbcs-dashboard-page .dashboard-chart-panel,.jbcs-dashboard-page .dashboard-insight-panel,.jbcs-dashboard-page .jbcs-dashboard-actions{border-radius:16px!important;box-shadow:0 2px 9px rgba(15,23,42,.035)!important}
-.jbcs-dashboard-page .dashboard-chart-panel,.jbcs-dashboard-page .dashboard-insight-panel{padding:22px!important}
-.jbcs-dashboard-page .dashboard-chart-grid{height:210px!important}
-.jbcs-dashboard-page .jbcs-dashboard-actions{margin-top:22px}
-.jbcs-dashboard-page h1{letter-spacing:-.045em}
-.jbcs-reports-page .report-chart-panel,.jbcs-reports-page section{border-radius:15px}
-.jbcs-reports-page .report-chart-panel{box-shadow:0 2px 9px rgba(15,23,42,.035)!important}
-.jbcs-reports-page .report-chart-panel{padding:20px!important}
-.jbcs-reports-page .report-chart-panel h2{letter-spacing:-.025em}
-.jbcs-reports-page .report-chart-grid{border-radius:10px}
-@media(max-width:640px){
- .jbcs-dashboard-page .dashboard-chart-panel,.jbcs-dashboard-page .dashboard-insight-panel,.jbcs-dashboard-page .jbcs-dashboard-actions{padding:16px!important}
- .jbcs-dashboard-page .dashboard-chart-grid{height:175px!important}
- .jbcs-dashboard-page .dashboard-metric-card{padding:15px!important}
- .jbcs-reports-page .report-chart-panel{padding:15px!important}
+function isPaid(invoice: Invoice): boolean {
+  return ["paid", "completed", "complete"].includes(
+    normalStatus(invoice.status)
+  );
 }
+
+function isCancelled(invoice: Invoice): boolean {
+  return ["cancelled", "canceled", "void", "deleted"].includes(
+    normalStatus(invoice.status)
+  );
+}
+
+function isOverdue(invoice: Invoice): boolean {
+  if (isPaid(invoice) || isCancelled(invoice)) return false;
+
+  if (!invoice.due_date) return false;
+
+  const due = new Date(invoice.due_date);
+  if (Number.isNaN(due.getTime())) return false;
+
+  due.setHours(23, 59, 59, 999);
+  return due.getTime() < Date.now();
+}
+
+function StatusBadge({ status }: { status?: string | null }) {
+  const value = normalStatus(status);
+  const overdue = value === "overdue";
+
+  const style =
+    value === "paid" || value === "completed" || value === "complete"
+      ? "bg-emerald-50 text-emerald-700 ring-emerald-200"
+      : overdue
+        ? "bg-rose-50 text-rose-700 ring-rose-200"
+        : value === "draft"
+          ? "bg-slate-100 text-slate-600 ring-slate-200"
+          : value === "cancelled" || value === "canceled" || value === "void"
+            ? "bg-rose-50 text-rose-600 ring-rose-200"
+            : "bg-amber-50 text-amber-700 ring-amber-200";
+
+  return (
+    <span
+      className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold capitalize ring-1 ring-inset ${style}`}
+    >
+      {status ? normalStatus(status) : "Unknown"}
+    </span>
+  );
+}
+
+function AnimatedMetricValue({ value }: { value: string }) {
+  const numericPart = value.match(/-?[\d,]+(?:\.\d+)?/);
+  const target = numericPart ? Number(numericPart[0].replace(/,/g, "")) : null;
+  const [current, setCurrent] = useState(0);
+
+  useEffect(() => {
+    if (target === null || !Number.isFinite(target)) return;
+    let frame = 0;
+    const startedAt = performance.now();
+    const duration = 1150;
+    const animate = (now: number) => {
+      const progress = Math.min((now - startedAt) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setCurrent(Math.round(target * eased));
+      if (progress < 1) frame = requestAnimationFrame(animate);
+    };
+    frame = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(frame);
+  }, [target]);
+
+  if (!numericPart || target === null || !Number.isFinite(target)) return <>{value}</>;
+  return <>{value.replace(numericPart[0], new Intl.NumberFormat("en-UG").format(current))}</>;
+}
+
+function MetricCard({
+  title,
+  value,
+  detail,
+  icon: Icon,
+  tone,
+  href,
+}: {
+  title: string;
+  value: string;
+  detail: string;
+  icon: typeof Users;
+  tone: "blue" | "green" | "amber" | "purple";
+  href?: string;
+}) {
+  const tones = {
+    blue: "bg-rose-50 text-[#9f1d35]",
+    green: "bg-emerald-50 text-emerald-700",
+    amber: "bg-amber-50 text-amber-700",
+    purple: "bg-violet-50 text-violet-700",
+  };
+
+  const card = (
+    <div className="dashboard-metric-card group rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm transition duration-300 hover:-translate-y-1 hover:border-rose-200 hover:shadow-lg hover:shadow-rose-950/5">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="text-sm font-medium text-slate-500">{title}</p>
+          <p className="mt-3 text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl">
+            <AnimatedMetricValue value={value} />
+          </p>
+        </div>
+        <div className={`rounded-xl p-3 transition duration-300 group-hover:scale-110 ${tones[tone]}`}>
+          <Icon size={21} />
+        </div>
+      </div>
+      <p className="mt-4 text-xs leading-5 text-slate-500">{detail}</p>
+      <div className="dashboard-metric-glow mt-4 h-1 overflow-hidden rounded-full bg-slate-100">
+        <div className={`dashboard-metric-glow-fill h-full rounded-full ${tone === "green" ? "bg-emerald-500" : tone === "amber" ? "bg-amber-500" : tone === "purple" ? "bg-violet-500" : "bg-[#F3192D]"}`} />
+      </div>
+    </div>
+  );
+  return href ? <Link href={href} aria-label={`Open ${title}`} className="block h-full rounded-2xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F3192D]">{card}</Link> : card;
+}
+
+function SectionTitle({
+  title,
+  subtitle,
+  href,
+  linkText = "View all",
+}: {
+  title: string;
+  subtitle: string;
+  href?: string;
+  linkText?: string;
+}) {
+  return (
+    <div className="flex flex-wrap items-end justify-between gap-3">
+      <div>
+        <h2 className="text-lg font-bold tracking-tight text-slate-900">
+          {title}
+        </h2>
+        <p className="mt-1 text-sm text-slate-500">{subtitle}</p>
+      </div>
+      {href && (
+        <Link
+          href={href}
+          className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#F3192D] hover:text-blue-900"
+        >
+          {linkText}
+          <ArrowRight size={15} />
+        </Link>
+      )}
+    </div>
+  );
+}
+
+export default function FinanceDashboardPage() {
+  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [expenses, setExpenses] = useState<Expense[]>([]);
+  const [supplierPayments, setSupplierPayments] = useState<SupplierPayment[]>([]);
+  const [customerPayments, setCustomerPayments] = useState<CustomerPayment[]>([]);
+  const [directSalesReceipts, setDirectSalesReceipts] = useState<DirectSalesReceipt[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState("");
+  const [accountEmail, setAccountEmail] = useState("");
+  const [planKey, setPlanKey] = useState("basic");
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+
+    fetch("/api/saas/me", {
+      method: "GET",
+      credentials: "same-origin",
+      cache: "no-store",
+    })
+      .then(async (response) => {
+        if (!response.ok) return null;
+        return response.json();
+      })
+      .then((data) => {
+        if (active && typeof data?.email === "string") {
+          setAccountEmail(data.email);
+        }
+        if (active && data?.isSuperAdmin === true) {
+          setIsSuperAdmin(true);
+          setPlanKey("pro");
+        }
+      })
+      .catch(() => {
+        // Keep the dashboard usable if account details cannot be loaded.
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+
+  const loadDashboard = useCallback(async (manual = false) => {
+    if (manual) setRefreshing(true);
+    else setLoading(true);
+
+    setError("");
+
+    try {
+      const planResponse = await fetch("/api/saas/plan", { cache: "no-store", credentials: "same-origin" });
+      const planData = await planResponse.json();
+      if (!planResponse.ok) throw new Error(planData.error || "Could not verify the subscription plan.");
+      const adminAccess = !!planData.plan?.isSuperAdmin;
+      const effectivePlan = planData.plan?.key === "pro" || adminAccess ? "pro" : "basic";
+      setPlanKey(effectivePlan);
+      setIsSuperAdmin(adminAccess);
+
+      const requests = [
+        fetch("/api/saas/customers", { cache: "no-store", credentials: "same-origin" }),
+        fetch("/api/saas/invoices", { cache: "no-store", credentials: "same-origin" }),
+        fetch("/api/saas/expenses", { cache: "no-store", credentials: "same-origin" }),
+        fetch("/api/saas/payments", { cache: "no-store", credentials: "same-origin" }),
+        fetch("/api/saas/sales-receipts", { cache: "no-store", credentials: "same-origin" }),
+      ];
+      const labels = ["customers", "invoices", "expenses", "customer payments", "direct sales receipts"];
+      if (effectivePlan === "pro") {
+        requests.push(fetch("/api/saas/supplier-payments", { cache: "no-store", credentials: "same-origin" }));
+        labels.push("supplier payments");
+      }
+      const results = await Promise.allSettled(requests);
+      const data: Record<string, unknown> = {};
+      const errors: string[] = [];
+
+      for (let index = 0; index < results.length; index++) {
+        const result = results[index];
+        const label = labels[index];
+
+        if (result.status === "rejected") {
+          errors.push(`Could not load ${label}.`);
+          continue;
+        }
+
+        if (!result.value.ok) {
+          let message = "";
+
+          try {
+            const body = await result.value.clone().json();
+            message =
+              typeof body?.error === "string" ? body.error : "";
+          } catch {
+            // Keep the fallback message if the response is not JSON.
+          }
+
+          if (result.value.status === 402) {
+            errors.push(
+              message ||
+                "Your workspace subscription could not be verified. Finance data is temporarily unavailable."
+            );
+          } else if (result.value.status === 401) {
+            errors.push("Your session has expired. Please sign in again.");
+          } else if (result.value.status === 409) {
+            errors.push(
+              message || "Please select an authorised workspace."
+            );
+          } else {
+            errors.push(
+              message || `Could not load ${label} (HTTP ${result.value.status}).`
+            );
+          }
+
+          continue;
+        }
+
+        try {
+          data[label] = await result.value.json();
+        } catch {
+          errors.push(`The ${label} response could not be read.`);
+        }
+      }
+
+      const customerPayload = data.customers as
+        | { customers?: Customer[] }
+        | undefined;
+      const invoicePayload = data.invoices as
+        | { invoices?: Invoice[] }
+        | undefined;
+      const expensePayload = data.expenses as
+        | { expenses?: Expense[] }
+        | undefined;
+      const supplierPaymentPayload = data["supplier payments"] as
+        | { payments?: SupplierPayment[]; migration_required?: boolean }
+        | undefined;
+      const customerPaymentPayload = data["customer payments"] as { payments?: CustomerPayment[] } | undefined;
+      const directSalesPayload = data["direct sales receipts"] as { receipts?: DirectSalesReceipt[] } | undefined;
+
+      setCustomers(
+        Array.isArray(customerPayload?.customers)
+          ? customerPayload.customers
+          : []
+      );
+      setInvoices(
+        Array.isArray(invoicePayload?.invoices)
+          ? invoicePayload.invoices
+          : []
+      );
+      setExpenses(
+        Array.isArray(expensePayload?.expenses)
+          ? expensePayload.expenses
+          : []
+      );
+      setSupplierPayments(
+        Array.isArray(supplierPaymentPayload?.payments)
+          ? supplierPaymentPayload.payments
+          : []
+      );
+      setCustomerPayments(Array.isArray(customerPaymentPayload?.payments) ? customerPaymentPayload.payments : []);
+      setDirectSalesReceipts(Array.isArray(directSalesPayload?.receipts) ? directSalesPayload.receipts : []);
+      if (supplierPaymentPayload?.migration_required) {
+        errors.push("Supplier payment records could not be loaded. Check the supplier payments database setup.");
+      }
+
+      setLastUpdated(new Date());
+
+      if (errors.length) setError([...new Set(errors)].join(" "));
+    } catch {
+      setError("Unable to load your dashboard. Please try again.");
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void loadDashboard();
+  }, [loadDashboard]);
+
+  const stats = useMemo(() => {
+    const activeInvoices = invoices.filter(
+      (invoice) => !isPaid(invoice) && !isCancelled(invoice)
+    );
+
+    const outstanding = activeInvoices.reduce(
+      (sum, invoice) => sum + invoiceAmount(invoice),
+      0
+    );
+
+    const overdueInvoices = activeInvoices.filter(isOverdue);
+
+    const monthlyExpenses = expenses
+      .filter((expense) =>
+        isThisMonth(
+          expense.expense_date ?? expense.date ?? expense.created_at
+        )
+      )
+      .reduce(
+        (sum, expense) => sum + expenseAmount(expense),
+        0
+      );
+
+    const monthlySupplierPayments = supplierPayments
+      .filter((payment) =>
+        isThisMonth(payment.payment_date ?? payment.created_at)
+      )
+      .reduce((sum, payment) => sum + supplierPaymentAmount(payment), 0);
+
+    const monthlySales = customerPayments
+      .filter((payment) => isThisMonth(payment.payment_date ?? payment.created_at))
+      .reduce((sum, payment) => sum + asNumber(payment.amount), 0)
+      + directSalesReceipts
+        .filter((receipt) => isThisMonth(receipt.sale_date ?? receipt.created_at))
+        .reduce((sum, receipt) => sum + asNumber(receipt.total), 0);
+
+    const recentCustomers = [...customers].sort(
+      (a, b) =>
+        new Date(b.created_at ?? 0).getTime() -
+        new Date(a.created_at ?? 0).getTime()
+    );
+
+    const recentInvoices = [...invoices].sort(
+      (a, b) =>
+        new Date(b.created_at ?? b.issue_date ?? 0).getTime() -
+        new Date(a.created_at ?? a.issue_date ?? 0).getTime()
+    );
+
+    return {
+      customerCount: customers.length,
+      invoiceCount: invoices.length,
+      outstanding,
+      overdueCount: overdueInvoices.length,
+      overdueAmount: overdueInvoices.reduce(
+        (sum, invoice) => sum + invoiceAmount(invoice),
+        0
+      ),
+      monthlyExpenses,
+      monthlySupplierPayments,
+      monthlySales,
+      recentSupplierPayments: [...supplierPayments]
+        .sort(
+          (a, b) =>
+            new Date(b.payment_date ?? b.created_at ?? 0).getTime() -
+            new Date(a.payment_date ?? a.created_at ?? 0).getTime()
+        )
+        .slice(0, 5),
+      recentCustomers: recentCustomers.slice(0, 5),
+      recentInvoices: recentInvoices.slice(0, 6),
+      recentExpenses: [...expenses]
+        .sort(
+          (a, b) =>
+            new Date(
+              b.expense_date ?? b.date ?? b.created_at ?? 0
+            ).getTime() -
+            new Date(
+              a.expense_date ?? a.date ?? a.created_at ?? 0
+            ).getTime()
+        )
+        .slice(0, 5),
+    };
+  }, [customers, invoices, expenses, supplierPayments, customerPayments, directSalesReceipts]);
+
+  const monthlyTrend = useMemo(() => {
+    const now = new Date();
+    return Array.from({ length: 6 }, (_, index) => {
+      const monthStartDate = new Date(now.getFullYear(), now.getMonth() - 5 + index, 1);
+      const nextMonthDate = new Date(monthStartDate.getFullYear(), monthStartDate.getMonth() + 1, 1);
+      const inMonth = (value?: string | null) => {
+        if (!value) return false;
+        const date = new Date(value);
+        return !Number.isNaN(date.getTime()) && date >= monthStartDate && date < nextMonthDate;
+      };
+      const sales = customerPayments
+        .filter((payment) => inMonth(payment.payment_date ?? payment.created_at))
+        .reduce((sum, payment) => sum + asNumber(payment.amount), 0)
+        + directSalesReceipts
+          .filter((receipt) => inMonth(receipt.sale_date ?? receipt.created_at))
+          .reduce((sum, receipt) => sum + asNumber(receipt.total), 0);
+      const costs = expenses
+        .filter((expense) => inMonth(expense.expense_date ?? expense.date ?? expense.created_at))
+        .reduce((sum, expense) => sum + expenseAmount(expense), 0);
+      return {
+        label: new Intl.DateTimeFormat("en-UG", { month: "short" }).format(monthStartDate),
+        sales,
+        expenses: costs,
+      };
+    });
+  }, [customerPayments, directSalesReceipts, expenses]);
+
+  const invoiceStatusSummary = useMemo(() => {
+    const active = invoices.filter((invoice) => !isCancelled(invoice));
+    const paid = active.filter(isPaid).length;
+    const overdue = active.filter(isOverdue).length;
+    const sent = Math.max(0, active.length - paid - overdue);
+    const total = active.length;
+    const percent = (count: number) => total ? Math.round((count / total) * 100) : 0;
+    return { paid, overdue, sent, total, paidPercent: percent(paid), overduePercent: percent(overdue), sentPercent: percent(sent) };
+  }, [invoices]);
+
+
+
+  const today = new Intl.DateTimeFormat("en-UG", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(new Date());
+
+  return (
+    <div className="jbcs-dashboard-page min-h-screen bg-slate-50 text-slate-900">
+      <div className="flex min-h-screen flex-col">
+        <FinanceSidebar activeHref="/workspace/finance" hiddenHrefs={isSuperAdmin || planKey === "pro" ? [] : ["/workspace/finance/owner-income", "/workspace/finance/reports"]} showMobileNav={false} desktopFrom="lg" />
+
+        <main className="min-w-0 flex-1 lg:ml-[264px] jbcs-finance-consistent-main">
+          <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/95 backdrop-blur">
+            <div className="flex min-h-[76px] items-center justify-between gap-4 px-4 py-3 sm:px-6 xl:px-10">
+              <div className="flex min-w-0 items-center gap-3">
+                
+                <div className="min-w-0">
+                  <p className="text-xs font-medium text-slate-500">
+                    Johden Business Consultancy Services
+                  </p>
+                  <h1 className="truncate text-lg font-bold tracking-tight sm:text-xl">
+                    Dashboard
+                  </h1>
+                </div>
+              </div>
+
+              <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+                {isSuperAdmin && <Link href="/workspace/admin" className="hidden rounded-xl border border-rose-200 bg-rose-50 px-3 py-2.5 text-xs font-semibold text-[#9f1d35] hover:bg-rose-100 sm:inline-flex">Platform Admin</Link>}
+                <button
+                  type="button"
+                  onClick={() => void loadDashboard(true)}
+                  disabled={loading || refreshing}
+                  title="Refresh dashboard"
+                  className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 transition hover:bg-slate-50 disabled:opacity-50"
+                >
+                  <RefreshCw
+                    size={17}
+                    className={
+                      refreshing ? "animate-spin" : ""
+                    }
+                  />
+                </button>
+                <button
+                  type="button"
+                  title="Notifications"
+                  className="relative hidden h-10 w-10 items-center justify-center rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 sm:flex"
+                >
+                  <Bell size={18} />
+                  <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-[#F3192D] ring-2 ring-white" />
+                </button>
+                <div className="flex min-w-0 items-center gap-2 sm:gap-3">
+                  <div className="hidden min-w-0 text-right sm:block">
+                    <p className="max-w-[220px] truncate text-sm font-semibold text-slate-800">
+                      {accountEmail || "Signed-in user"}
+                    </p>
+                    <p className="text-xs text-slate-500">Logged in</p>
+                  </div>
+                  <form action="/api/saas/logout" method="post">
+                    <button
+                      type="submit"
+                      className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-700 transition hover:border-[#F3192D] hover:bg-[#fff5f5] hover:text-[#9f1d35]"
+                    >
+                      <span aria-hidden="true">↪</span>
+                      <span>Log Out</span>
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </header>
+
+          <div className="mx-auto max-w-[1600px] space-y-7 p-4 sm:p-6 xl:p-10">
+            <section className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+              <div>
+                <div className="mb-2 flex items-center gap-2 text-sm text-slate-500">
+                  <CalendarDays size={16} />
+                  {today}
+                </div>
+                <h2 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+                  Welcome to your workspace
+                </h2>
+                <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
+                  Keep track of customers, sales, outstanding invoices and
+                  business expenses from one place.
+                </p>
+              </div>
+
+              <div className="flex flex-wrap gap-2">
+                <Link
+                  href="/workspace/finance/customers"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50"
+                >
+                  <Plus size={17} />
+                  Add customer
+                </Link>
+                <Link
+                  href="/workspace/finance/invoices"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#F3192D] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#CF1022]"
+                >
+                  <FilePlus2 size={17} />
+                  Create invoice
+                </Link>
+              </div>
+            </section>
+
+            {error && (
+              <div
+                role="alert"
+                className="flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4"
+              >
+                <XCircle
+                  size={21}
+                  className="mt-0.5 shrink-0 text-amber-700"
+                />
+                <div className="min-w-0 flex-1">
+                  <p className="font-semibold text-amber-900">
+                    Some dashboard information is unavailable
+                  </p>
+                  <p className="mt-1 text-sm leading-6 text-amber-800">
+                    {error}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => void loadDashboard(true)}
+                  className="shrink-0 rounded-lg px-3 py-2 text-sm font-semibold text-amber-900 hover:bg-amber-100"
+                >
+                  Retry
+                </button>
+              </div>
+            )}
+
+            <section aria-label="Key financial indicators" className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+              <MetricCard
+                title="Outstanding invoices"
+                value={loading && invoices.length === 0 ? "—" : money(stats.outstanding)}
+                detail={`${stats.overdueCount} overdue invoice${stats.overdueCount === 1 ? "" : "s"}`}
+                icon={CircleDollarSign}
+                tone="amber"
+                href="/workspace/finance/invoices"
+              />
+              <MetricCard
+                title="Sales collected this month"
+                value={loading && invoices.length === 0 ? "—" : money(stats.monthlySales)}
+                detail="Invoice payments and direct sales receipts recorded this month"
+                icon={ChartNoAxesCombined}
+                tone="green"
+                href="/workspace/finance/payments"
+              />
+              <MetricCard
+                title="Expenses this month"
+                value={loading && expenses.length === 0 ? "—" : money(stats.monthlyExpenses)}
+                detail="Expense records only; supplier payments are shown separately"
+                icon={Wallet}
+                tone="purple"
+                href="/workspace/finance/expenses"
+              />
+              {(planKey === "pro" || isSuperAdmin) && (
+                <MetricCard
+                  title="Supplier payments this month"
+                  value={loading && supplierPayments.length === 0 ? "—" : money(stats.monthlySupplierPayments)}
+                  detail="Cash paid to suppliers this month"
+                  icon={CreditCard}
+                  tone="amber"
+                  href="/workspace/finance/supplier-payments"
+                />
+              )}
+            </section>
+
+            <section className="grid gap-6 xl:grid-cols-[1.5fr_1fr]">
+              <div className="dashboard-chart-panel min-w-0 rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm sm:p-6">
+                <div className="flex flex-wrap items-start justify-between gap-4">
+                  <div>
+                    <div className="mb-2 inline-flex items-center gap-2 rounded-full bg-rose-50 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider text-[#9f1d35]">
+                      <Activity size={13} /> Business pulse
+                    </div>
+                    <SectionTitle title="Performance overview" subtitle="Collected sales compared with recorded expenses" />
+                  </div>
+                  <span className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-500">Last 6 months</span>
+                </div>
+
+                <div className="mt-6 flex flex-wrap items-center gap-4 text-xs font-medium text-slate-600">
+                  <span className="inline-flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-[#9f1d35]" /> Sales collected</span>
+                  <span className="inline-flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-rose-200" /> Expenses recorded</span>
+                </div>
+
+                <div className="dashboard-chart-grid mt-5 grid h-52 grid-cols-6 gap-2 border-b border-slate-100 sm:gap-4">
+                  {monthlyTrend.map((month, index) => {
+                    const maxValue = Math.max(1, ...monthlyTrend.flatMap((item) => [item.sales, item.expenses]));
+                    const salesHeight = month.sales > 0 ? Math.max(5, (month.sales / maxValue) * 100) : 0;
+                    const expensesHeight = month.expenses > 0 ? Math.max(5, (month.expenses / maxValue) * 100) : 0;
+                    return (
+                      <div key={month.label + index} className="flex min-w-0 flex-col items-center justify-end">
+                        <div className="flex h-[calc(100%_-_28px)] w-full items-end justify-center gap-1 sm:gap-2">
+                          <div className="dashboard-chart-bar w-[42%] max-w-7 rounded-t-md bg-[#9f1d35] shadow-sm shadow-rose-900/10" style={{ height: `${salesHeight}%`, animationDelay: `${index * 90}ms` }} title={`Sales: ${money(month.sales)}`} />
+                          <div className="dashboard-chart-bar w-[42%] max-w-7 rounded-t-md bg-rose-200" style={{ height: `${expensesHeight}%`, animationDelay: `${index * 90 + 60}ms` }} title={`Expenses: ${money(month.expenses)}`} />
+                        </div>
+                        <span className="pb-2 pt-2 text-[10px] font-semibold text-slate-500 sm:text-xs">{month.label}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+                <div className="mt-4 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500">
+                  <span>Data sources: customer payments + direct sales receipts for sales collected; expense records for expenses.</span><span className="flex flex-wrap gap-3 font-semibold"><Link href="/workspace/finance/payments" className="text-[#9f1d35] hover:underline">Payments</Link><Link href="/workspace/finance/sales-receipts" className="text-[#9f1d35] hover:underline">Sales receipts</Link><Link href="/workspace/finance/expenses" className="text-[#9f1d35] hover:underline">Expenses</Link></span>
+                  {(planKey === "pro" || isSuperAdmin) && (
+                    <Link href="/workspace/finance/reports" className="inline-flex items-center gap-1 font-semibold text-[#9f1d35] hover:text-[#74162a]">
+                      Explore reports <ArrowRight size={14} />
+                    </Link>
+                  )}
+                </div>
+              </div>
+
+              <div className="dashboard-insight-panel relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <h2 className="text-lg font-bold tracking-tight text-slate-900">Invoice status</h2>
+                    <p className="mt-1 text-sm text-slate-500">Breakdown of active invoices by status</p>
+                  </div>
+                  <Link href="/workspace/finance/invoices" className="text-xs font-semibold text-[#9f1d35] hover:underline">View invoices <ArrowRight size={13} className="inline" /></Link>
+                </div>
+                <div className="mt-5 flex flex-col items-center gap-5 sm:flex-row sm:items-center sm:justify-center">
+                  <div className="relative h-40 w-40 shrink-0 rounded-full" style={{ background: invoiceStatusSummary.total ? `conic-gradient(#059669 0% ${invoiceStatusSummary.paidPercent}%, #f59e0b ${invoiceStatusSummary.paidPercent}% ${invoiceStatusSummary.paidPercent + invoiceStatusSummary.sentPercent}%, #e9162b ${invoiceStatusSummary.paidPercent + invoiceStatusSummary.sentPercent}% 100%)` : "#e2e8f0" }} role="img" aria-label={`${invoiceStatusSummary.total} active invoices: ${invoiceStatusSummary.paid} paid, ${invoiceStatusSummary.sent} outstanding, ${invoiceStatusSummary.overdue} overdue`}>
+                    <div className="absolute inset-[22px] flex flex-col items-center justify-center rounded-full bg-white text-center">
+                      <span className="text-3xl font-bold tracking-tight text-slate-950">{invoiceStatusSummary.total.toLocaleString("en-UG")}</span>
+                      <span className="text-xs font-medium text-slate-500">Invoices</span>
+                    </div>
+                  </div>
+                  <div className="w-full max-w-[220px] space-y-3">
+                    {[
+                      { label: "Paid", count: invoiceStatusSummary.paid, percent: invoiceStatusSummary.paidPercent, color: "bg-emerald-500" },
+                      { label: "Outstanding", count: invoiceStatusSummary.sent, percent: invoiceStatusSummary.sentPercent, color: "bg-amber-500" },
+                      { label: "Overdue", count: invoiceStatusSummary.overdue, percent: invoiceStatusSummary.overduePercent, color: "bg-rose-600" },
+                    ].map((item) => (
+                      <div key={item.label} className="flex items-center justify-between gap-3 border-b border-slate-100 pb-2 last:border-0">
+                        <div className="flex items-center gap-2">
+                          <span className={`h-3 w-3 rounded-sm ${item.color}`} />
+                          <span className="text-sm text-slate-700">{item.label}</span>
+                        </div>
+                        <div className="text-right">
+                          <span className="block text-sm font-bold text-slate-900">{item.percent}%</span>
+                          <span className="text-[11px] text-slate-500">{item.count} invoices</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="mt-5 grid grid-cols-2 gap-3 border-t border-slate-100 pt-4">
+                  <div className="rounded-xl bg-slate-50 p-3">
+                    <p className="text-xs text-slate-500">Outstanding balance</p>
+                    <p className="mt-1 text-base font-bold text-[#9f1d35]">{money(stats.outstanding)}</p>
+                  </div>
+                  <div className="rounded-xl bg-slate-50 p-3">
+                    <p className="text-xs text-slate-500">Overdue amount</p>
+                    <p className="mt-1 text-base font-bold text-slate-900">{money(stats.overdueAmount)}</p>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section className="jbcs-dashboard-actions rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+              <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                  <p className="text-[11px] font-bold uppercase tracking-[.16em] text-[#F3192D]">Quick actions</p>
+                  <h2 className="mt-1 text-lg font-bold tracking-tight text-slate-900">Get things done</h2>
+                  <p className="mt-1 text-sm text-slate-500">Jump straight to a common finance task.</p>
+                </div>
+                {(planKey === "pro" || isSuperAdmin) && <Link href="/workspace/finance/reports" className="inline-flex items-center gap-2 text-sm font-semibold text-[#9f1d35] hover:underline">Open financial reports <ArrowRight size={15} /></Link>}
+              </div>
+              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                {[
+                  { title: "Record a payment", description: "Register customer money received", icon: CreditCard, href: "/workspace/finance/payments", tone: "bg-rose-50 text-[#F3192D]" },
+                  { title: "Record an expense", description: "Track business spending", icon: Wallet, href: "/workspace/finance/expenses", tone: "bg-amber-50 text-amber-700" },
+                  { title: "Manage customers", description: "Open your customer register", icon: Users, href: "/workspace/finance/customers", tone: "bg-emerald-50 text-emerald-700" },
+                  { title: "Supplier payments", description: "Review and record supplier payments", icon: CreditCard, href: "/workspace/finance/supplier-payments", tone: "bg-slate-100 text-slate-700", pro: true },
+                  { title: "Owner income & commissions", description: "Manage owner records", icon: CircleDollarSign, href: "/workspace/finance/owner-income", tone: "bg-slate-100 text-slate-700", pro: true },
+                ].filter((action) => !action.pro || isSuperAdmin || planKey === "pro").map((action) => {
+                  const Icon = action.icon;
+                  return <Link key={action.title} href={action.href} className="group flex min-w-0 items-center gap-3 rounded-xl border border-slate-200 p-3.5 transition hover:border-rose-200 hover:bg-rose-50/40">
+                    <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${action.tone}`}><Icon size={19} /></span>
+                    <span className="min-w-0"><span className="block text-sm font-semibold text-slate-800">{action.title}</span><span className="mt-0.5 block text-xs text-slate-500">{action.description}</span></span>
+                    <ArrowRight size={15} className="ml-auto shrink-0 text-slate-400 transition group-hover:translate-x-0.5 group-hover:text-[#F3192D]" />
+                  </Link>;
+                })}
+              </div>
+            </section>
+
+            <footer className="flex flex-col justify-between gap-2 border-t border-slate-200 py-5 text-xs text-slate-400 sm:flex-row sm:items-center">
+              <p>Johden Business Consultancy Services · Finance workspace</p>
+              <p>
+                {lastUpdated
+                  ? `Last refreshed ${lastUpdated.toLocaleTimeString("en-UG", {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}`
+                  : "Dashboard"}
+              </p>
+            </footer>
+          </div>
+
+          <nav className="sticky bottom-0 z-20 grid grid-cols-3 border-t border-slate-200 bg-white px-1 py-2 lg:hidden">
+            {[
+              {
+                label: "Home",
+                href: "/workspace/finance",
+                icon: LayoutDashboard,
+              },
+              {
+                label: "Customers",
+                href: "/workspace/finance/customers",
+                icon: Users,
+              },
+              {
+                label: "Invoices",
+                href: "/workspace/finance/invoices",
+                icon: FileText,
+              },
+              {
+                label: "Expenses",
+                href: "/workspace/finance/expenses",
+                icon: Wallet,
+              },
+              {
+                label: "Owner Income",
+                href: "/workspace/finance/owner-income",
+                icon: Wallet,
+              },
+              {
+                label: "Reports",
+                href: "/workspace/finance/reports",
+                icon: FileBarChart,
+              },
+            ].filter((item) => isSuperAdmin || planKey === "pro" || !["Owner Income", "Reports"].includes(item.label)).map((item) => {
+              const Icon = item.icon;
+
+              return (
+                <Link
+                  key={item.label}
+                  href={item.href}
+                  className={`flex flex-col items-center gap-1 rounded-lg py-2 text-[10px] font-medium ${
+                    item.label === "Dashboard"
+                      ? "text-[#F3192D]"
+                      : "text-slate-500 hover:text-slate-900"
+                  }`}
+                >
+                  <Icon size={19} />
+                  {item.label}
+                </Link>
+              );
+            })}
+          </nav>
+        </main>
+      </div>
+    </div>
+  );
+}
+
+
+
+
+/* JBCS Finance visual system — shared visual tokens and surface rules */
+:root{
+  --finance-canvas:#f6f7f9;
+  --finance-surface:#ffffff;
+  --finance-ink:#262326;
+  --finance-muted:#69666b;
+  --finance-line:#e4e7ec;
+  --finance-red:#f3192d;
+  --finance-red-dark:#c91024;
+  --finance-orange:#f58220;
+  --finance-success:#15803d;
+  --finance-warning:#b45309;
+  --finance-danger:#b91c1c;
+  --finance-info:#1d4ed8;
+  --finance-radius-sm:8px;
+  --finance-radius-md:12px;
+  --finance-radius-lg:16px;
+  --finance-shadow:0 1px 2px rgba(26,29,36,.03),0 8px 24px rgba(26,29,36,.045);
+}
+.finance-shared-sidebar{background:var(--finance-surface)!important;border-color:var(--finance-line)!important}
+.finance-shared-sidebar nav{scrollbar-width:thin;scrollbar-color:#d9dde4 transparent}
+.finance-shared-sidebar a{line-height:1.25}
+.finance-shared-sidebar a[aria-current='page']{background:var(--finance-red)!important;box-shadow:0 5px 14px rgba(243,25,45,.12)}
+.finance-mobile-nav{scrollbar-width:none}
+.finance-mobile-nav::-webkit-scrollbar{display:none}
+main.jbcs-finance-consistent-main{min-height:100vh;background:var(--finance-canvas)!important;color:var(--finance-ink)}
+main.jbcs-finance-consistent-main input:focus,main.jbcs-finance-consistent-main select:focus,main.jbcs-finance-consistent-main textarea:focus{border-color:var(--finance-red);box-shadow:0 0 0 3px rgba(243,25,45,.10);outline:none}
+.jbcs-dashboard-page{background:var(--finance-canvas)!important}
+.jbcs-dashboard-page .dashboard-metric-card,.jbcs-dashboard-page .dashboard-chart-panel,.jbcs-dashboard-page .dashboard-insight-panel,.jbcs-dashboard-page .jbcs-dashboard-actions{border-color:var(--finance-line)!important;border-radius:var(--finance-radius-md)!important;box-shadow:var(--finance-shadow)!important}
+.jbcs-dashboard-page .dashboard-metric-card{padding:18px!important}
+.jbcs-dashboard-page .dashboard-metric-card:hover{border-color:#f5bcc3!important;transform:translateY(-1px)}
+.jbcs-dashboard-page .dashboard-chart-grid{border-color:#eef0f3!important}
+.jbcs-dashboard-page a:focus-visible,.jbcs-reports-page a:focus-visible,main.jbcs-finance-consistent-main button:focus-visible{outline:2px solid var(--finance-red)!important;outline-offset:2px}
+.jbcs-reports-page{background:var(--finance-canvas)!important}
+.jbcs-finance-consistent-main .jbcs-primary-button,main.jbcs-finance-consistent-main button.bg-\\[\\#F3192D\\]{background:var(--finance-red)!important}
+.jbcs-finance-consistent-main .jbcs-primary-button:hover,main.jbcs-finance-consistent-main button.bg-\\[\\#F3192D\\]:hover{background:var(--finance-red-dark)!important}
+@media(max-width:767px){.jbcs-dashboard-page .dashboard-metric-card{padding:16px!important}.jbcs-dashboard-page .dashboard-chart-panel,.jbcs-dashboard-page .dashboard-insight-panel,.jbcs-dashboard-page .jbcs-dashboard-actions{padding:16px!important}}
