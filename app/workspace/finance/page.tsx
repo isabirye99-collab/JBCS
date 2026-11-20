@@ -340,12 +340,16 @@ function MetricCard({
   detail,
   icon: Icon,
   tone,
+  href,
+  linkText,
 }: {
   title: string;
   value: string;
   detail: string;
   icon: typeof Users;
   tone: "blue" | "green" | "amber" | "purple";
+  href?: string;
+  linkText?: string;
 }) {
   const tones = {
     blue: "bg-rose-50 text-[#9f1d35]",
@@ -368,6 +372,11 @@ function MetricCard({
         </div>
       </div>
       <p className="mt-4 text-xs leading-5 text-slate-500">{detail}</p>
+      {href && (
+        <Link href={href} className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-[#9f1d35] hover:underline">
+          {linkText || "View details"} <ArrowRight size={13} />
+        </Link>
+      )}
       <div className="dashboard-metric-glow mt-4 h-1 overflow-hidden rounded-full bg-slate-100">
         <div className={`dashboard-metric-glow-fill h-full rounded-full ${tone === "green" ? "bg-emerald-500" : tone === "amber" ? "bg-amber-500" : tone === "purple" ? "bg-violet-500" : "bg-[#F3192D]"}`} />
       </div>
