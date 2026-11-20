@@ -3,6 +3,22 @@ import { getSaasContext } from "@/lib/saas-context";
 
 export const dynamic = "force-dynamic";
 
+export async function GET(request: NextRequest) {
+  const ctx = await getSaasContext();
+  if ("error" in ctx) return NextResponse.json({ error: ctx.error }, { status: ctx.status });
+  const obligationId = request.nextUrl.searchParams.get("obligation_id") || "";
+  if (obligationId && !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(obligationId)) {
+    return NextResponse.json({ error: "Select a valid money-owed record." }, { status: 400 });
+  }
+  const filters = obligationId ? `&obligation_id=eq.${encodeURIComponent(obligationId)}` : "";
+  const response = await fetch(`${ctx.url}/rest/v1/business_obligation_payments?workspace_id=eq.${encodeURIComponent(ctx.workspaceId)}${filters}&select=id,obligation_id,payment_date,amount,currency,payment_method,payment_reference,principal_amount,interest_amount,notes&order=payment_date.desc,created_at.desc&limit=2000`, {
+    headers: { apikey: ctx.serviceKey, Authorization: `Bearer ${ctx.serviceKey}` },
+    cache: "no-store",
+  });
+  if (!response.ok) return NextResponse.json({ error: "Unable to load repayment history. Confirm the database migration has been applied." }, { status: 502 });
+  return NextResponse.json({ payments: await response.json() });
+}
+
 export async function POST(request: NextRequest) {
   const ctx = await getSaasContext();
   if ("error" in ctx) return NextResponse.json({ error: ctx.error }, { status: ctx.status });
