@@ -156,6 +156,11 @@ const navigation: { heading: string; items: NavItem[] }[] = [
         icon: Landmark,
       },
       {
+        label: "Money Owed",
+        href: "/workspace/finance/money-owed",
+        icon: Receipt,
+      },
+      {
         label: "Reports",
         href: "/workspace/finance/reports",
         icon: FileBarChart,
