@@ -65,3 +65,17 @@ export async function POST(request: NextRequest) {
   const rows = await response.json();
   return NextResponse.json({ review: Array.isArray(rows) ? rows[0] : null }, { status: 200 });
 }
+
+
+export async function DELETE(request: NextRequest) {
+  const ctx = await getSaasContext();
+  if ("error" in ctx) return NextResponse.json({ error: ctx.error }, { status: ctx.status });
+  const expenseId = request.nextUrl.searchParams.get("expense_id") || "";
+  if (!uuid.test(expenseId)) return NextResponse.json({ error: "Select a valid expense review." }, { status: 400 });
+  const response = await fetch(
+    `${base(ctx)}/business_expense_reviews?workspace_id=eq.${encodeURIComponent(ctx.workspaceId)}&expense_id=eq.${encodeURIComponent(expenseId)}`,
+    { method: "DELETE", headers: { ...headers(ctx), Prefer: "return=minimal" }, cache: "no-store" },
+  );
+  if (!response.ok) return NextResponse.json({ error: "Could not reopen this expense review." }, { status: 502 });
+  return NextResponse.json({ success: true });
+}
