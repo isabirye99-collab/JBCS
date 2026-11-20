@@ -75,6 +75,8 @@ type Expense = {
   created_at?: string | null;
 };
 
+type DashboardObligation = { id: string; currency: string; outstanding_amount: number | string; due_date?: string | null; status: string; };
+
 type SupplierPayment = {
   id: string;
   supplier_name?: string | null;
@@ -154,6 +156,11 @@ const navigation: { heading: string; items: NavItem[] }[] = [
         label: "Loans",
         href: "/workspace/finance/loans",
         icon: Landmark,
+      },
+      {
+        label: "Money Owed",
+        href: "/workspace/finance/money-owed",
+        icon: Receipt,
       },
       {
         label: "Reports",
@@ -333,12 +340,16 @@ function MetricCard({
   detail,
   icon: Icon,
   tone,
+  href,
+  linkText,
 }: {
   title: string;
   value: string;
   detail: string;
   icon: typeof Users;
   tone: "blue" | "green" | "amber" | "purple";
+  href?: string;
+  linkText?: string;
 }) {
   const tones = {
     blue: "bg-rose-50 text-[#9f1d35]",
@@ -361,6 +372,11 @@ function MetricCard({
         </div>
       </div>
       <p className="mt-4 text-xs leading-5 text-slate-500">{detail}</p>
+      {href && (
+        <Link href={href} className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-[#9f1d35] hover:underline">
+          {linkText || "View details"} <ArrowRight size={13} />
+        </Link>
+      )}
       <div className="dashboard-metric-glow mt-4 h-1 overflow-hidden rounded-full bg-slate-100">
         <div className={`dashboard-metric-glow-fill h-full rounded-full ${tone === "green" ? "bg-emerald-500" : tone === "amber" ? "bg-amber-500" : tone === "purple" ? "bg-violet-500" : "bg-[#F3192D]"}`} />
       </div>
@@ -404,6 +420,8 @@ export default function FinanceDashboardPage() {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [expenses, setExpenses] = useState<Expense[]>([]);
+  const [obligations, setObligations] = useState<DashboardObligation[]>([]);
+  const [obligationsAvailable, setObligationsAvailable] = useState(false);
   const [supplierPayments, setSupplierPayments] = useState<SupplierPayment[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -557,6 +575,23 @@ export default function FinanceDashboardPage() {
         errors.push("Supplier payment records could not be loaded. Check the supplier payments database setup.");
       }
 
+      // Optional until the Money Owed migration is applied; do not let its absence
+      // block the rest of the finance dashboard.
+      try {
+        const obligationResponse = await fetch("/api/saas/obligations", { cache: "no-store", credentials: "same-origin" });
+        if (obligationResponse.ok) {
+          const obligationPayload = await obligationResponse.json();
+          setObligations(Array.isArray(obligationPayload?.obligations) ? obligationPayload.obligations : []);
+          setObligationsAvailable(true);
+        } else {
+          setObligations([]);
+          setObligationsAvailable(false);
+        }
+      } catch {
+        setObligations([]);
+        setObligationsAvailable(false);
+      }
+
       setLastUpdated(new Date());
 
       if (errors.length) setError([...new Set(errors)].join(" "));
@@ -624,10 +659,28 @@ export default function FinanceDashboardPage() {
         new Date(a.created_at ?? a.issue_date ?? 0).getTime()
     );
 
+    const outstandingByCurrency = obligations.reduce<Record<string, number>>((totals, item) => {
+      const currency = item.currency || "UGX";
+      totals[currency] = (totals[currency] || 0) + Math.max(0, asNumber(item.outstanding_amount));
+      return totals;
+    }, {});
+    const outstandingObligationsLabel = Object.entries(outstandingByCurrency)
+      .filter(([, value]) => value > 0)
+      .map(([currency, value]) => money(value, currency))
+      .join(" · ") || money(0);
+    const todayKey = new Date().toISOString().slice(0, 10);
+    const dueSoonKey = new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10);
+    const activeObligations = obligations.filter(item => asNumber(item.outstanding_amount) > 0 && !["settled", "written off"].includes(normalStatus(item.status)));
+    const overdueObligationCount = activeObligations.filter(item => Boolean(item.due_date) && String(item.due_date) < todayKey && normalStatus(item.status) !== "disputed").length;
+    const dueSoonObligationCount = activeObligations.filter(item => Boolean(item.due_date) && String(item.due_date) >= todayKey && String(item.due_date) <= dueSoonKey).length;
+
     return {
       customerCount: customers.length,
       invoiceCount: invoices.length,
       outstanding,
+      outstandingObligationsLabel,
+      overdueObligationCount,
+      dueSoonObligationCount,
       overdueCount: overdueInvoices.length,
       overdueAmount: overdueInvoices.reduce(
         (sum, invoice) => sum + invoiceAmount(invoice),
@@ -657,7 +710,7 @@ export default function FinanceDashboardPage() {
         )
         .slice(0, 5),
     };
-  }, [customers, invoices, expenses, supplierPayments]);
+  }, [customers, invoices, expenses, supplierPayments, obligations]);
 
   const monthlyTrend = useMemo(() => {
     const now = new Date();
@@ -923,6 +976,15 @@ export default function FinanceDashboardPage() {
                 detail={`${stats.overdueCount} overdue invoice${stats.overdueCount === 1 ? "" : "s"}`}
                 icon={CircleDollarSign}
                 tone="amber"
+              />
+              <MetricCard
+                title="Money owed"
+                value={obligationsAvailable ? stats.outstandingObligationsLabel : "—"}
+                detail={obligationsAvailable ? `${stats.overdueObligationCount} overdue · ${stats.dueSoonObligationCount} due in 30 days` : "Money Owed register unavailable; check database migration"}
+                icon={Landmark}
+                tone="amber"
+                href="/workspace/finance/money-owed"
+                linkText="View register"
               />
               <MetricCard
                 title="Sales collected this month"

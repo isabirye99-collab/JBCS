@@ -13,6 +13,7 @@ const financeNavigation = [
   { label: "Sales Receipts", href: "/workspace/finance/sales-receipts", icon: Receipt },
   { label: "Payments", href: "/workspace/finance/payments", icon: CreditCard },
   { label: "Expenses", href: "/workspace/finance/expenses", icon: Wallet },
+  { label: "Money Owed", href: "/workspace/finance/money-owed", icon: Wallet },
   { label: "Supplier Payments", href: "/workspace/finance/supplier-payments", icon: CreditCard },
 { label: "Owner's Income & Commissions", href: "/workspace/finance/owner-income", icon: Wallet },
   { label: "Reports", href: "/workspace/finance/reports", icon: FileBarChart },
