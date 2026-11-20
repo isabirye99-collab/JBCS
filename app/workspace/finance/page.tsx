@@ -359,16 +359,16 @@ function MetricCard({
   };
 
   return (
-    <div className="dashboard-metric-card group rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm transition duration-300 hover:-translate-y-1 hover:border-rose-200 hover:shadow-lg hover:shadow-rose-950/5">
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <p className="text-sm font-medium text-slate-500">{title}</p>
-          <p className="mt-3 text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl">
+    <div className="dashboard-metric-card group rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm transition duration-300 hover:-translate-y-1 hover:border-rose-200 hover:shadow-lg hover:shadow-rose-950/5 sm:p-5">
+      <div className="flex min-w-0 items-start justify-between gap-2 sm:gap-3">
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-medium leading-5 text-slate-500">{title}</p>
+          <p className="mt-3 max-w-full text-[clamp(1.05rem,1.35vw,1.65rem)] font-bold leading-tight tracking-tight text-slate-950 [overflow-wrap:anywhere]">
             <AnimatedMetricValue value={value} />
           </p>
         </div>
-        <div className={`rounded-xl p-3 transition duration-300 group-hover:scale-110 ${tones[tone]}`}>
-          <Icon size={21} />
+        <div className={`shrink-0 rounded-xl p-2.5 transition duration-300 group-hover:scale-110 sm:p-3 ${tones[tone]}`}>
+          <Icon size={20} />
         </div>
       </div>
       <p className="mt-4 text-xs leading-5 text-slate-500">{detail}</p>
@@ -923,6 +923,20 @@ export default function FinanceDashboardPage() {
                 >
                   <FilePlus2 size={17} />
                   Create invoice
+                </Link>
+                <Link
+                  href="/workspace/finance/payments"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-rose-200 hover:bg-rose-50"
+                >
+                  <CreditCard size={17} />
+                  Record payment
+                </Link>
+                <Link
+                  href="/workspace/finance/expenses"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-rose-200 hover:bg-rose-50"
+                >
+                  <Wallet size={17} />
+                  Add expense
                 </Link>
               </div>
             </section>
