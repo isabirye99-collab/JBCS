@@ -4,13 +4,14 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
 import { RefreshCw, Plus, Search, CircleAlert } from "lucide-react";
 
+type Expense = { id: string; expense_date: string; category: string; description: string; supplier_name?: string | null; amount: number | string; currency: string; };
 type Obligation = {
   id: string; obligation_type: string; lender_type: string; lender_name: string;
   lender_contact?: string | null; reference_number?: string | null; description: string;
   currency: string; original_amount: number | string; outstanding_amount: number | string;
   interest_rate?: number | string | null; interest_type: string;
   received_or_incurred_date: string; due_date?: string | null; repayment_frequency: string;
-  status: string; notes?: string | null;
+  status: string; notes?: string | null; source_expense_id?: string | null;
 };
 const amount = (value: number | string, currency = "UGX") => {
   try { return new Intl.NumberFormat("en-UG", { style: "currency", currency, maximumFractionDigits: 2 }).format(Number(value || 0)); }
@@ -22,6 +23,8 @@ const blank = () => ({ obligation_type: "loan", lender_type: "individual", lende
 
 export default function MoneyOwedPage() {
   const [items, setItems] = useState<Obligation[]>([]);
+  const [expenses, setExpenses] = useState<Expense[]>([]);
+  const [reconciling, setReconciling] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [showForm, setShowForm] = useState(false);
@@ -35,10 +38,16 @@ export default function MoneyOwedPage() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await fetch("/api/saas/obligations", { cache: "no-store" });
+      const [response, expenseResponse] = await Promise.all([
+        fetch("/api/saas/obligations", { cache: "no-store" }),
+        fetch("/api/saas/expenses", { cache: "no-store" }),
+      ]);
       const data = await response.json();
+      const expenseData = await expenseResponse.json();
       if (!response.ok) throw new Error(data.error || "Unable to load money owed records.");
+      if (!expenseResponse.ok) throw new Error(expenseData.error || "Unable to load existing expenses for reconciliation.");
       setItems(Array.isArray(data.obligations) ? data.obligations : []);
+      setExpenses(Array.isArray(expenseData.expenses) ? expenseData.expenses : []);
       setMessage("");
     } catch (e) { setMessage(e instanceof Error ? e.message : "Unable to load records."); }
     finally { setLoading(false); }
@@ -49,6 +58,19 @@ export default function MoneyOwedPage() {
     const matches = `${item.lender_name} ${item.description} ${item.reference_number || ""} ${item.obligation_type} ${item.lender_type}`.toLowerCase().includes(q);
     return matches && (status === "all" || item.status === status);
   }), [items, query, status]);
+  const linkedExpenseIds = new Set(items.map(item => item.source_expense_id).filter((id): id is string => Boolean(id)));
+  const expensesForReview = expenses.filter(expense => !linkedExpenseIds.has(expense.id));
+  async function reconcileExpense(expense: Expense) {
+    setReconciling(expense.id); setMessage("");
+    try {
+      const response = await fetch("/api/saas/obligations/from-expense", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ expense_id: expense.id }) });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Could not create a review record.");
+      setMessage("Expense linked to Money Owed for review. Confirm it is still unpaid before using the balance as a liability.");
+      await load();
+    } catch (e) { setMessage(e instanceof Error ? e.message : "Could not reconcile this expense."); }
+    finally { setReconciling(null); }
+  }
   const totalsByCurrency = visible.reduce<Record<string, number>>((totals, item) => {
     const currency = item.currency || "UGX";
     totals[currency] = (totals[currency] || 0) + Number(item.outstanding_amount || 0);
@@ -114,6 +136,7 @@ export default function MoneyOwedPage() {
         <label className="jbcs-span-2">Notes<textarea rows={3} maxLength={4000} value={form.notes} onChange={e => setForm(s => ({...s,notes:e.target.value}))} placeholder="Agreement details, land reference, payment promises, etc." /></label>
         <div className="jbcs-span-2"><button className="jbcs-primary-button" disabled={saving}>{saving ? "Saving…" : "Save record"}</button></div>
       </form></section>}
+      <section className="jbcs-panel mb-5"><div className="jbcs-panel-heading"><div><p className="jbcs-eyebrow">RECONCILIATION REVIEW</p><h2>Existing expenses to check</h2><p className="mt-1 text-sm text-slate-500">Only create a Money Owed review record when the original expense is genuinely unpaid. This does not edit or delete the expense.</p></div></div><div className="jbcs-table-wrap"><table className="jbcs-table"><thead><tr><th>Date</th><th>Expense / supplier</th><th>Amount</th><th>Action</th></tr></thead><tbody>{expensesForReview.slice(0,100).map(expense => <tr key={expense.id}><td>{dateLabel(expense.expense_date)}</td><td><strong>{expense.description}</strong><small>{expense.category} · {expense.supplier_name || "Payee not specified"}</small></td><td className="jbcs-amount">{amount(Number(expense.amount),expense.currency)}</td><td><button type="button" className="jbcs-secondary-button whitespace-nowrap" disabled={reconciling !== null} onClick={() => void reconcileExpense(expense)}>{reconciling === expense.id ? "Linking…" : "Review as owed"}</button></td></tr>)}{!expensesForReview.length && <tr><td colSpan={4} className="jbcs-empty">All currently loaded expenses are linked to a Money Owed record or no expenses are available.</td></tr>}</tbody></table></div><p className="mt-3 text-xs text-slate-500">Showing up to 100 unlinked expenses at a time. Linking creates a review record with the original amount; verify the outstanding amount before relying on it for reporting.</p></section>
       <section className="jbcs-panel"><div className="jbcs-panel-heading"><div><p className="jbcs-eyebrow">OBLIGATIONS REGISTER</p><h2>Loans and amounts owed</h2></div></div><div className="jbcs-filters"><label className="flex min-w-0 flex-1 items-center gap-2"><Search size={16}/><input aria-label="Search obligations" placeholder="Search lender, description or reference…" value={query} onChange={e => setQuery(e.target.value)} /></label><select aria-label="Filter status" value={status} onChange={e => setStatus(e.target.value)}><option value="all">All statuses</option><option value="open">Open</option><option value="partially_paid">Partially paid</option><option value="overdue">Overdue</option><option value="settled">Settled</option><option value="disputed">Disputed</option><option value="written_off">Written off</option></select></div><div className="jbcs-table-wrap"><table className="jbcs-table"><thead><tr><th>Lender / payee</th><th>Type / description</th><th>Incurred</th><th>Due date</th><th>Original</th><th>Outstanding</th><th>Status</th><th>Action</th></tr></thead><tbody>{visible.map(item => <tr key={item.id}><td><strong>{item.lender_name}</strong><small>{item.lender_contact || item.reference_number || "No contact/reference"}</small></td><td>{item.obligation_type.replaceAll("_"," ")}<small>{item.description}</small></td><td>{dateLabel(item.received_or_incurred_date)}</td><td>{dateLabel(item.due_date)}</td><td className="jbcs-amount">{amount(Number(item.original_amount),item.currency)}</td><td className="jbcs-amount">{amount(Number(item.outstanding_amount),item.currency)}</td><td><span className="inline-flex rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold capitalize">{item.status.replaceAll("_"," ")}</span></td><td>{Number(item.outstanding_amount) > 0 && item.status !== "written_off" && <button type="button" className="jbcs-secondary-button whitespace-nowrap" onClick={() => { setPaying(item); setPaymentForm({ payment_date: today(), amount: "", interest_amount: "0", payment_method: "bank_transfer", payment_reference: "", notes: "" }); }}>Record payment</button>}</td></tr>)}{!visible.length && <tr><td colSpan={8} className="jbcs-empty">{loading ? "Loading records…" : "No money owed records match these filters."}</td></tr>}</tbody></table></div><div className="mt-3 flex items-center gap-2 text-xs text-slate-500"><CircleAlert size={14}/> Repayments update this register atomically. This does not yet post general-ledger entries or reconcile existing Expenses.</div></section>
       <div className="mt-4"><Link href="/workspace/finance/expenses" className="text-sm font-semibold text-[#F3192D]">Review existing Expenses →</Link></div>
     </main>
