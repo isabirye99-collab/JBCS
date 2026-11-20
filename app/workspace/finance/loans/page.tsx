@@ -68,7 +68,7 @@ export default function LoansPage() {
 
   return <main style={{minHeight:"100vh",background:"#f7f7f8",padding:"26px clamp(14px,3vw,34px)",color:"#211f22"}}>
     <div style={{maxWidth:1440,margin:"0 auto"}}>
-      <Link href="/workspace/finance" style={{display:"inline-flex",alignItems:"center",gap:7,color:"#7b2438",textDecoration:"none",fontWeight:700,fontSize:13,marginBottom:18}}><ArrowLeft size={16}/> Finance overview</Link>
+      <div style={{display:"flex",gap:16,alignItems:"center",flexWrap:"wrap",marginBottom:18}}><Link href="/workspace/finance" style={{display:"inline-flex",alignItems:"center",gap:7,color:"#7b2438",textDecoration:"none",fontWeight:700,fontSize:13}}><ArrowLeft size={16}/> Finance overview</Link><Link href="/workspace/finance/money-owed" style={{display:"inline-flex",alignItems:"center",gap:7,color:"#7b2438",textDecoration:"none",fontWeight:700,fontSize:13}}>All loans &amp; money owed →</Link></div>
       <header style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",gap:16,flexWrap:"wrap",marginBottom:22}}>
         <div><p style={{fontSize:11,fontWeight:800,letterSpacing:".16em",color:"#9f1d35",margin:"0 0 8px"}}>FINANCE / BORROWING</p><h1 style={{fontSize:"clamp(27px,3vw,36px)",margin:0,letterSpacing:"-.04em"}}>Loans</h1><p style={{color:"#77717a",fontSize:14,margin:"8px 0 0"}}>Track loan terms, scheduled instalments and confirmed payments.</p></div>
         <button onClick={()=>void load()} disabled={loading} style={{border:"1px solid #ded9dc",borderRadius:9,background:"#fff",padding:"10px 13px",fontWeight:700,cursor:"pointer",display:"inline-flex",gap:8,alignItems:"center"}}><RefreshCw size={15}/>{loading?"Refreshing":"Refresh"}</button>
