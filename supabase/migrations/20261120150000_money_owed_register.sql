@@ -126,3 +126,25 @@ $$;
 
 revoke all on function public.record_business_obligation_payment(uuid, uuid, date, numeric, numeric, numeric, text, text, text, uuid) from public, anon, authenticated;
 grant execute on function public.record_business_obligation_payment(uuid, uuid, date, numeric, numeric, numeric, text, text, text, uuid) to service_role;
+
+
+-- Keep explicit review decisions for existing expenses that are not outstanding payables.
+-- This prevents paid expenses and already-recorded loan repayments from repeatedly
+-- appearing as candidates for conversion into a liability.
+create table if not exists public.business_expense_reviews (
+  id uuid primary key default gen_random_uuid(),
+  workspace_id uuid not null,
+  expense_id uuid not null,
+  classification text not null check (classification in ('already_paid', 'ordinary_expense', 'loan_repayment')),
+  notes text,
+  reviewed_by uuid,
+  reviewed_at timestamptz not null default now(),
+  created_at timestamptz not null default now(),
+  constraint business_expense_reviews_workspace_expense_key unique (workspace_id, expense_id)
+);
+create index if not exists business_expense_reviews_workspace_classification_idx
+  on public.business_expense_reviews (workspace_id, classification);
+alter table public.business_expense_reviews enable row level security;
+grant select, insert, update, delete on public.business_obligations to service_role;
+grant select, insert, update, delete on public.business_obligation_payments to service_role;
+grant select, insert, update, delete on public.business_expense_reviews to service_role;
