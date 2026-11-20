@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
-import { ArrowLeft, RefreshCw, Plus, Search, HandCoins, CircleAlert } from "lucide-react";
+import { RefreshCw, Plus, Search, CircleAlert } from "lucide-react";
 
 type Obligation = {
   id: string; obligation_type: string; lender_type: string; lender_name: string;
