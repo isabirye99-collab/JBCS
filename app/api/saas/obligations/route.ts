@@ -65,7 +65,9 @@ export async function POST(request: NextRequest) {
     original_amount: originalAmount, outstanding_amount: outstandingAmount, interest_rate: interestRate,
     interest_type: interestType, received_or_incurred_date: incurredDate, due_date: dueDate || null,
     repayment_frequency: frequency, status, notes: clean(body.notes, 4000) || null,
-    source_expense_id: clean(body.source_expense_id, 64) || null, created_by: ctx.session.user.id,
+    // Only the dedicated, workspace-validated expense reconciliation endpoint
+    // may link an existing expense to an obligation.
+    source_expense_id: null, created_by: ctx.session.user.id,
   };
   const response = await fetch(`${base(ctx)}/business_obligations`, {
     method: "POST",
